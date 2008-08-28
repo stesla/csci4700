@@ -1,0 +1,32 @@
+array xyz[ 10 ], abc[ 20 ];
+array foobar[ 100 ];
+global i, j;
+global k;
+
+main( a, b[], c )
+{
+	array b[ 30 ], c[40];
+	global x, y;
+	array b[5 ];
+	f(x,y);
+	read( b );
+	write( "string" );
+	write( ( 3 + b ) );
+	a = b + c * d;
+	for( i = 6; i < 45; i++ )
+		while ( this )
+			this[ 43 ]++;
+	return( 4 + b );
+}
+
+another()
+{
+	global glob;
+	array gunk[ 30 ];
+	gunk[ 5 ] = gunk[ 6 ];
+}
+
+third()
+{
+	x = func();
+}
