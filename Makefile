@@ -10,7 +10,7 @@ ${PROGNAME}: ${OBJS} parser.o lexer.o
 	${CC} ${CFLAGS} -o $@ $^ ${LDFLAGS}
 
 lexer.c: lexer.l
-	${LEX} -t $^ > $@
+	${LEX} -d -t $^ > $@
 
 parser.c: parser.y
 	${YACC} -t --defines=y.tab.h -o $@ $^

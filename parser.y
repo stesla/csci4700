@@ -35,9 +35,11 @@ char        listing_line[ 132 ];    // for listings.
 int     err_count;      // # of errors.
 short       listing;        // true gives listing
 short           echo;                   // true echos input
-short           lex_debug;              // true debugs scanner
 short           line = 0;           // For listings
 ifstream        infile;
+
+extern int yyget_debug(void);
+extern void yyset_debug(int value);
 
 %}
 
@@ -254,6 +256,9 @@ int main( int ac, char *av[] )
     char *filename;
     int  i;
 
+    /* Default debugging to off */
+    yyset_debug(FALSE);
+
     if ( ac < 2 )
     exit( usage() );
     else
@@ -265,7 +270,7 @@ int main( int ac, char *av[] )
                         echo = ! echo;
                         break;
                     case 'l':
-                        lex_debug = ! lex_debug;
+                      yyset_debug(!yyget_debug());
                         break;
                     case 's':
                         listing = ! listing;
