@@ -18,11 +18,11 @@ For:     CSCI4700
 #include        <stdlib.h>       // Possibly needed
 #include        <ctype.h>        // Possibly needed
 #include        <string.h>       // Possibly needed
-#include        "parse.h"
+#include        "parser.h"
 
 using namespace std;
 
-extern int  yydebug; // Use if you want the Bison generated debugging
+extern int yydebug; // Use if you want the Bison generated debugging
 
 int usage( void );
 int yyerror( const char *msg );
@@ -31,12 +31,12 @@ void detab( char *line );
 int yylex( void );
 extern "C" int yywrap( void );
 
-char		listing_line[ 132 ];	// for listings.	
-int		err_count;		// # of errors.		
-short		listing;		// true gives listing	
-short           echo;                   // true echos input     
-short           lex_debug;              // true debugs scanner  
-short           line = 0;       	// For listings		
+char        listing_line[ 132 ];    // for listings.
+int     err_count;      // # of errors.
+short       listing;        // true gives listing
+short           echo;                   // true echos input
+short           lex_debug;              // true debugs scanner
+short           line = 0;           // For listings
 ifstream        infile;
 
 %}
@@ -53,7 +53,7 @@ know about that one.
 
 %token IDENTIFIER CONSTANT STRING_LITERAL
 %token INC_OP DEC_OP LE_OP GE_OP EQ_OP NE_OP
-%token AND_OP OR_OP 
+%token AND_OP OR_OP
 %token IF ELSE WHILE FOR RETURN
 
 %expect 1
@@ -61,14 +61,14 @@ know about that one.
 %%
 
 translation_unit
-	: external_declaration
-	| translation_unit external_declaration
-	;
+    : external_declaration
+    | translation_unit external_declaration
+    ;
 
 external_declaration
-	: IDENTIFIER '(' formal_list ')' block
+    : IDENTIFIER '(' formal_list ')' block
         | decl
-	;
+    ;
 
 formal_list
         : formal_list ',' formal
@@ -82,16 +82,16 @@ formal
         ;
 
 block
-	: '{' '}'
-	| '{' statement_list '}'
-	| '{' decl_list '}'
-	| '{' decl_list statement_list '}'
-	;
+    : '{' '}'
+    | '{' statement_list '}'
+    | '{' decl_list '}'
+    | '{' decl_list statement_list '}'
+    ;
 
 statement_list
-	: statement
-	| statement_list statement
-	;
+    : statement
+    | statement_list statement
+    ;
 
 decl_list
         : decl
@@ -105,140 +105,140 @@ decl
 
 a_list
         : IDENTIFIER '[' CONSTANT ']'
-        | a_list ',' IDENTIFIER '[' CONSTANT ']' 
+        | a_list ',' IDENTIFIER '[' CONSTANT ']'
         ;
 
 statement
-	: block
-	| expression_stmt
-	| selection_stmt
-	| iteration_stmt
-	| return_stmt
+    : block
+    | expression_stmt
+    | selection_stmt
+    | iteration_stmt
+    | return_stmt
         | READ '(' IDENTIFIER ')' ';'
         | WRITE '(' primary_expression ')' ';'
-	;
+    ;
 
 expression_stmt
-	: ';'
-	| expression ';'
-	;
+    : ';'
+    | expression ';'
+    ;
 
 selection_stmt
-	: IF '(' expression ')' statement
-	| IF '(' expression ')' statement ELSE statement
-	;
+    : IF '(' expression ')' statement
+    | IF '(' expression ')' statement ELSE statement
+    ;
 
 iteration_stmt
-	: WHILE '(' expression ')' statement
-	| FOR '(' expression_stmt expression_stmt ')' statement
-	| FOR '(' expression_stmt expression_stmt expression ')' statement
-	;
+    : WHILE '(' expression ')' statement
+    | FOR '(' expression_stmt expression_stmt ')' statement
+    | FOR '(' expression_stmt expression_stmt expression ')' statement
+    ;
 
 return_stmt
-	: RETURN ';'
-	| RETURN expression ';'
-	;
+    : RETURN ';'
+    | RETURN expression ';'
+    ;
 
 expression
-	: assignment_expression
-	| expression ',' assignment_expression
-	;
+    : assignment_expression
+    | expression ',' assignment_expression
+    ;
 
 primary_expression
-	: IDENTIFIER
-	| CONSTANT
-	| STRING_LITERAL
-	| '(' expression ')'
-	;
+    : IDENTIFIER
+    | CONSTANT
+    | STRING_LITERAL
+    | '(' expression ')'
+    ;
 
 postfix_expression
-	: primary_expression
-	| postfix_expression '[' expression ']'
-	| postfix_expression INC_OP
-	| postfix_expression DEC_OP
-	;
+    : primary_expression
+    | postfix_expression '[' expression ']'
+    | postfix_expression INC_OP
+    | postfix_expression DEC_OP
+    ;
 
 unary_expression
-	: postfix_expression
-	| INC_OP unary_expression
-	| DEC_OP unary_expression
-	| unary_operator unary_expression
-	;
+    : postfix_expression
+    | INC_OP unary_expression
+    | DEC_OP unary_expression
+    | unary_operator unary_expression
+    ;
 
 unary_operator
-	: '&'
-	| '*'
-	| '+'
-	| '-'
-	| '!'
-	;
+    : '&'
+    | '*'
+    | '+'
+    | '-'
+    | '!'
+    ;
 
 multiplicative_expression
-	: unary_expression
-	| multiplicative_expression '*' unary_expression
-	| multiplicative_expression '/' unary_expression
-	| multiplicative_expression '%' unary_expression
-	;
+    : unary_expression
+    | multiplicative_expression '*' unary_expression
+    | multiplicative_expression '/' unary_expression
+    | multiplicative_expression '%' unary_expression
+    ;
 
 additive_expression
-	: multiplicative_expression
-	| additive_expression '+' multiplicative_expression
-	| additive_expression '-' multiplicative_expression
-	;
+    : multiplicative_expression
+    | additive_expression '+' multiplicative_expression
+    | additive_expression '-' multiplicative_expression
+    ;
 
 relational_expression
-	: additive_expression
-	| relational_expression '<' additive_expression
-	| relational_expression '>' additive_expression
-	| relational_expression LE_OP additive_expression
-	| relational_expression GE_OP additive_expression
-	;
+    : additive_expression
+    | relational_expression '<' additive_expression
+    | relational_expression '>' additive_expression
+    | relational_expression LE_OP additive_expression
+    | relational_expression GE_OP additive_expression
+    ;
 
 equality_expression
-	: relational_expression
-	| equality_expression EQ_OP relational_expression
-	| equality_expression NE_OP relational_expression
-	;
+    : relational_expression
+    | equality_expression EQ_OP relational_expression
+    | equality_expression NE_OP relational_expression
+    ;
 
 and_expression
-	: equality_expression
-	| and_expression '&' equality_expression
-	;
+    : equality_expression
+    | and_expression '&' equality_expression
+    ;
 
 exclusive_or_expression
-	: and_expression
-	| exclusive_or_expression '^' and_expression
-	;
+    : and_expression
+    | exclusive_or_expression '^' and_expression
+    ;
 
 inclusive_or_expression
-	: exclusive_or_expression
-	| inclusive_or_expression '|' exclusive_or_expression
-	;
+    : exclusive_or_expression
+    | inclusive_or_expression '|' exclusive_or_expression
+    ;
 
 logical_and_expression
-	: inclusive_or_expression
-	| logical_and_expression AND_OP inclusive_or_expression
-	;
+    : inclusive_or_expression
+    | logical_and_expression AND_OP inclusive_or_expression
+    ;
 
 logical_or_expression
-	: logical_and_expression
-	| logical_or_expression OR_OP logical_and_expression
-	;
+    : logical_and_expression
+    | logical_or_expression OR_OP logical_and_expression
+    ;
 
 // Modified this and moved the function calls here from postfix_expression so that one can NOT
 // call a function in the middle of an expression; this is harder for students to implement
 // because of the live registers in the expression.
 assignment_expression
-	: logical_or_expression
-	| postfix_expression '(' ')'
-	| postfix_expression '(' identifier_list ')'
-	| unary_expression '=' assignment_expression
-	;
+    : logical_or_expression
+    | postfix_expression '(' ')'
+    | postfix_expression '(' identifier_list ')'
+    | unary_expression '=' assignment_expression
+    ;
 
 identifier_list
-	: IDENTIFIER
-	| identifier_list ',' IDENTIFIER
-	;
+    : IDENTIFIER
+    | identifier_list ',' IDENTIFIER
+    ;
 
 %%
 
@@ -250,42 +250,42 @@ MAIN
 
 int main( int ac, char *av[] )
 {
-    
+
     char *filename;
     int  i;
 
     if ( ac < 2 )
-	exit( usage() );
+    exit( usage() );
     else
-	for( i = 1; i < ac; i++ )
-	    if ( av[ i ][ 0 ] == '-' )
-		switch( av[ i ][ 1 ] )
-		{
-                    case 'e':       
+    for( i = 1; i < ac; i++ )
+        if ( av[ i ][ 0 ] == '-' )
+        switch( av[ i ][ 1 ] )
+        {
+                    case 'e':
                         echo = ! echo;
                         break;
-                    case 'l':       
+                    case 'l':
                         lex_debug = ! lex_debug;
                         break;
-                    case 's':       
+                    case 's':
                         listing = ! listing;
                         break;
-                    case 'y':  
+                    case 'y':
                         yydebug = ! yydebug;
                         break;
                     default:
                         exit( usage() );
-		}
-	    else
-		filename = av[ i ];
-    
+        }
+        else
+        filename = av[ i ];
+
     infile.open( filename, ios::in );
     if ( ! infile )
     {
         cerr << "Can't open source file!\n";
-	exit( 2 );
+    exit( 2 );
     }
-    
+
     // We can test the return of yyparse, but I'll go ahead
     // and track an error count internally and use that.
 
@@ -300,10 +300,10 @@ int main( int ac, char *av[] )
     }
     else
     {
-	cerr << "Completed with " << err_count << "errors.\n";
-	return( 1 );
+    cerr << "Completed with " << err_count << "errors.\n";
+    return( 1 );
     }
-    
+
 }
 
 /*===========================================================================
@@ -335,7 +335,7 @@ yyerror
 
 This is called from within the parser when something is not matching a
 grammar rule. It can also be called manually (see de_reference) to
-generate an error for some other reason. 
+generate an error for some other reason.
 
 Inputs:  None
 Outputs: None
@@ -395,10 +395,10 @@ Inputs:  buf - pointer to a place where the scanner wants the data
          max_size - the largest buffer that the scanner will accept
 Outputs: buf - filled in with data from the input file (one byte at a
          time using this function, although the data is still buffered
-	 internally to us, so it isn't too inefficient).
+     internally to us, so it isn't too inefficient).
 Returns: 0 on end-of-file
          N - number of bytes read into "buf" (always one for this
-	 version)
+     version)
 
 =========================================================================== */
 
@@ -407,29 +407,29 @@ int my_input( unsigned char *buf, int max_size )
 
     if ( ! infile.eof() )
         infile.getline( listing_line, sizeof( listing_line ) );
-    
+
     if ( infile.eof() )
     {
-	listing_line[ 0 ] = '\0';
-	*buf = '\0';
-	return( 0 ); // A.k.a. YY_NULL 
+    listing_line[ 0 ] = '\0';
+    *buf = '\0';
+    return( 0 ); // A.k.a. YY_NULL
     }
     else
     {
-	char *s;
-	// Getline tosses the newline, but we want it on there.
-	// Various things depend on it (it is treated as a token).
-	strcat( listing_line, "\n" );
-	if ( listing )
+    char *s;
+    // Getline tosses the newline, but we want it on there.
+    // Various things depend on it (it is treated as a token).
+    strcat( listing_line, "\n" );
+    if ( listing )
         {
-  	    detab( listing_line );
+        detab( listing_line );
             cout << listing_line;
         }
-	line++;
+    line++;
         // For some reason FLEX wants this as unsigned char, but
         // strcpy wants it as signed char...
         strcpy( (char *) buf, listing_line );
-	return( strlen( listing_line ) );
+    return( strlen( listing_line ) );
     }
 }
 
@@ -450,24 +450,24 @@ Returns: none
 
 void detab( char *line )
 {
-    
-    static char	  temp[ BUFSIZ ];
+
+    static char   temp[ BUFSIZ ];
     register char *s, *d;
-    int		  col;
+    int       col;
 
     col = 0; s = line; d = temp;
     while ( *s )
-	if ( *s != '\t' )
-	    *d++ = *s++, col++;
-	else
-	{
-	    do	{
-		*d++ = ' ';
-		col++;
-	    } while ( col % 8 );
-	    s++;
-	}
+    if ( *s != '\t' )
+        *d++ = *s++, col++;
+    else
+    {
+        do  {
+        *d++ = ' ';
+        col++;
+        } while ( col % 8 );
+        s++;
+    }
     *d = '\0';
     (void) strcpy( line, temp );
-    
-} 
+
+}

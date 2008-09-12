@@ -1,30 +1,22 @@
-# Template grammar for 4700 Fall 2005
+PROGNAME=c--
 
 YACC=bison
 LEX=flex
 CC=g++
-LN=g++
-COPT=-g
-LOPT=-g
-DIFF=diff
+CFLAGS=-g
+LDFLAGS=
 
-parse :	parse.o scanner.o
-	$(CC) $(LOPT) -o parse parse.o scanner.o
-	rm parse.o scanner.o
+${PROGNAME}: ${OBJS} parser.o lexer.o
+	${CC} ${CFLAGS} -o $@ $^ ${LDFLAGS}
 
-# Bison has this annoying habit of sending yydebug to stderr
-# so I change that to go to stdout, which I like better.
-# Bison puts output in the non-traditional place; move it.
-parse.o :	parse.y parse.h
-	$(YACC) -d -t parse.y
-	sed "s/stderr/stdout/" parse.tab.c >parse.cpp ; rm parse.tab.c
-	mv parse.tab.h y.tab.h
-	$(CC) $(COPT) -c parse.cpp
+lexer.c: lexer.l
+	${LEX} -t $^ > $@
 
-scanner.o :	scanner.lex y.tab.h parse.h
-	$(LEX) scanner.lex
-	mv lex.yy.c scanner.cpp
-	$(CC) $(COPT) -c scanner.cpp
+parser.c: parser.y
+	${YACC} -t --defines=y.tab.h -o $@ $^
 
-clean :	
-	rm parse.cpp scanner.cpp *.o parse parse.exe *~ \#*\# y.tab.h ram.image
+lexer.o: lexer.c y.tab.h parser.h
+y.tab.h: parser.c
+
+clean:
+	rm *.o c-- parser.c lexer.c y.tab.h

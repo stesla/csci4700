@@ -10,7 +10,7 @@ Scanner for test grammar for CSCI4700 Fall 2005
 #include        <iomanip>
 #include        <stdlib.h>
 #include        <string.h>
-#include        "parse.h"
+#include        "parser.h"
 #include        "y.tab.h"
 
 using namespace std;

@@ -1,11 +1,13 @@
+#ifndef PARSER_H
+#define PARSER_H
 /* ===========================================================================
 
 header file for sample Flex/Bison parser.
 
 =========================================================================== */
 
-#define	TRUE		1
-#define	FALSE		0
+#define TRUE        1
+#define FALSE       0
 
 #define SYM_LEN         32
 
@@ -19,3 +21,5 @@ struct  yystype {
 #undef  YYSTYPE
 #endif
 #define YYSTYPE struct yystype
+
+#endif PARSER_H
