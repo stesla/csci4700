@@ -1,55 +1,19 @@
 %{
 
-/* ===========================================================================
-
-Parser template, supplied as a starting point for compiler
-construction. Use and abuse as you wish.
-
-Author:  Bill Mahoney
-For:     CSCI4700
-
-=========================================================================== */
-
-#include        <iostream>       // Just plain needed...
-#include        <iomanip>        // Needed for setw, hex, ...
-#include        <fstream>        // Needed for ofstream type
-#include        <stdio.h>        // Possibly needed
-#include        <unistd.h>       // Possibly needed
-#include        <stdlib.h>       // Possibly needed
-#include        <ctype.h>        // Possibly needed
-#include        <string.h>       // Possibly needed
-#include        "parser.h"
-
-using namespace std;
-
-extern int yydebug; // Use if you want the Bison generated debugging
+#include <stdlib.h>
+#include <stdio.h>
+#include "parser.h"
 
 int usage( void );
-int yyerror( const char *msg );
-int my_input( char *buf, int max_size );
-void detab( char *line );
-int yylex( void );
-extern "C" int yywrap( void );
-
-char        listing_line[ 132 ];    // for listings.
-int     err_count;      // # of errors.
-short       listing;        // true gives listing
-short           echo;                   // true echos input
-short           line = 0;           // For listings
-ifstream        infile;
-
+ void yyerror(const char *s);
 extern int yyget_debug(void);
+int yylex( void );
 extern void yyset_debug(int value);
+extern int yywrap( void );
 
+extern int yydebug;
+extern FILE *yyin;
 %}
-
-/* ===========================================================================
-
-Here's the grammar part. The %expect says to expect one conflict
-(shift/reduce). In this case it is the dangling else problem and we
-know about that one.
-
-=========================================================================== */
 
 %token ARRAY GLOBAL READ WRITE
 
@@ -244,235 +208,64 @@ identifier_list
 
 %%
 
-/* ===========================================================================
-
-MAIN
-
-=========================================================================== */
-
-int main( int ac, char *av[] )
+int main(int argc, char **argv)
 {
+  char *filename;
+  int  i;
+  int result;
 
-    char *filename;
-    int  i;
+  /* Default debugging to off */
+  yyset_debug(FALSE);
 
-    /* Default debugging to off */
-    yyset_debug(FALSE);
-
-    if ( ac < 2 )
+  if ( argc < 2 )
     exit( usage() );
-    else
-    for( i = 1; i < ac; i++ )
-        if ( av[ i ][ 0 ] == '-' )
-        switch( av[ i ][ 1 ] )
-        {
-                    case 'e':
-                        echo = ! echo;
-                        break;
-                    case 'l':
-                      yyset_debug(!yyget_debug());
-                        break;
-                    case 's':
-                        listing = ! listing;
-                        break;
-                    case 'y':
-                        yydebug = ! yydebug;
-                        break;
-                    default:
-                        exit( usage() );
-        }
-        else
-        filename = av[ i ];
+  else
+    for( i = 1; i < argc; i++ )
+      if ( argv[ i ][ 0 ] == '-' )
+        switch( argv[ i ][ 1 ] )
+          {
+          case 'l':
+            yyset_debug(!yyget_debug());
+            break;
+          case 'y':
+            yydebug = ! yydebug;
+            break;
+          default:
+            exit( usage() );
+          }
+      else
+        filename = argv[ i ];
 
-    infile.open( filename, ios::in );
-    if ( ! infile )
+  yyin = fopen(filename, "r");
+  result = yyparse();
+  fclose(yyin);
+
+  if (result)
     {
-        cerr << "Can't open source file!\n";
-    exit( 2 );
+      fprintf(stderr, "Failed to compile\n");
+      return(1);
     }
-
-    // We can test the return of yyparse, but I'll go ahead
-    // and track an error count internally and use that.
-
-    (void) yyparse();
-
-    infile.close();
-
-    if ( ! err_count )
+  else
     {
-        cout << "Compiled OK\n";
-        return( 0 );
+      printf("Compiled OK!\n");
+      return(0);
     }
-    else
-    {
-    cerr << "Completed with " << err_count << "errors.\n";
-    return( 1 );
-    }
-
 }
-
-/*===========================================================================
-
-usage
-
-Print usage message, curl up, and die. Basically we just return 1
-always, as we are usually called as "exit( usage() )". So there.
-
-Inputs:  None
-Outputs: None
-Returns: 1 always
-
-=========================================================================== */
 
 int usage( void )
 {
-    cout << "usage: whatever <file> [-e] [-l] [-m size ] [-p] [-s] [-y]\n"
-         << "-e == turns on echo of input file\n"
-         << "-l == turns on lex debug flag\n"
-         << "-s == enable a listing of the program being compiled.\n"
-         << "-y == turns on yydebug flag\n";
-    return( 1 );
+  printf("usage: whatever <file> [-l] [-y]\n");
+  printf("-l == turns on lex debug flag\n");
+  printf("-y == turns on yydebug flag\n");
+  return( 1 );
 }
-
-/* ===========================================================================
-
-yyerror
-
-This is called from within the parser when something is not matching a
-grammar rule. It can also be called manually (see de_reference) to
-generate an error for some other reason.
-
-Inputs:  None
-Outputs: None
-Returns: int?
-
-=========================================================================== */
-
-int yyerror( const char *msg )
-{
-    cerr << "Error: line " << line << ": " << listing_line << endl;
-    cerr << msg << endl;
-    err_count++;
-    return( 0 );
-}
-
-/* ===========================================================================
-
-yywrap
-
-This function is called automatically when we tell the scanner that
-the file is done. The purpose is to let the scanner know if there is
-more input coming up (like from an additonal file) or not. In the case
-of the assembler, we want to go through the file two times - once to
-make the symbol table, once to do the dirty work. So the first time
-we're called, rewind to the beginning of the file. Second time, tell
-them that we're really done.
-
-Inputs:  None
-Outputs: None
-Returns: 0 as an indication that there is more input (pass two for us)
-         1 on a true end-of-file
-
-=========================================================================== */
-
-extern "C" {
 
 int yywrap( void )
 {
-    return( 1 ); /* done! */
+  return( 1 );
 }
 
-};
-
-/* ===========================================================================
-
-my_input
-
-This function is dropped in in the place of the normal scanner input
-function. The reason we do this is to allow us to count input lines,
-generate listing output, and so on. To set this up, in the scanner
-define YY_INPUT to call here instead if handling it internally. Then
-whenever the scanner wants data we call here, read a line, return
-it. At the end of file it is necessary to return a 0 to indicate "no
-more".
-
-Inputs:  buf - pointer to a place where the scanner wants the data
-         max_size - the largest buffer that the scanner will accept
-Outputs: buf - filled in with data from the input file (one byte at a
-         time using this function, although the data is still buffered
-     internally to us, so it isn't too inefficient).
-Returns: 0 on end-of-file
-         N - number of bytes read into "buf" (always one for this
-     version)
-
-=========================================================================== */
-
-int my_input( unsigned char *buf, int max_size )
+void yyerror(const char *s)
 {
-
-    if ( ! infile.eof() )
-        infile.getline( listing_line, sizeof( listing_line ) );
-
-    if ( infile.eof() )
-    {
-    listing_line[ 0 ] = '\0';
-    *buf = '\0';
-    return( 0 ); // A.k.a. YY_NULL
-    }
-    else
-    {
-    char *s;
-    // Getline tosses the newline, but we want it on there.
-    // Various things depend on it (it is treated as a token).
-    strcat( listing_line, "\n" );
-    if ( listing )
-        {
-        detab( listing_line );
-            cout << listing_line;
-        }
-    line++;
-        // For some reason FLEX wants this as unsigned char, but
-        // strcpy wants it as signed char...
-        strcpy( (char *) buf, listing_line );
-    return( strlen( listing_line ) );
-    }
-}
-
-/* ===========================================================================
-
-detab
-
-Remove any tab characters from the input line and replace them with
-spaces. Basically this is just here to make things line up regardless
-of the tab settings on the terminal / printer / whatever. If it is not
-needed, you can just nuke it.
-
-Inputs:  line - the line to handle
-Outputs: line - with tabs replaced by spaces
-Returns: none
-
-=========================================================================== */
-
-void detab( char *line )
-{
-
-    static char   temp[ BUFSIZ ];
-    register char *s, *d;
-    int       col;
-
-    col = 0; s = line; d = temp;
-    while ( *s )
-    if ( *s != '\t' )
-        *d++ = *s++, col++;
-    else
-    {
-        do  {
-        *d++ = ' ';
-        col++;
-        } while ( col % 8 );
-        s++;
-    }
-    *d = '\0';
-    (void) strcpy( line, temp );
-
+  fprintf(stderr, "%s\n", s);
 }

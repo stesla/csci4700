@@ -6,31 +6,15 @@ Scanner for test grammar for CSCI4700 Fall 2005
 
 =========================================================================== */
 
-#include        <iostream>
-#include        <iomanip>
-#include        <stdlib.h>
-#include        <string.h>
-#include        "parser.h"
-#include        "y.tab.h"
+#include <stdio.h>
+#include "parser.h"
+#include "y.tab.h"
 
-using namespace std;
-
-extern YYSTYPE  yylval;
-extern short    line;
+extern YYSTYPE yylval;
+extern short line;
 extern char listing_line[];
 
 int is_keyword( const char *string );
-
-// Define this so that it will call our input routine (my_input) instead
-// of reading from stdin (cin) as a normal flex-generated scanner would.
-int my_input( unsigned char *buf, int max_size );
-#undef YY_INPUT
-#define YY_INPUT(buf,result,max_size) result = my_input( (unsigned char *) buf, max_size );
-
-// ----------------------------------------------------------------
-// Here are the things I have removed from the original lex file...
-// ----------------------------------------------------------------
-
 %}
 
 D           [0-9]
@@ -40,15 +24,13 @@ E           [Ee][+-]?{D}+
 FS          (f|F|l|L)
 IS          (u|U|l|L)*
 
-
 %%
 
 "\/\/"      {
-            // These are comments.
-                    while ( yyinput() != '\n' )
+                    while ( input() != '\n' )
             ;
             if ( yy_flex_debug )
-                cout << "Removed comment from input stream.\n";
+              printf("Removed comment from input stream.\n");
                 }
 
 {L}({L}|{D})*       {  return( is_keyword( yytext ) ); }
@@ -106,15 +88,15 @@ int is_keyword( const char *string )
     int             comp( const void *, const void * );
     struct tab      *ptr;
     static struct   tab     table[] = {
-{ "array",  ARRAY },
-{ "else",   ELSE },
-{ "for",    FOR },
-{ "global",     GLOBAL },
-{ "if",     IF },
-{ "read",       READ },
-{ "return", RETURN },
-{ "while",  WHILE },
-{ "write",      WRITE }
+      { "array", ARRAY },
+      { "else", ELSE },
+      { "for", FOR },
+      { "global", GLOBAL },
+      { "if", IF },
+      { "read", READ },
+      { "return", RETURN },
+      { "while", WHILE },
+      { "write", WRITE }
     };
 
     ptr = (struct tab *) bsearch( string, (char *) &table[ 0 ], sizeof( table ) /

@@ -2,7 +2,7 @@ PROGNAME=c--
 
 YACC=bison
 LEX=flex
-CC=g++
+CC=gcc
 CFLAGS=-g
 LDFLAGS=
 
