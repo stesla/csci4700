@@ -1,10 +1,5 @@
 #ifndef PARSER_H
 #define PARSER_H
-/* ===========================================================================
-
-header file for sample Flex/Bison parser.
-
-=========================================================================== */
 
 #define TRUE        1
 #define FALSE       0
@@ -12,9 +7,9 @@ header file for sample Flex/Bison parser.
 #define SYM_LEN         32
 
 struct  yystype {
-    int       int_val;
-    char      *str_ptr;
-    char      str_val[ SYM_LEN + 1 ];
+  int       integer;
+  char      *string;
+  char      symbol[ SYM_LEN + 1 ];
 };
 
 #ifdef  YYSTYPE
