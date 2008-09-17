@@ -4,15 +4,16 @@
 #include <stdio.h>
 #include "parser.h"
 
-int usage( void );
- void yyerror(const char *s);
-extern int yyget_debug(void);
-int yylex( void );
-extern void yyset_debug(int value);
-extern int yywrap( void );
+int yywrap( void )
+{
+  return( 1 );
+}
 
-extern int yydebug;
-extern FILE *yyin;
+void yyerror(const char *s)
+{
+  fprintf(stderr, "%s\n", s);
+}
+
 %}
 
 %token ARRAY GLOBAL READ WRITE
@@ -207,65 +208,3 @@ identifier_list
     ;
 
 %%
-
-int main(int argc, char **argv)
-{
-  char *filename;
-  int  i;
-  int result;
-
-  /* Default debugging to off */
-  yyset_debug(FALSE);
-
-  if ( argc < 2 )
-    exit( usage() );
-  else
-    for( i = 1; i < argc; i++ )
-      if ( argv[ i ][ 0 ] == '-' )
-        switch( argv[ i ][ 1 ] )
-          {
-          case 'l':
-            yyset_debug(!yyget_debug());
-            break;
-          case 'y':
-            yydebug = ! yydebug;
-            break;
-          default:
-            exit( usage() );
-          }
-      else
-        filename = argv[ i ];
-
-  yyin = fopen(filename, "r");
-  result = yyparse();
-  fclose(yyin);
-
-  if (result)
-    {
-      fprintf(stderr, "Failed to compile\n");
-      return(1);
-    }
-  else
-    {
-      printf("Compiled OK!\n");
-      return(0);
-    }
-}
-
-int usage( void )
-{
-  printf("usage: whatever <file> [-l] [-y]\n");
-  printf("-l == turns on lex debug flag\n");
-  printf("-y == turns on yydebug flag\n");
-  return( 1 );
-}
-
-int yywrap( void )
-{
-  return( 1 );
-}
-
-void yyerror(const char *s)
-{
-  fprintf(stderr, "%s\n", s);
-}
