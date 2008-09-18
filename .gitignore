@@ -1,0 +1,5 @@
+*.o
+lexer.c
+parser.c
+y.tab.h
+c--
