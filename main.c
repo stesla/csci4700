@@ -13,6 +13,7 @@ int usage( void )
 {
   printf("usage: whatever <file> [-l] [-y]\n");
   printf("-l == turns on lex debug flag\n");
+  printf("-s == enable a listing of program being compiled\n");
   printf("-y == turns on yydebug flag\n");
   return( 1 );
 }
@@ -35,6 +36,9 @@ int main(int argc, char **argv)
           {
           case 'l':
             yyset_debug(!yyget_debug());
+            break;
+          case 's':
+            toggle_listing();
             break;
           case 'y':
             yydebug = ! yydebug;

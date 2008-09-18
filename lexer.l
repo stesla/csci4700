@@ -7,11 +7,16 @@ Scanner for test grammar for CSCI4700 Fall 2005
 =========================================================================== */
 
 #include <stdio.h>
+#include "input.h"
 #include "lexer_util.h"
 #include "parser.h"
 #include "y.tab.h"
 
 extern YYSTYPE yylval;
+
+#undef YY_INPUT
+#define YY_INPUT(buf,result,max_size) result = my_input( (unsigned char *) buf, max_size );
+
 %}
 
 D           [0-9]

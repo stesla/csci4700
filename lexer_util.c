@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "lexer_util.h"
 #include "y.tab.h"
 
 struct tab {
@@ -11,7 +12,6 @@ static int comp( const void *a, const void *b )
   return( strcmp( ( ( struct tab *) a ) -> word,
                   ( ( struct tab *) b ) -> word ) );
 }
-
 
 int is_keyword( const char *string )
 {

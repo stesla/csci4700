@@ -6,7 +6,7 @@ CC=gcc
 CFLAGS=-g
 LDFLAGS=
 
-OBJS=main.o lexer_util.o
+OBJS=input.o lexer_util.o main.o
 
 ${PROGNAME}: ${OBJS} parser.o lexer.o
 	${CC} ${CFLAGS} -o $@ $^ ${LDFLAGS}
