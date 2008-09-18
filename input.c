@@ -7,17 +7,28 @@
 #endif
 
 static FILE *input;
+static const char *filename;
 static int listing = 0;
 static int lineno = 0;
-static char line[MAX_LINE];
 
 int close_input()
 {
   return(fclose(input) != 0 ? -1 : 0);
 }
 
+const char *input_file()
+{
+  return filename;
+}
+
+int input_lineno()
+{
+  return lineno;
+}
+
 size_t my_input(unsigned char *buf, size_t max_size)
 {
+  char line[MAX_LINE];
   size_t size = min(max_size, sizeof(line));
 
   if (fgets(line, size, input) != NULL)
@@ -29,7 +40,7 @@ size_t my_input(unsigned char *buf, size_t max_size)
       strncpy((char *) buf, line, size);
 
       if (listing)
-        printf("%d: %s", lineno, line);
+        printf("%i: %s", lineno, line);
 
       return(length);
     }
@@ -40,8 +51,9 @@ size_t my_input(unsigned char *buf, size_t max_size)
     }
 }
 
-int open_input(const char *filename)
+int open_input(const char *file)
 {
+  filename = file;
   return((input = fopen(filename, "r")) == NULL ? -1 : 0);
 }
 

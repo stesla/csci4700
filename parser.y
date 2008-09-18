@@ -2,6 +2,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include "input.h"
 #include "parser.h"
 
 int yywrap( void )
@@ -11,7 +12,7 @@ int yywrap( void )
 
 void yyerror(const char *s)
 {
-  fprintf(stderr, "%s\n", s);
+  fprintf(stderr, "%s:%i: error: %s\n", input_file(), input_lineno(), s);
 }
 
 %}

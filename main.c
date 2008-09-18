@@ -66,14 +66,5 @@ int main(int argc, char **argv)
       exit(1);
     }
 
-  if (result)
-    {
-      fprintf(stderr, "Failed to compile\n");
-      return(1);
-    }
-  else
-    {
-      printf("Compiled OK!\n");
-      return(0);
-    }
+  return (result ? 1 : 0);
 }
