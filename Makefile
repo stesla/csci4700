@@ -11,7 +11,7 @@ OBJS=input.o lexer_util.o main.o
 ${PROGNAME}: ${OBJS} parser.o lexer.o
 	${CC} ${CFLAGS} -o $@ $^ ${LDFLAGS}
 
-lexer.c: lexer.l
+lexer.c: lexer.lex
 	${LEX} -d -t $^ > $@
 
 parser.c: parser.y
