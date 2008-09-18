@@ -1,13 +1,16 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include "input.h"
 #include "parser.h"
 
 extern int yyparse(void);
+
+/* lexer debugging flag */
 extern int yyget_debug(void);
 extern void yyset_debug(int value);
 
+/* parser debugging flag */
 extern int yydebug;
-extern FILE *yyin;
 
 int usage( void )
 {
@@ -44,14 +47,24 @@ int main(int argc, char **argv)
             yydebug = ! yydebug;
             break;
           default:
-            exit( usage() );
+            exit(usage());
           }
       else
         filename = argv[ i ];
 
-  yyin = fopen(filename, "r");
+  if (open_input(filename) < 0)
+    {
+      perror("open_input");
+      exit(1);
+    }
+
   result = yyparse();
-  fclose(yyin);
+
+  if (close_input() < 0)
+    {
+      perror("close_input");
+      exit(1);
+    }
 
   if (result)
     {
