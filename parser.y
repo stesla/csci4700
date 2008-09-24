@@ -2,6 +2,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include "ast.h"
 #include "input.h"
 #include "parser.h"
 
@@ -19,10 +20,12 @@ void yyerror(const char *s)
 
 %token ARRAY GLOBAL READ WRITE
 
-%token IDENTIFIER CONSTANT STRING_LITERAL
+%token <text> IDENTIFIER CONSTANT STRING_LITERAL
 %token INC_OP DEC_OP LE_OP GE_OP EQ_OP NE_OP
 %token AND_OP OR_OP
 %token IF ELSE WHILE FOR RETURN
+
+%type <node> identifier constant string_literal
 
 %expect 1
 
@@ -34,7 +37,7 @@ translation_unit
     ;
 
 external_declaration
-    : IDENTIFIER '(' formal_list ')' block
+    : identifier '(' formal_list ')' block
         | decl
     ;
 
@@ -45,8 +48,8 @@ formal_list
         ;
 
 formal
-        : IDENTIFIER '[' ']'
-        | IDENTIFIER
+        : identifier '[' ']'
+        | identifier
         ;
 
 block
@@ -72,8 +75,8 @@ decl
         ;
 
 a_list
-        : IDENTIFIER '[' CONSTANT ']'
-        | a_list ',' IDENTIFIER '[' CONSTANT ']'
+        : identifier '[' constant ']'
+        | a_list ',' identifier '[' constant ']'
         ;
 
 statement
@@ -82,7 +85,7 @@ statement
     | selection_stmt
     | iteration_stmt
     | return_stmt
-        | READ '(' IDENTIFIER ')' ';'
+        | READ '(' identifier ')' ';'
         | WRITE '(' primary_expression ')' ';'
     ;
 
@@ -113,9 +116,9 @@ expression
     ;
 
 primary_expression
-    : IDENTIFIER
-    | CONSTANT
-    | STRING_LITERAL
+    : identifier
+    | constant
+    | string_literal
     | '(' expression ')'
     ;
 
@@ -204,8 +207,12 @@ assignment_expression
     ;
 
 identifier_list
-    : IDENTIFIER
-    | identifier_list ',' IDENTIFIER
+    : identifier
+    | identifier_list ',' identifier
     ;
+
+constant : CONSTANT { $$ = ast_create(AST_CONSTANT, $1); }
+identifier : IDENTIFIER { $$ = ast_create(AST_IDENTIFIER, $1); }
+string_literal : STRING_LITERAL { $$ = ast_create(AST_STRING_LITERAL, $1); }
 
 %%

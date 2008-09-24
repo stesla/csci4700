@@ -6,7 +6,7 @@ CC=gcc
 CFLAGS=-g
 LDFLAGS=
 
-OBJS=input.o lexer_util.o parser.o lexer.o
+OBJS=ast.o input.o lexer_util.o parser.o lexer.o
 
 
 ## Main Program

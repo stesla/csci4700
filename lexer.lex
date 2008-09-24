@@ -5,8 +5,6 @@
 #include "parser.h"
 #include "y.tab.h"
 
-extern YYSTYPE yylval;
-
 #undef YY_INPUT
 #define YY_INPUT(buf,result,max_size) result = my_input( (unsigned char *) buf, max_size );
 
@@ -23,12 +21,12 @@ IS          (u|U|l|L)*
 
 "\/\/"      { consume_comment(); }
 
-{L}({L}|{D})*       {  return( is_keyword( yytext ) ); }
-0[xX]{H}+{IS}?      {  return( CONSTANT ); }
-0{D}+{IS}?      {  return( CONSTANT ); }
-{D}+{IS}?       {  return( CONSTANT ); }
-{D}+{E}{FS}?        {  return( CONSTANT ); }
-L?\"(\\.|[^\\"])*\" {  return( STRING_LITERAL ); }
+{L}({L}|{D})* { return(identifier(yytext)); }
+0[xX]{H}+{IS}? { return(constant(yytext)); }
+0{D}+{IS}? { return(constant(yytext)); }
+{D}+{IS}? { return(constant(yytext)); }
+{D}+{E}{FS}? { return(constant(yytext)); }
+L?\"(\\.|[^\\"])*\" { return(string_literal(yytext)); }
 "++"            {  return( INC_OP ); }
 "--"            {  return( DEC_OP ); }
 "&&"            {  return( AND_OP ); }

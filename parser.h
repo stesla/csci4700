@@ -1,15 +1,14 @@
 #ifndef PARSER_H
 #define PARSER_H
 
-#define TRUE        1
-#define FALSE       0
+#include "ast.h"
 
-#define SYM_LEN         32
+#define TRUE 1
+#define FALSE 0
 
-struct  yystype {
-  int       integer;
-  char      *string;
-  char      symbol[ SYM_LEN + 1 ];
+struct yystype {
+  char *text;
+  NODE *node;
 };
 
 #ifdef  YYSTYPE
