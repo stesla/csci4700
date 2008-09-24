@@ -6,9 +6,12 @@ CC=gcc
 CFLAGS=-g
 LDFLAGS=
 
-OBJS=input.o lexer_util.o main.o
+OBJS=input.o lexer_util.o parser.o lexer.o
 
-${PROGNAME}: ${OBJS} parser.o lexer.o
+
+## Main Program
+
+${PROGNAME}: ${OBJS} main.o
 	${CC} ${CFLAGS} -o $@ $^ ${LDFLAGS}
 
 lexer.c: lexer.lex
@@ -22,5 +25,17 @@ lexer_util.o: y.tab.h parser.h
 main.o: parser.h
 y.tab.h: parser.c
 
+## Tests
+
+TEST_OBJS=
+
+test: run-test
+	./run-test
+
+run-test: ${OBJS} ${TEST_OBJS} test.o
+	${CC} ${CFLAGS} -o $@ $^ ${LDFLAGS} -lcheck
+
+## Utilities
+
 clean:
-	rm *.o c-- parser.c lexer.c y.tab.h
+	rm *.o c-- run-test parser.c lexer.c y.tab.h
