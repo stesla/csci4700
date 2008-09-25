@@ -22,6 +22,13 @@ struct _node {
   */
   union _slots {
     struct {
+      NODE *first_identifier;
+      NODE *first_count;
+      NODE *rest;
+      const char *to_s;
+    } array_list;
+
+    struct {
       int value;
       const char *to_s;
     } constant;
@@ -41,6 +48,10 @@ struct _node {
 /*
 ** FORWARD DECLARATIONS
 */
+
+/* Array List */
+static NODE * ast_array_list_init(NODE *node, va_list args);
+static const char *ast_array_list_to_s(NODE *node);
 
 /* Constant */
 static NODE * ast_constant_init(NODE *node, va_list args);
@@ -83,6 +94,7 @@ NODE *ast_create(NODE_TYPE type, ...)
   NODE *result = ast_alloc(type);
   static NODE * (*init[])(NODE *node, va_list args) =
     {
+      ast_array_list_init,
       ast_constant_init,
       ast_identifier_init,
       ast_identifier_list_init,
@@ -100,6 +112,7 @@ const char *ast_to_s(NODE *node)
 {
   static const char *(*to_s[])(NODE *node) =
     {
+      ast_array_list_to_s,
       ast_constant_to_s,
       ast_identifier_to_s,
       ast_identifier_list_to_s,
@@ -112,6 +125,46 @@ const char *ast_to_s(NODE *node)
 /*
 ** PRIVATE FUNCTIONS
 */
+
+/* Array List */
+static NODE * ast_array_list_init(NODE *node, va_list args)
+{
+  S(node).array_list.first_identifier = va_arg(args, NODE *);
+  S(node).array_list.first_count = va_arg(args, NODE *);
+  S(node).array_list.rest = va_arg(args, NODE *);
+  fprintf(stderr, "array list: %s\n", ast_to_s(node));
+  return node;
+}
+
+static const char *ast_array_list_to_s(NODE *node)
+{
+  /* This just makes the code shorter below */
+  const char **result = &(S(node).array_list.to_s);
+
+  if (*result == NULL)
+    {
+      if (S(node).array_list.rest == NULL)
+        {
+          /* Make our own copy of our child's string */
+          const char *identifier = ast_to_s(S(node).array_list.first_identifier);
+          const char *count = ast_to_s(S(node).array_list.first_count);
+          size_t length = strlen(identifier) + strlen(count) + 3; /* first[count] */
+          *result = my_malloc(length * sizeof(char));
+          snprintf((char *) *result, length, "%s[%s]", identifier, count);
+        }
+      else
+        {
+          const char *identifier = ast_to_s(S(node).array_list.first_identifier);
+          const char *count = ast_to_s(S(node).array_list.first_count);
+          const char *rest = ast_to_s(S(node).array_list.rest);
+          size_t length = strlen(identifier) + strlen(count)+ strlen(rest) + 5; /* first[count], rest */
+          *result = my_malloc(length * sizeof(char));
+          snprintf((char *) *result, length, "%s[%s], %s", identifier, count, rest);
+        }
+    }
+
+  return *result;
+}
 
 /* Constant */
 
@@ -155,19 +208,9 @@ static const char *ast_identifier_to_s(NODE *node)
 
 static NODE *ast_identifier_list_init(NODE *node, va_list args)
 {
-  NODE *first = va_arg(args, NODE *);
-  NODE *rest = va_arg(args, NODE *);
-
-  if (rest == NULL)
-    {
-      S(node).identifier_list.first = first;
-    }
-  else
-    {
-      S(node).identifier_list.first = first;
-      S(node).identifier_list.rest = rest;
-    }
-  fprintf(stderr, "ast_identifier_list_init: %s\n", ast_to_s(node));
+  S(node).identifier_list.first = va_arg(args, NODE *);
+  S(node).identifier_list.rest = va_arg(args, NODE *);
+  fprintf(stderr, "id list: %s\n", ast_to_s(node));
   return node;
 }
 
@@ -182,16 +225,16 @@ static const char *ast_identifier_list_to_s(NODE *node)
         {
           /* Make our own copy of our child's string */
           *result = strdup(ast_to_s(S(node).identifier_list.first));
-      }
-    else
-      {
-        const char *first = ast_to_s(S(node).identifier_list.first);
-        const char *rest = ast_to_s(S(node).identifier_list.rest);
-        size_t length = strlen(first) + strlen(rest) + 3;
-        *result = my_malloc(length * sizeof(char));
-        snprintf((char *) *result, length, "%s, %s", first, rest);
-      }
-  }
+        }
+      else
+        {
+          const char *first = ast_to_s(S(node).identifier_list.first);
+          const char *rest = ast_to_s(S(node).identifier_list.rest);
+          size_t length = strlen(first) + strlen(rest) + 3;
+          *result = my_malloc(length * sizeof(char));
+          snprintf((char *) *result, length, "%s, %s", first, rest);
+        }
+    }
 
   return *result;
 }
