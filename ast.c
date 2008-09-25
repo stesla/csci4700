@@ -11,6 +11,7 @@
 
 struct _node {
   NODE_TYPE type;
+  const char *to_s;
 
   /* Method Table */
   struct _methods {
@@ -35,6 +36,11 @@ struct _node {
     struct {
       NODE *list;
     } declare;
+
+    struct {
+      NODE *identifier;
+      int is_array;
+    } formal;
 
     const char *identifier;
 
@@ -63,6 +69,10 @@ static const char *ast_constant_to_s(NODE *node);
 /* Declare */
 static NODE * ast_declare_init(NODE *node, va_list args);
 static const char *ast_declare_to_s(NODE *node);
+
+/* Formal */
+static NODE * ast_formal_init(NODE *node, va_list args);
+static const char *ast_formal_to_s(NODE *node);
 
 /* Identifier */
 static NODE * ast_identifier_init(NODE *node, va_list args);
@@ -111,6 +121,7 @@ NODE *ast_create(NODE_TYPE type, ...)
       ast_array_init,
       ast_constant_init,
       ast_declare_init,
+      ast_formal_init,
       ast_identifier_init,
       ast_list_init,
       ast_string_literal_init
@@ -198,6 +209,34 @@ static const char *ast_declare_to_s(NODE *node)
   return ast_to_s(S(node).declare.list);
 }
 
+/* Formal */
+static NODE * ast_formal_init(NODE *node, va_list args)
+{
+  S(node).formal.identifier = va_arg(args, NODE *);
+  S(node).formal.is_array = va_arg(args, int);
+
+  SET_M(node, ast_formal_to_s);
+}
+
+static const char *ast_formal_to_s(NODE *node)
+{
+  if (node->to_s == NULL)
+    {
+      if (S(node).formal.is_array)
+        {
+          const char *identifier = ast_to_s(S(node).formal.identifier);
+          size_t length = strlen(identifier) + 3; /* identifier[] */
+          node->to_s = my_malloc(length * sizeof(char));
+          snprintf((char *) node->to_s, length, "%s[]", identifier);
+        }
+      else
+        {
+          node->to_s = strdup(ast_to_s(S(node).formal.identifier));
+        }
+    }
+  return node->to_s;
+}
+
 /* Identifier */
 
 static NODE * ast_identifier_init(NODE *node, va_list args)
@@ -233,7 +272,11 @@ static const char *ast_list_to_s(NODE *node)
 
   if (*result == NULL)
     {
-      if (S(node).list.rest == NULL)
+      if(S(node).list.first == NULL)
+        {
+          *result = "(empty)"; /* empty list */
+        }
+      else if (S(node).list.rest == NULL)
         {
           /* Make our own copy of our child's string */
           *result = strdup(ast_to_s(S(node).list.first));

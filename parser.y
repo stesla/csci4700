@@ -27,6 +27,7 @@ void yyerror(const char *s)
 
 %type <node> identifier constant string_literal
 %type <node> decl_list decl a_list identifier_list
+%type <node> formal_list formal
 
 %expect 1
 
@@ -43,15 +44,15 @@ external_declaration
     ;
 
 formal_list
-        : formal_list ',' formal
-        | formal
-        |
-        ;
+    : formal ',' formal_list { $$ = ast_create(AST_LIST, $1, $3); }
+    | formal { $$ = ast_create(AST_LIST, $1, NULL); }
+    | { $$ = ast_create(AST_LIST, NULL, NULL); }
+    ;
 
 formal
-        : identifier '[' ']'
-        | identifier
-        ;
+    : identifier '[' ']' { $$ = ast_create(AST_FORMAL, $1, TRUE); }
+    | identifier { $$ = ast_create(AST_FORMAL, $1, FALSE); }
+    ;
 
 block
     : '{' '}'

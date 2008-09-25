@@ -6,6 +6,7 @@ typedef enum _node_type {
   AST_ARRAY,
   AST_CONSTANT,
   AST_DECLARE,
+  AST_FORMAL,
   AST_IDENTIFIER,
   AST_LIST,
   AST_STRING_LITERAL
