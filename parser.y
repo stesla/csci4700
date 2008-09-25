@@ -26,6 +26,7 @@ void yyerror(const char *s)
 %token IF ELSE WHILE FOR RETURN
 
 %type <node> identifier constant string_literal
+%type <node> identifier_list
 
 %expect 1
 
@@ -38,7 +39,7 @@ translation_unit
 
 external_declaration
     : identifier '(' formal_list ')' block
-        | decl
+    | decl
     ;
 
 formal_list
@@ -79,14 +80,19 @@ a_list
         | a_list ',' identifier '[' constant ']'
         ;
 
+identifier_list
+    : identifier { $$ = ast_create(AST_IDENTIFIER_LIST, $1, NULL); }
+    | identifier_list ',' identifier { $$ = ast_create(AST_IDENTIFIER_LIST, $1, $3);  }
+    ;
+
 statement
     : block
     | expression_stmt
     | selection_stmt
     | iteration_stmt
     | return_stmt
-        | READ '(' identifier ')' ';'
-        | WRITE '(' primary_expression ')' ';'
+    | READ '(' identifier ')' ';'
+    | WRITE '(' primary_expression ')' ';'
     ;
 
 expression_stmt
@@ -119,7 +125,7 @@ primary_expression
     : identifier
     | constant
     | string_literal
-    | '(' expression ')'
+    | '(' expression ')' { $$ = $2; }
     ;
 
 postfix_expression
@@ -204,11 +210,6 @@ assignment_expression
     | postfix_expression '(' ')'
     | postfix_expression '(' identifier_list ')'
     | unary_expression '=' assignment_expression
-    ;
-
-identifier_list
-    : identifier
-    | identifier_list ',' identifier
     ;
 
 constant : CONSTANT { $$ = ast_create(AST_CONSTANT, $1); }
