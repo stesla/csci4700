@@ -28,7 +28,8 @@ void yyerror(const char *s)
 %type <node> identifier constant string_literal
 %type <node> decl_list decl a_list identifier_list
 %type <node> formal_list formal
-%type <node> primary_expression postfix_expression
+%type <node> primary_expression postfix_expression unary_expression
+%type <op> unary_operator
 
 %expect 1
 
@@ -135,23 +136,23 @@ primary_expression
 postfix_expression
     : primary_expression
     | postfix_expression '[' expression ']' { $$ = NULL; /* TODO: fix this */ }
-    | postfix_expression INC_OP { $$ = ast_create(AST_POSTFIX, $1, AST_OP_INC) }
-    | postfix_expression DEC_OP { $$ = ast_create(AST_POSTFIX, $1, AST_OP_DEC) }
+    | postfix_expression INC_OP { $$ = ast_create(AST_POSTFIX, $1, AST_OP_INC); }
+    | postfix_expression DEC_OP { $$ = ast_create(AST_POSTFIX, $1, AST_OP_DEC); }
     ;
 
 unary_expression
     : postfix_expression
-    | INC_OP unary_expression
-    | DEC_OP unary_expression
-    | unary_operator unary_expression
+    | INC_OP unary_expression { $$ = ast_create(AST_PREFIX, $2, AST_OP_INC); }
+    | DEC_OP unary_expression { $$ = ast_create(AST_PREFIX, $2, AST_OP_DEC); }
+    | unary_operator unary_expression { $$ = ast_create(AST_PREFIX, $2, $1); }
     ;
 
 unary_operator
-    : '&'
-    | '*'
-    | '+'
-    | '-'
-    | '!'
+    : '&' { $$ = AST_OP_REF; }
+    | '*' { $$ = AST_OP_DEREF; }
+    | '+' { $$ = AST_OP_PLUS; }
+    | '-' { $$ = AST_OP_MINUS; }
+    | '!' { $$ = AST_OP_NOT; }
     ;
 
 multiplicative_expression

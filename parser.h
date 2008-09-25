@@ -7,8 +7,9 @@
 #define FALSE 0
 
 struct yystype {
-  char *text;
   NODE *node;
+  OP_TYPE op;
+  char *text;
 };
 
 #ifdef  YYSTYPE

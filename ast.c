@@ -48,7 +48,7 @@ struct _node {
     struct {
       NODE *operand;
       OP_TYPE op;
-    } postfix;
+    } unary;
 
     const char *string_literal;
   } stab;
@@ -86,6 +86,10 @@ static const char *ast_list_to_s(NODE *node);
 static void ast_postfix_init(NODE *node, va_list args);
 static const char *ast_postfix_to_s(NODE *node);
 
+/* Prefix Op */
+static void ast_prefix_init(NODE *node, va_list args);
+static const char *ast_prefix_to_s(NODE *node);
+
 /* String Literal */
 static void ast_string_literal_init(NODE *node, va_list args);
 static const char *ast_string_literal_to_s(NODE *node);
@@ -103,14 +107,20 @@ static const char *_node_type_str[] =
     "AST_IDENTIFIER",
     "AST_LIST",
     "AST_POSTFIX",
+    "AST_PREFIX",
     "AST_STRING_LITERAL"
   };
 #define NODE_TYPE_STR(x) (_node_type_str[(x)])
 
 static const char *_op_str[] =
   {
-    "--", // AST_OP_DEC
-    "++" // AST_OP_INC
+    "!",  //AST_OP_NOT,   // !
+    "--", //AST_OP_DEC,   // --
+    "++", //AST_OP_INC,   // ++
+    "-",  //AST_OP_MINUS, // -
+    "+",  //AST_OP_PLUS,  // +
+    "*",  //AST_OP_DEREF, // * (when prefix)
+    "&"   //AST_OP_REF    // & (when prefix)
   };
 #define OP_TYPE_STR(x) (_op_str[(x)])
 
@@ -148,6 +158,7 @@ NODE *ast_create(NODE_TYPE type, ...)
       ast_identifier_init,
       ast_list_init,
       ast_postfix_init,
+      ast_prefix_init,
       ast_string_literal_init
     };
 
@@ -174,7 +185,8 @@ const char *ast_to_s(NODE *node)
 ** PRIVATE FUNCTIONS
 */
 
-/* Array List */
+/* Array */
+
 static void ast_array_init(NODE *node, va_list args)
 {
   S(node).array.identifier = va_arg(args, NODE *);
@@ -234,6 +246,7 @@ static const char *ast_declare_to_s(NODE *node)
 }
 
 /* Formal */
+
 static void ast_formal_init(NODE *node, va_list args)
 {
   S(node).formal.identifier = va_arg(args, NODE *);
@@ -312,10 +325,11 @@ static const char *ast_list_to_s(NODE *node)
 }
 
 /* Postfix Op */
+
 static void ast_postfix_init(NODE *node, va_list args)
 {
-  S(node).postfix.operand = va_arg(args, NODE *);
-  S(node).postfix.op = va_arg(args, OP_TYPE);
+  S(node).unary.operand = va_arg(args, NODE *);
+  S(node).unary.op = va_arg(args, OP_TYPE);
 
   SET_M(node, ast_postfix_to_s);
 }
@@ -324,11 +338,34 @@ static const char *ast_postfix_to_s(NODE *node)
 {
   if (node->to_s == NULL)
     {
-      const char *operand = ast_to_s(S(node).postfix.operand);
-      const char *op = OP_TYPE_STR(S(node).postfix.op);
+      const char *operand = ast_to_s(S(node).unary.operand);
+      const char *op = OP_TYPE_STR(S(node).unary.op);
       size_t length = strlen(operand) + strlen(op) + 1;
       node->to_s = my_malloc(length * sizeof(char));
       snprintf((char *) node->to_s, length, "%s%s", operand, op);
+    }
+  return node->to_s;
+}
+
+/* Prefix Op */
+
+static void ast_prefix_init(NODE *node, va_list args)
+{
+  S(node).unary.operand = va_arg(args, NODE *);
+  S(node).unary.op = va_arg(args, OP_TYPE);
+
+  SET_M(node, ast_prefix_to_s);
+}
+
+static const char *ast_prefix_to_s(NODE *node)
+{
+  if (node->to_s == NULL)
+    {
+      const char *operand = ast_to_s(S(node).unary.operand);
+      const char *op = OP_TYPE_STR(S(node).unary.op);
+      size_t length = strlen(operand) + strlen(op) + 1;
+      node->to_s = my_malloc(length * sizeof(char));
+      snprintf((char *) node->to_s, length, "%s%s", op, operand);
     }
   return node->to_s;
 }
