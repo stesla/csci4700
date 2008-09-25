@@ -29,6 +29,10 @@ void yyerror(const char *s)
 %type <node> decl_list decl a_list identifier_list
 %type <node> formal_list formal
 %type <node> primary_expression postfix_expression unary_expression
+%type <node> multiplicative_expression additive_expression
+%type <node> relational_expression equality_expression and_expression
+%type <node> exclusive_or_expression inclusive_or_expression
+%type <node> logical_and_expression logical_or_expression
 %type <op> unary_operator
 
 %expect 1
@@ -130,81 +134,81 @@ primary_expression
     : identifier
     | constant
     | string_literal
-    | '(' expression ')' { $$ = NULL; /* TODO: fix this */ }
+    | '(' expression ')' { $$ = NULL; /* FIXME */ }
     ;
 
 postfix_expression
     : primary_expression
-    | postfix_expression '[' expression ']' { $$ = NULL; /* TODO: fix this */ }
-    | postfix_expression INC_OP { $$ = ast_create(AST_POSTFIX, $1, AST_OP_PLUS_PLUS); }
-    | postfix_expression DEC_OP { $$ = ast_create(AST_POSTFIX, $1, AST_OP_MINUS_MINUS); }
+    | postfix_expression '[' expression ']' { $$ = ast_create(AST_ARRAY, $1, $3); }
+    | postfix_expression INC_OP { $$ = ast_create(AST_POSTFIX, $1, AST_OP_INC); }
+    | postfix_expression DEC_OP { $$ = ast_create(AST_POSTFIX, $1, AST_OP_DEC); }
     ;
 
 unary_expression
     : postfix_expression
-    | INC_OP unary_expression { $$ = ast_create(AST_PREFIX, $2, AST_OP_PLUS_PLUS); }
-    | DEC_OP unary_expression { $$ = ast_create(AST_PREFIX, $2, AST_OP_MINUS_MINUS); }
+    | INC_OP unary_expression { $$ = ast_create(AST_PREFIX, $2, AST_OP_INC); }
+    | DEC_OP unary_expression { $$ = ast_create(AST_PREFIX, $2, AST_OP_DEC); }
     | unary_operator unary_expression { $$ = ast_create(AST_PREFIX, $2, $1); }
     ;
 
 unary_operator
-    : '&' { $$ = AST_OP_AMP; }
-    | '*' { $$ = AST_OP_STAR; }
+    : '&' { $$ = AST_OP_REF; }
+    | '*' { $$ = AST_OP_DEREF; }
     | '+' { $$ = AST_OP_PLUS; }
     | '-' { $$ = AST_OP_MINUS; }
-    | '!' { $$ = AST_OP_BANG; }
+    | '!' { $$ = AST_OP_NOT; }
     ;
 
 multiplicative_expression
     : unary_expression
-    | multiplicative_expression '*' unary_expression
-    | multiplicative_expression '/' unary_expression
-    | multiplicative_expression '%' unary_expression
+    | multiplicative_expression '*' unary_expression { $$ = ast_create(AST_BINARY, AST_OP_MULT, $1, $3); }
+    | multiplicative_expression '/' unary_expression { $$ = ast_create(AST_BINARY, AST_OP_DIV, $1, $3); }
+    | multiplicative_expression '%' unary_expression { $$ = ast_create(AST_BINARY, AST_OP_MOD, $1, $3); }
     ;
 
 additive_expression
     : multiplicative_expression
-    | additive_expression '+' multiplicative_expression
-    | additive_expression '-' multiplicative_expression
+    | additive_expression '+' multiplicative_expression { $$ = ast_create(AST_BINARY, AST_OP_PLUS, $1, $3); }
+    | additive_expression '-' multiplicative_expression { $$ = ast_create(AST_BINARY, AST_OP_MINUS, $1, $3); }
     ;
 
 relational_expression
     : additive_expression
-    | relational_expression '<' additive_expression
-    | relational_expression '>' additive_expression
-    | relational_expression LE_OP additive_expression
-    | relational_expression GE_OP additive_expression
+    | relational_expression '<' additive_expression { $$ = ast_create(AST_BINARY, AST_OP_LT, $1, $3); }
+    | relational_expression '>' additive_expression { $$ = ast_create(AST_BINARY, AST_OP_GT, $1, $3); }
+    | relational_expression LE_OP additive_expression { $$ = ast_create(AST_BINARY, AST_OP_LE, $1, $3); }
+    | relational_expression GE_OP additive_expression { $$ = ast_create(AST_BINARY, AST_OP_GE, $1, $3); }
     ;
 
 equality_expression
     : relational_expression
-    | equality_expression EQ_OP relational_expression
-    | equality_expression NE_OP relational_expression
+    | equality_expression EQ_OP relational_expression { $$ = ast_create(AST_BINARY, AST_OP_EQ, $1, $3); }
+    | equality_expression NE_OP relational_expression { $$ = ast_create(AST_BINARY, AST_OP_NE, $1, $3); }
     ;
 
 and_expression
     : equality_expression
-    | and_expression '&' equality_expression
+    | and_expression '&' equality_expression { $$ = ast_create(AST_BINARY, AST_OP_BAND, $1, $3); }
     ;
 
 exclusive_or_expression
     : and_expression
-    | exclusive_or_expression '^' and_expression
+    | exclusive_or_expression '^' and_expression { $$ = ast_create(AST_BINARY, AST_OP_BXOR, $1, $3); }
     ;
 
 inclusive_or_expression
     : exclusive_or_expression
-    | inclusive_or_expression '|' exclusive_or_expression
+    | inclusive_or_expression '|' exclusive_or_expression { $$ = ast_create(AST_BINARY, AST_OP_BOR, $1, $3); }
     ;
 
 logical_and_expression
     : inclusive_or_expression
-    | logical_and_expression AND_OP inclusive_or_expression
+    | logical_and_expression AND_OP inclusive_or_expression { $$ = ast_create(AST_BINARY, AST_OP_LAND, $1, $3); }
     ;
 
 logical_or_expression
     : logical_and_expression
-    | logical_or_expression OR_OP logical_and_expression
+    | logical_or_expression OR_OP logical_and_expression { $$ = ast_create(AST_BINARY, AST_OP_LOR, $1, $3); }
     ;
 
 // Modified this and moved the function calls here from postfix_expression so that one can NOT

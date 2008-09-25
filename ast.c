@@ -27,6 +27,12 @@ struct _node {
       NODE *count;
     } array;
 
+    struct {
+      OP_TYPE op;
+      NODE *left;
+      NODE *right;
+    } binary;
+
     int constant;
 
     struct {
@@ -61,6 +67,10 @@ struct _node {
 /* Array */
 static void ast_array_init(NODE *node, va_list args);
 static const char *ast_array_to_s(NODE *node);
+
+/* Binary */
+static void ast_binary_init(NODE *node, va_list args);
+static const char *ast_binary_to_s(NODE *node);
 
 /* Constant */
 static void ast_constant_init(NODE *node, va_list args);
@@ -101,6 +111,7 @@ static const char *ast_string_literal_to_s(NODE *node);
 static const char *_node_type_str[] =
   {
     "AST_ARRAY",
+    "AST_BINARY",
     "AST_CONSTANT",
     "AST_DECLARE",
     "AST_FORMAL",
@@ -114,13 +125,27 @@ static const char *_node_type_str[] =
 
 static const char *_op_str[] =
   {
-    "&",  //AST_OP_AMP,
-    "!",  //AST_OP_BANG,
-    "-",  //AST_OP_MINUS,
-    "--", //AST_OP_MINUS_MINUS,
+    "&",  //AST_OP_BAND,
+    "|",  //AST_OP_BOR,
+    "^",  //AST_OP_BXOR,
+    "--", //AST_OP_DEC,
+    "*",  //AST_OP_DEREF,
+    "/",  //AST_OP_DIV,
+    "==", //AST_OP_EQ,
+    ">=", //AST_OP_GE,
+    ">",  //AST_OP_GT,
+    "++", //AST_OP_INC,
+    "&&", //AST_OP_LAND,
+    "<=", //AST_OP_LE,
+    "||", //AST_OP_LOR,
+    "<",  //AST_OP_LT,
+    "--", //AST_OP_MINUS,
+    "%",  //AST_OP_MOD,
+    "*",  //AST_OP_MULT,
+    "!=", //AST_OP_NE,
+    "!",  //AST_OP_NOT,
     "+",  //AST_OP_PLUS,
-    "++", //AST_OP_PLUS_PLUS,
-    "*",  //AST_OP_STAR
+    "&"   //AST_OP_REF
   };
 #define OP_TYPE_STR(x) (_op_str[(x)])
 
@@ -152,6 +177,7 @@ NODE *ast_create(NODE_TYPE type, ...)
   static void (*init[])(NODE *node, va_list args) =
     {
       ast_array_init,
+      ast_binary_init,
       ast_constant_init,
       ast_declare_init,
       ast_formal_init,
@@ -208,6 +234,29 @@ static const char *ast_array_to_s(NODE *node)
   return node->to_s;
 }
 
+/* Binary */
+static void ast_binary_init(NODE *node, va_list args)
+{
+  S(node).binary.op = va_arg(args, OP_TYPE);
+  S(node).binary.left = va_arg(args, NODE *);
+  S(node).binary.right = va_arg(args, NODE *);
+
+  SET_M(node, ast_binary_to_s);
+}
+
+static const char *ast_binary_to_s(NODE *node)
+{
+  if (node->to_s == NULL)
+    {
+      const char *left = ast_to_s(S(node).binary.left);
+      const char *op = OP_TYPE_STR(S(node).binary.op);
+      const char *right = ast_to_s(S(node).binary.right);
+      size_t length = strlen(left) + strlen(op) + strlen(right) + 3;
+      node->to_s = my_malloc(length *sizeof(char));
+      snprintf((char *) node->to_s, length, "%s %s %s", left, op, right);
+    }
+  return node->to_s;
+}
 
 /* Constant */
 
