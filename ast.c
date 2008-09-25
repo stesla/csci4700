@@ -33,6 +33,11 @@ struct _node {
       NODE *right;
     } binary;
 
+    struct {
+      NODE *func;
+      NODE *args;
+    } call;
+
     int constant;
 
     struct {
@@ -71,6 +76,10 @@ static const char *ast_array_to_s(NODE *node);
 /* Binary */
 static void ast_binary_init(NODE *node, va_list args);
 static const char *ast_binary_to_s(NODE *node);
+
+/* Call */
+static void ast_call_init(NODE *node, va_list args);
+static const char *ast_call_to_s(NODE *node);
 
 /* Constant */
 static void ast_constant_init(NODE *node, va_list args);
@@ -112,6 +121,7 @@ static const char *_node_type_str[] =
   {
     "AST_ARRAY",
     "AST_BINARY",
+    "AST_CALL",
     "AST_CONSTANT",
     "AST_DECLARE",
     "AST_FORMAL",
@@ -178,6 +188,7 @@ NODE *ast_create(NODE_TYPE type, ...)
     {
       ast_array_init,
       ast_binary_init,
+      ast_call_init,
       ast_constant_init,
       ast_declare_init,
       ast_formal_init,
@@ -235,6 +246,7 @@ static const char *ast_array_to_s(NODE *node)
 }
 
 /* Binary */
+
 static void ast_binary_init(NODE *node, va_list args)
 {
   S(node).binary.op = va_arg(args, OP_TYPE);
@@ -254,6 +266,29 @@ static const char *ast_binary_to_s(NODE *node)
       size_t length = strlen(left) + strlen(op) + strlen(right) + 3;
       node->to_s = my_malloc(length *sizeof(char));
       snprintf((char *) node->to_s, length, "%s %s %s", left, op, right);
+    }
+  return node->to_s;
+}
+
+/* Call */
+
+static void ast_call_init(NODE *node, va_list args)
+{
+  S(node).call.func = va_arg(args, NODE *);
+  S(node).call.args = va_arg(args, NODE *);
+
+  SET_M(node, ast_call_to_s);
+}
+
+static const char *ast_call_to_s(NODE *node)
+{
+  if (node->to_s == NULL)
+    {
+      const char *func = ast_to_s(S(node).call.func);
+      const char *args = ast_to_s(S(node).call.args);
+      size_t length = strlen(func) + strlen(args) + 3;
+      node->to_s = malloc(length * sizeof(char));
+      snprintf((char *) node->to_s, length, "%s(%s)", func, args);
     }
   return node->to_s;
 }

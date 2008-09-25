@@ -5,6 +5,7 @@ typedef struct _node NODE;
 typedef enum _node_type {
   AST_ARRAY,
   AST_BINARY,
+  AST_CALL,
   AST_CONSTANT,
   AST_DECLARE,
   AST_FORMAL,

@@ -33,6 +33,7 @@ void yyerror(const char *s)
 %type <node> relational_expression equality_expression and_expression
 %type <node> exclusive_or_expression inclusive_or_expression
 %type <node> logical_and_expression logical_or_expression
+%type <node> assignment_expression
 %type <op> unary_operator
 
 %expect 1
@@ -216,9 +217,9 @@ logical_or_expression
 // because of the live registers in the expression.
 assignment_expression
     : logical_or_expression
-    | postfix_expression '(' ')'
-    | postfix_expression '(' identifier_list ')'
-    | unary_expression '=' assignment_expression
+    | postfix_expression '(' ')' { $$ = ast_create(AST_CALL, $1, ast_create(AST_LIST, NULL, NULL)); }
+    | postfix_expression '(' identifier_list ')' { $$ = ast_create(AST_CALL, $1, $3); }
+    | unary_expression '=' assignment_expression { $$ = NULL /* FIXME */ }
     ;
 
 constant : CONSTANT { $$ = ast_create(AST_CONSTANT, $1); }
