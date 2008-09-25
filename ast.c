@@ -75,6 +75,13 @@ static const char *ast_string_literal_to_s(NODE *node);
 #define M(node) (node->mtab)
 #define S(node) (node->stab)
 
+#define SET_M(node,                             \
+              _to_s)                            \
+  {                                             \
+    M(node).to_s = (_to_s);                     \
+  }
+
+
 static NODE *ast_alloc(NODE_TYPE type)
 {
   NODE *result = (NODE *) my_malloc(sizeof(NODE));
@@ -122,9 +129,8 @@ static NODE * ast_array_init(NODE *node, va_list args)
   S(node).array.identifier = va_arg(args, NODE *);
   S(node).array.count = va_arg(args, NODE *);
 
-  M(node).to_s = ast_array_to_s;
+  SET_M(node, ast_array_to_s);
 
-  fprintf(stderr, "array: %s\n", ast_to_s(node));
   return node;
 }
 
@@ -153,7 +159,7 @@ static NODE * ast_constant_init(NODE *node, va_list args)
   S(node).constant.value = atoi(text);
   free(text);
 
-  M(node).to_s = ast_constant_to_s;
+  SET_M(node, ast_constant_to_s);
 
   return node;
 }
@@ -176,7 +182,7 @@ static NODE * ast_identifier_init(NODE *node, va_list args)
 {
   S(node).identifier = va_arg(args, char *);
 
-  M(node).to_s = ast_identifier_to_s;
+  SET_M(node, ast_identifier_to_s);
 
   return node;
 }
@@ -193,9 +199,8 @@ static NODE *ast_list_init(NODE *node, va_list args)
   S(node).list.first = va_arg(args, NODE *);
   S(node).list.rest = va_arg(args, NODE *);
 
-  M(node).to_s = ast_list_to_s;
+  SET_M(node, ast_list_to_s);
 
-  fprintf(stderr, "list: %s\n", ast_to_s(node));
   return node;
 }
 
@@ -230,7 +235,7 @@ static NODE *ast_string_literal_init(NODE *node, va_list args)
 {
   S(node).string_literal = va_arg(args, char *);
 
-  M(node).to_s = ast_string_literal_to_s;
+  SET_M(node, ast_string_literal_to_s);
 
   return node;
 }
