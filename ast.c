@@ -114,13 +114,13 @@ static const char *_node_type_str[] =
 
 static const char *_op_str[] =
   {
-    "!",  //AST_OP_NOT,   // !
-    "--", //AST_OP_DEC,   // --
-    "++", //AST_OP_INC,   // ++
-    "-",  //AST_OP_MINUS, // -
-    "+",  //AST_OP_PLUS,  // +
-    "*",  //AST_OP_DEREF, // * (when prefix)
-    "&"   //AST_OP_REF    // & (when prefix)
+    "&",  //AST_OP_AMP,
+    "!",  //AST_OP_BANG,
+    "-",  //AST_OP_MINUS,
+    "--", //AST_OP_MINUS_MINUS,
+    "+",  //AST_OP_PLUS,
+    "++", //AST_OP_PLUS_PLUS,
+    "*",  //AST_OP_STAR
   };
 #define OP_TYPE_STR(x) (_op_str[(x)])
 

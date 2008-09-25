@@ -15,13 +15,13 @@ typedef enum _node_type {
 } NODE_TYPE;
 
 typedef enum _op_type {
-  AST_OP_NOT,   // !
-  AST_OP_DEC,   // --
-  AST_OP_INC,   // ++
-  AST_OP_MINUS, // -
-  AST_OP_PLUS,  // +
-  AST_OP_DEREF, // * (when prefix)
-  AST_OP_REF    // & (when prefix)
+  AST_OP_AMP,
+  AST_OP_BANG,
+  AST_OP_MINUS,
+  AST_OP_MINUS_MINUS,
+  AST_OP_PLUS,
+  AST_OP_PLUS_PLUS,
+  AST_OP_STAR
 } OP_TYPE;
 
 NODE *ast_create(NODE_TYPE type, ...);
