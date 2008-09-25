@@ -17,6 +17,7 @@ typedef enum _node_type {
 } NODE_TYPE;
 
 typedef enum _op_type {
+  AST_OP_ASSIGN,
   AST_OP_BAND,
   AST_OP_BOR,
   AST_OP_BXOR,

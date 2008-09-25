@@ -219,7 +219,7 @@ assignment_expression
     : logical_or_expression
     | postfix_expression '(' ')' { $$ = ast_create(AST_CALL, $1, ast_create(AST_LIST, NULL, NULL)); }
     | postfix_expression '(' identifier_list ')' { $$ = ast_create(AST_CALL, $1, $3); }
-    | unary_expression '=' assignment_expression { $$ = NULL /* FIXME */ }
+    | unary_expression '=' assignment_expression { $$ = ast_create(AST_BINARY, AST_OP_ASSIGN, $1, $3); }
     ;
 
 constant : CONSTANT { $$ = ast_create(AST_CONSTANT, $1); }

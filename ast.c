@@ -135,6 +135,7 @@ static const char *_node_type_str[] =
 
 static const char *_op_str[] =
   {
+    "=",  //AST_OP_ASSIGN,
     "&",  //AST_OP_BAND,
     "|",  //AST_OP_BOR,
     "^",  //AST_OP_BXOR,
