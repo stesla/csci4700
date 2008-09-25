@@ -31,52 +31,45 @@ static const char *ast_string_literal_to_s(NODE *node);
 ** TYPES
 */
 
-typedef struct {
-  const char *(*to_s)(NODE *);
-} MTAB;
+struct _node {
+  NODE_TYPE type;
 
-typedef union {
-  struct {
-    int value;
-    const char *to_s;
-  } constant;
+  /* methods */
+  struct _methods {
+    const char *(*to_s)(NODE *);
+  } mtab;
 
-  const char *identifier;
+  /* slots */
+  union _slots {
+    struct {
+      int value;
+      const char *to_s;
+    } constant;
 
-  struct {
-    NODE *first;
-    NODE *rest;
-    const char *to_s;
-  } identifier_list;
+    const char *identifier;
 
-  const char *string_literal;
-} STAB;
+    struct {
+      NODE *first;
+      NODE *rest;
+      const char *to_s;
+    } identifier_list;
 
-#define M(node) (*((MTAB *)(node)->mtab))
-#define S(node) (*((STAB *)(node)->stab))
+    const char *string_literal;
+  } stab;
+};
+
+#define M(node) (node->mtab)
+#define S(node) (node->stab)
 
 /*
 ** UTILITIES
 */
 
-static const char *_node_type_strings[] =
-  {"AST_CONSTANT",
-   "AST_IDENTIFIER",
-   "AST_STRING_LITERAL"};
-#define NODE_STR(type) (_node_type_strings[(type)])
-
-
 static NODE *ast_alloc(NODE_TYPE type)
 {
   NODE *result = (NODE *) my_malloc(sizeof(NODE));
+  bzero(result, sizeof(NODE));
   result->type = type;
-
-  result->mtab = my_malloc(sizeof(MTAB));
-  bzero(result->mtab, sizeof(MTAB));
-
-  result->stab = my_malloc(sizeof(STAB));
-  bzero(result->stab, sizeof(STAB));
-
   return result;
 }
 
