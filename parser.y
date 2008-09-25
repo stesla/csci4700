@@ -26,7 +26,7 @@ void yyerror(const char *s)
 %token IF ELSE WHILE FOR RETURN
 
 %type <node> identifier constant string_literal
-%type <node> a_list identifier_list
+%type <node> decl a_list identifier_list
 
 %expect 1
 
@@ -71,9 +71,9 @@ decl_list
         ;
 
 decl
-        : ARRAY a_list ';'
-        | GLOBAL identifier_list ';'
-        ;
+    : ARRAY a_list ';' { $$ = ast_create(AST_DECLARE, $2); }
+    | GLOBAL identifier_list ';' { $$ = ast_create(AST_DECLARE, $2); }
+    ;
 
 a_list
     : identifier '[' constant ']' {

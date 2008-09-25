@@ -32,6 +32,10 @@ struct _node {
       const char *to_s;
     } constant;
 
+    struct {
+      NODE *list;
+    } declare;
+
     const char *identifier;
 
     struct {
@@ -55,6 +59,10 @@ static const char *ast_array_to_s(NODE *node);
 /* Constant */
 static NODE * ast_constant_init(NODE *node, va_list args);
 static const char *ast_constant_to_s(NODE *node);
+
+/* Declare */
+static NODE * ast_declare_init(NODE *node, va_list args);
+static const char *ast_declare_to_s(NODE *node);
 
 /* Identifier */
 static NODE * ast_identifier_init(NODE *node, va_list args);
@@ -102,6 +110,7 @@ NODE *ast_create(NODE_TYPE type, ...)
     {
       ast_array_init,
       ast_constant_init,
+      ast_declare_init,
       ast_identifier_init,
       ast_list_init,
       ast_string_literal_init
@@ -174,6 +183,21 @@ static const char *ast_constant_to_s(NODE *node)
       snprintf((char *) S(node).constant.to_s, MAX_DIGITS, "%d", S(node).constant.value);
     }
   return S(node).constant.to_s;
+}
+
+/* Declare */
+static NODE * ast_declare_init(NODE *node, va_list args)
+{
+  S(node).declare.list = va_arg(args, NODE *);
+
+  SET_M(node, ast_declare_to_s);
+
+  printf("ast_declare_init: %s\n", ast_to_s(node));
+}
+
+static const char *ast_declare_to_s(NODE *node)
+{
+  return ast_to_s(S(node).declare.list);
 }
 
 /* Identifier */
