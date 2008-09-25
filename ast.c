@@ -142,22 +142,19 @@ static NODE * ast_identifier_init(NODE *node, va_list args)
 static NODE *ast_identifier_list_init(NODE *node, va_list args)
 {
   NODE *first = va_arg(args, NODE *);
-  NODE *second = va_arg(args, NODE *);
-  NODE *result = NULL;
+  NODE *rest = va_arg(args, NODE *);
 
-  if (first->type == AST_IDENTIFIER) /* First Identifier */
+  if (rest == NULL)
     {
       S(node).identifier_list.first = first;
-      result = node;
     }
   else
     {
-      S(first).identifier_list.rest = node;
-      S(node).identifier_list.first = second;
-      result = first;
+      S(node).identifier_list.first = first;
+      S(node).identifier_list.rest = rest;
     }
-  fprintf(stderr, "ast_identifier_list_init: %s\n", ast_to_s(result));
-  return result;
+  fprintf(stderr, "ast_identifier_list_init: %s\n", ast_to_s(node));
+  return node;
 }
 
 static NODE *ast_string_literal_init(NODE *node, va_list args)
@@ -187,29 +184,27 @@ static const char *ast_identifier_to_s(NODE *node)
 
 static const char *ast_identifier_list_to_s(NODE *node)
 {
-  char *result;
+  /* This just makes the code shorter below */
+  const char **result = &(S(node).identifier_list.to_s);
 
-  /* We can't rely on the previous string value because elements are consed
-     onto the back end instead of the front end of the list, and we could be
-     reaching this from inside debugging code before the list is complete. */
-  if (S(node).identifier_list.to_s)
-    free((void *) S(node).identifier_list.to_s);
-
-  if (S(node).identifier_list.rest == NULL)
+  if (*result == NULL)
     {
-      /* Make our own copy of our child's string */
-      result = strdup(ast_to_s(S(node).identifier_list.first));
-    }
-  else
-    {
-      const char *first = ast_to_s(S(node).identifier_list.first);
-      const char *rest = ast_to_s(S(node).identifier_list.rest);
-      size_t length = strlen(first) + strlen(rest) + 3;
-      result = my_malloc(length * sizeof(char));
-      snprintf(result, length, "%s, %s", first, rest);
-    }
+      if (S(node).identifier_list.rest == NULL)
+        {
+          /* Make our own copy of our child's string */
+          *result = strdup(ast_to_s(S(node).identifier_list.first));
+      }
+    else
+      {
+        const char *first = ast_to_s(S(node).identifier_list.first);
+        const char *rest = ast_to_s(S(node).identifier_list.rest);
+        size_t length = strlen(first) + strlen(rest) + 3;
+        *result = my_malloc(length * sizeof(char));
+        snprintf((char *) *result, length, "%s, %s", first, rest);
+      }
+  }
 
-  return S(node).identifier_list.to_s = result;
+  return *result;
 }
 
 static const char *ast_string_literal_to_s(NODE *node)

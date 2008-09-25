@@ -82,7 +82,7 @@ a_list
 
 identifier_list
     : identifier { $$ = ast_create(AST_IDENTIFIER_LIST, $1, NULL); }
-    | identifier_list ',' identifier { $$ = ast_create(AST_IDENTIFIER_LIST, $1, $3);  }
+    | identifier ',' identifier_list { $$ = ast_create(AST_IDENTIFIER_LIST, $1, $3);  }
     ;
 
 statement
