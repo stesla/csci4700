@@ -6,40 +6,20 @@
 #include "util.h"
 
 /*
-** FORWARD DECLARATIONS
-*/
-
-static const char *ast_default_to_s(NODE *node);
-
-/* Constant */
-static NODE * ast_constant_init(NODE *node, va_list args);
-static const char *ast_constant_to_s(NODE *node);
-
-/* Identifier */
-static NODE * ast_identifier_init(NODE *node, va_list args);
-static const char *ast_identifier_to_s(NODE *node);
-
-/* Identifier List */
-static NODE * ast_identifier_list_init(NODE *node, va_list args);
-static const char *ast_identifier_list_to_s(NODE *node);
-
-/* String Literal */
-static NODE * ast_string_literal_init(NODE *node, va_list args);
-static const char *ast_string_literal_to_s(NODE *node);
-
-/*
-** TYPES
+** Class Definition
 */
 
 struct _node {
   NODE_TYPE type;
 
-  /* methods */
+  /* Method Table */
   struct _methods {
     const char *(*to_s)(NODE *);
   } mtab;
 
-  /* slots */
+  /* Slot Table:
+  **   An entry per NODE_TYPE with the slots for that type.
+  */
   union _slots {
     struct {
       int value;
@@ -58,12 +38,32 @@ struct _node {
   } stab;
 };
 
-#define M(node) (node->mtab)
-#define S(node) (node->stab)
+/*
+** FORWARD DECLARATIONS
+*/
+
+/* Constant */
+static NODE * ast_constant_init(NODE *node, va_list args);
+static const char *ast_constant_to_s(NODE *node);
+
+/* Identifier */
+static NODE * ast_identifier_init(NODE *node, va_list args);
+static const char *ast_identifier_to_s(NODE *node);
+
+/* Identifier List */
+static NODE * ast_identifier_list_init(NODE *node, va_list args);
+static const char *ast_identifier_list_to_s(NODE *node);
+
+/* String Literal */
+static NODE * ast_string_literal_init(NODE *node, va_list args);
+static const char *ast_string_literal_to_s(NODE *node);
 
 /*
 ** UTILITIES
 */
+
+#define M(node) (node->mtab)
+#define S(node) (node->stab)
 
 static NODE *ast_alloc(NODE_TYPE type)
 {
@@ -113,7 +113,7 @@ const char *ast_to_s(NODE *node)
 ** PRIVATE FUNCTIONS
 */
 
-/* init */
+/* Constant */
 
 static NODE * ast_constant_init(NODE *node, va_list args)
 {
@@ -126,11 +126,32 @@ static NODE * ast_constant_init(NODE *node, va_list args)
   return node;
 }
 
+#define MAX_DIGITS 11 /* 10 digits in a 32-bit number + 1 for trailing \0 */
+static const char *ast_constant_to_s(NODE *node)
+{
+  /* The biggest 32-bit integer is 10 digits wide */
+  if (S(node).constant.to_s == NULL)
+    {
+      S(node).constant.to_s = (char *) my_malloc(MAX_DIGITS * sizeof(char));
+      snprintf((char *) S(node).constant.to_s, MAX_DIGITS, "%d", S(node).constant.value);
+    }
+  return S(node).constant.to_s;
+}
+
+/* Identifier */
+
 static NODE * ast_identifier_init(NODE *node, va_list args)
 {
   S(node).identifier = va_arg(args, char *);
   return node;
 }
+
+static const char *ast_identifier_to_s(NODE *node)
+{
+  return S(node).identifier;
+}
+
+/* Identifier List */
 
 static NODE *ast_identifier_list_init(NODE *node, va_list args)
 {
@@ -148,31 +169,6 @@ static NODE *ast_identifier_list_init(NODE *node, va_list args)
     }
   fprintf(stderr, "ast_identifier_list_init: %s\n", ast_to_s(node));
   return node;
-}
-
-static NODE *ast_string_literal_init(NODE *node, va_list args)
-{
-  S(node).string_literal = va_arg(args, char *);
-  return node;
-}
-
-/* to_s */
-
-#define MAX_DIGITS 11 /* 10 digits in a 32-bit number + 1 for trailing \0 */
-static const char *ast_constant_to_s(NODE *node)
-{
-  /* The biggest 32-bit integer is 10 digits wide */
-  if (S(node).constant.to_s == NULL)
-    {
-      S(node).constant.to_s = (char *) my_malloc(MAX_DIGITS * sizeof(char));
-      snprintf((char *) S(node).constant.to_s, MAX_DIGITS, "%d", S(node).constant.value);
-    }
-  return S(node).constant.to_s;
-}
-
-static const char *ast_identifier_to_s(NODE *node)
-{
-  return S(node).identifier;
 }
 
 static const char *ast_identifier_list_to_s(NODE *node)
@@ -198,6 +194,14 @@ static const char *ast_identifier_list_to_s(NODE *node)
   }
 
   return *result;
+}
+
+/* String Literal */
+
+static NODE *ast_string_literal_init(NODE *node, va_list args)
+{
+  S(node).string_literal = va_arg(args, char *);
+  return node;
 }
 
 static const char *ast_string_literal_to_s(NODE *node)
