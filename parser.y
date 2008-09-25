@@ -76,13 +76,15 @@ decl
         ;
 
 a_list
-    : identifier '[' constant ']' { $$ = ast_create(AST_ARRAY_LIST, $1, $3, NULL); }
-    | identifier '[' constant ']' ',' a_list { $$ = ast_create(AST_ARRAY_LIST, $1, $3, $6); }
+    : identifier '[' constant ']' {
+      $$ = ast_create(AST_LIST, ast_create(AST_ARRAY, $1, $3), NULL); }
+    | identifier '[' constant ']' ',' a_list {
+      $$ = ast_create(AST_LIST, ast_create(AST_ARRAY, $1, $3), $6); }
     ;
 
 identifier_list
-    : identifier { $$ = ast_create(AST_IDENTIFIER_LIST, $1, NULL); }
-    | identifier ',' identifier_list { $$ = ast_create(AST_IDENTIFIER_LIST, $1, $3);  }
+    : identifier { $$ = ast_create(AST_LIST, $1, NULL); }
+    | identifier ',' identifier_list { $$ = ast_create(AST_LIST, $1, $3); }
     ;
 
 statement

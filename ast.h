@@ -3,10 +3,10 @@
 
 typedef struct _node NODE;
 typedef enum _node_type {
-  AST_ARRAY_LIST,
+  AST_ARRAY,
   AST_CONSTANT,
   AST_IDENTIFIER,
-  AST_IDENTIFIER_LIST,
+  AST_LIST,
   AST_STRING_LITERAL
 } NODE_TYPE;
 
