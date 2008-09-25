@@ -59,35 +59,35 @@ struct _node {
 */
 
 /* Array */
-static NODE * ast_array_init(NODE *node, va_list args);
+static void ast_array_init(NODE *node, va_list args);
 static const char *ast_array_to_s(NODE *node);
 
 /* Constant */
-static NODE * ast_constant_init(NODE *node, va_list args);
+static void ast_constant_init(NODE *node, va_list args);
 static const char *ast_constant_to_s(NODE *node);
 
 /* Declare */
-static NODE * ast_declare_init(NODE *node, va_list args);
+static void ast_declare_init(NODE *node, va_list args);
 static const char *ast_declare_to_s(NODE *node);
 
 /* Formal */
-static NODE * ast_formal_init(NODE *node, va_list args);
+static void ast_formal_init(NODE *node, va_list args);
 static const char *ast_formal_to_s(NODE *node);
 
 /* Identifier */
-static NODE * ast_identifier_init(NODE *node, va_list args);
+static void ast_identifier_init(NODE *node, va_list args);
 static const char *ast_identifier_to_s(NODE *node);
 
 /* List */
-static NODE * ast_list_init(NODE *node, va_list args);
+static void ast_list_init(NODE *node, va_list args);
 static const char *ast_list_to_s(NODE *node);
 
 /* Postfix Op */
-static NODE * ast_postfix_init(NODE *node, va_list args);
+static void ast_postfix_init(NODE *node, va_list args);
 static const char *ast_postfix_to_s(NODE *node);
 
 /* String Literal */
-static NODE * ast_string_literal_init(NODE *node, va_list args);
+static void ast_string_literal_init(NODE *node, va_list args);
 static const char *ast_string_literal_to_s(NODE *node);
 
 /*
@@ -123,7 +123,7 @@ static const char *_op_str[] =
     M(node).to_s = (_to_s);                     \
   }
 
-static NODE *ast_alloc(NODE_TYPE type)
+static NODE * ast_alloc(NODE_TYPE type)
 {
   NODE *result = (NODE *) my_malloc(sizeof(NODE));
   bzero(result, sizeof(NODE));
@@ -139,7 +139,7 @@ NODE *ast_create(NODE_TYPE type, ...)
 {
   va_list args;
   NODE *result = ast_alloc(type);
-  static NODE * (*init[])(NODE *node, va_list args) =
+  static void (*init[])(NODE *node, va_list args) =
     {
       ast_array_init,
       ast_constant_init,
@@ -154,6 +154,9 @@ NODE *ast_create(NODE_TYPE type, ...)
   va_start(args, type);
   init[type](result, args);
   va_end(args);
+
+  /* Leave this debug statement in until we're done */
+  printf("ast_create(%s): %s\n", NODE_TYPE_STR(result->type), ast_to_s(result));
 
   return result;
 }
@@ -172,14 +175,12 @@ const char *ast_to_s(NODE *node)
 */
 
 /* Array List */
-static NODE * ast_array_init(NODE *node, va_list args)
+static void ast_array_init(NODE *node, va_list args)
 {
   S(node).array.identifier = va_arg(args, NODE *);
   S(node).array.count = va_arg(args, NODE *);
 
   SET_M(node, ast_array_to_s);
-
-  return node;
 }
 
 static const char *ast_array_to_s(NODE *node)
@@ -198,15 +199,13 @@ static const char *ast_array_to_s(NODE *node)
 
 /* Constant */
 
-static NODE * ast_constant_init(NODE *node, va_list args)
+static void ast_constant_init(NODE *node, va_list args)
 {
   char *text = va_arg(args, char *);
   S(node).constant = atoi(text);
   free(text);
 
   SET_M(node, ast_constant_to_s);
-
-  return node;
 }
 
 #define MAX_DIGITS 11 /* 10 digits in a 32-bit number + 1 for trailing \0 */
@@ -222,13 +221,11 @@ static const char *ast_constant_to_s(NODE *node)
 }
 
 /* Declare */
-static NODE * ast_declare_init(NODE *node, va_list args)
+static void ast_declare_init(NODE *node, va_list args)
 {
   S(node).declare.list = va_arg(args, NODE *);
 
   SET_M(node, ast_declare_to_s);
-
-  return node;
 }
 
 static const char *ast_declare_to_s(NODE *node)
@@ -237,14 +234,12 @@ static const char *ast_declare_to_s(NODE *node)
 }
 
 /* Formal */
-static NODE * ast_formal_init(NODE *node, va_list args)
+static void ast_formal_init(NODE *node, va_list args)
 {
   S(node).formal.identifier = va_arg(args, NODE *);
   S(node).formal.is_array = va_arg(args, int);
 
   SET_M(node, ast_formal_to_s);
-
-  return node;
 }
 
 static const char *ast_formal_to_s(NODE *node)
@@ -268,13 +263,11 @@ static const char *ast_formal_to_s(NODE *node)
 
 /* Identifier */
 
-static NODE * ast_identifier_init(NODE *node, va_list args)
+static void ast_identifier_init(NODE *node, va_list args)
 {
   S(node).identifier = va_arg(args, char *);
 
   SET_M(node, ast_identifier_to_s);
-
-  return node;
 }
 
 static const char *ast_identifier_to_s(NODE *node)
@@ -284,14 +277,12 @@ static const char *ast_identifier_to_s(NODE *node)
 
 /* List */
 
-static NODE *ast_list_init(NODE *node, va_list args)
+static void ast_list_init(NODE *node, va_list args)
 {
   S(node).list.first = va_arg(args, NODE *);
   S(node).list.rest = va_arg(args, NODE *);
 
   SET_M(node, ast_list_to_s);
-
-  return node;
 }
 
 static const char *ast_list_to_s(NODE *node)
@@ -321,16 +312,12 @@ static const char *ast_list_to_s(NODE *node)
 }
 
 /* Postfix Op */
-static NODE * ast_postfix_init(NODE *node, va_list args)
+static void ast_postfix_init(NODE *node, va_list args)
 {
   S(node).postfix.operand = va_arg(args, NODE *);
   S(node).postfix.op = va_arg(args, OP_TYPE);
 
   SET_M(node, ast_postfix_to_s);
-
-  printf("ast_create(%s): %s\n", NODE_TYPE_STR(node->type), ast_to_s(node));
-
-  return node;
 }
 
 static const char *ast_postfix_to_s(NODE *node)
@@ -348,13 +335,11 @@ static const char *ast_postfix_to_s(NODE *node)
 
 /* String Literal */
 
-static NODE *ast_string_literal_init(NODE *node, va_list args)
+static void ast_string_literal_init(NODE *node, va_list args)
 {
   S(node).string_literal = va_arg(args, char *);
 
   SET_M(node, ast_string_literal_to_s);
-
-  return node;
 }
 
 static const char *ast_string_literal_to_s(NODE *node)
