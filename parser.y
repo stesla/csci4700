@@ -28,6 +28,7 @@ void yyerror(const char *s)
 %type <node> identifier constant string_literal
 %type <node> decl_list decl a_list identifier_list
 %type <node> formal_list formal
+%type <node> primary_expression postfix_expression
 
 %expect 1
 
@@ -128,14 +129,14 @@ primary_expression
     : identifier
     | constant
     | string_literal
-    | '(' expression ')' { $$ = $2; }
+    | '(' expression ')' { $$ = NULL; /* TODO: fix this */ }
     ;
 
 postfix_expression
     : primary_expression
-    | postfix_expression '[' expression ']'
-    | postfix_expression INC_OP
-    | postfix_expression DEC_OP
+    | postfix_expression '[' expression ']' { $$ = NULL; /* TODO: fix this */ }
+    | postfix_expression INC_OP { $$ = ast_create(AST_POSTFIX, $1, AST_OP_INC) }
+    | postfix_expression DEC_OP { $$ = ast_create(AST_POSTFIX, $1, AST_OP_DEC) }
     ;
 
 unary_expression
