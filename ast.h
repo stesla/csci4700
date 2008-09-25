@@ -9,6 +9,7 @@ typedef enum _node_type {
   AST_CONSTANT,
   AST_DECLARE,
   AST_FORMAL,
+  AST_GROUP,
   AST_IDENTIFIER,
   AST_LIST,
   AST_POSTFIX,

@@ -33,7 +33,7 @@ void yyerror(const char *s)
 %type <node> relational_expression equality_expression and_expression
 %type <node> exclusive_or_expression inclusive_or_expression
 %type <node> logical_and_expression logical_or_expression
-%type <node> assignment_expression
+%type <node> assignment_expression expression
 %type <op> unary_operator
 
 %expect 1
@@ -127,15 +127,15 @@ return_stmt
     ;
 
 expression
-    : assignment_expression
-    | expression ',' assignment_expression
+    : assignment_expression { $$ = ast_create(AST_LIST, $1, NULL); }
+    | assignment_expression ',' expression { $$ = ast_create(AST_LIST, $1, $3); }
     ;
 
 primary_expression
     : identifier
     | constant
     | string_literal
-    | '(' expression ')' { $$ = NULL; /* FIXME */ }
+    | '(' expression ')' { $$ = ast_create(AST_GROUP, $2); }
     ;
 
 postfix_expression

@@ -49,6 +49,8 @@ struct _node {
       int is_array;
     } formal;
 
+    NODE *group;
+
     const char *identifier;
 
     struct {
@@ -93,6 +95,10 @@ static const char *ast_declare_to_s(NODE *node);
 static void ast_formal_init(NODE *node, va_list args);
 static const char *ast_formal_to_s(NODE *node);
 
+/* Group */
+static void ast_group_init(NODE *node, va_list args);
+static const char *ast_group_to_s(NODE *node);
+
 /* Identifier */
 static void ast_identifier_init(NODE *node, va_list args);
 static const char *ast_identifier_to_s(NODE *node);
@@ -125,6 +131,7 @@ static const char *_node_type_str[] =
     "AST_CONSTANT",
     "AST_DECLARE",
     "AST_FORMAL",
+    "AST_GROUP",
     "AST_IDENTIFIER",
     "AST_LIST",
     "AST_POSTFIX",
@@ -193,6 +200,7 @@ NODE *ast_create(NODE_TYPE type, ...)
       ast_constant_init,
       ast_declare_init,
       ast_formal_init,
+      ast_group_init,
       ast_identifier_init,
       ast_list_init,
       ast_postfix_init,
@@ -355,6 +363,27 @@ static const char *ast_formal_to_s(NODE *node)
         {
           node->to_s = strdup(ast_to_s(S(node).formal.identifier));
         }
+    }
+  return node->to_s;
+}
+
+/* Group */
+
+static void ast_group_init(NODE *node, va_list args)
+{
+  S(node).group = va_arg(args, NODE *);
+
+  SET_M(node, ast_group_to_s);
+}
+
+static const char *ast_group_to_s(NODE *node)
+{
+  if (node->to_s == NULL)
+    {
+      const char *group = ast_to_s(S(node).group);
+      size_t length = strlen(group) + 3;
+      node->to_s = my_malloc(length * sizeof(char));
+      snprintf((char *) node->to_s, length, "(%s)", group);
     }
   return node->to_s;
 }
