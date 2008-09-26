@@ -7,33 +7,47 @@
 
 #include "ast_array.h"
 #include "ast_binary.h"
+#include "ast_block.h"
 #include "ast_call.h"
+#include "ast_conditional.h"
 #include "ast_constant.h"
 #include "ast_declare.h"
+#include "ast_for.h"
 #include "ast_formal.h"
+#include "ast_function.h"
 #include "ast_group.h"
 #include "ast_identifier.h"
 #include "ast_list.h"
 #include "ast_postfix.h"
 #include "ast_prefix.h"
+#include "ast_read.h"
 #include "ast_return.h"
 #include "ast_string_literal.h"
+#include "ast_while.h"
+#include "ast_write.h"
 
 static const char *_node_type_str[] =
   {
     "AST_ARRAY",
     "AST_BINARY",
+    "AST_BLOCK",
     "AST_CALL",
+    "AST_CONDITIONAL",
     "AST_CONSTANT",
-    "AST_ECLARE",
+    "AST_DECLARE",
+    "AST_FOR",
     "AST_FORMAL",
+    "AST_FUNCTION",
     "AST_GROUP",
     "AST_IDENTIFIER",
     "AST_LIST",
     "AST_POSTFIX",
     "AST_PREFIX",
+    "AST_READ",
     "AST_RETURN",
-    "AST_STRING_LITERAL"
+    "AST_STRING_LITERAL",
+    "AST_WHILE",
+    "AST_WRITE"
   };
 #define NODE_TYPE_STR(x) (_node_type_str[(x)])
 
@@ -82,17 +96,24 @@ NODE *ast_create(NODE_TYPE type, ...)
     {
       {ast_array_size, ast_array_init},
       {ast_binary_size, ast_binary_init},
+      {ast_block_size, ast_block_init},
       {ast_call_size, ast_call_init},
+      {ast_conditional_size, ast_conditional_init},
       {ast_constant_size, ast_constant_init},
       {ast_declare_size, ast_declare_init},
+      {ast_for_size, ast_for_init},
       {ast_formal_size, ast_formal_init},
+      {ast_function_size, ast_function_init},
       {ast_group_size, ast_group_init},
       {ast_identifier_size, ast_identifier_init},
       {ast_list_size, ast_list_init},
       {ast_postfix_size, ast_postfix_init},
       {ast_prefix_size, ast_prefix_init},
+      {ast_read_size, ast_read_init},
       {ast_return_size, ast_return_init},
-      {ast_string_literal_size, ast_string_literal_init}
+      {ast_string_literal_size, ast_string_literal_init},
+      {ast_while_size, ast_while_init},
+      {ast_write_size, ast_write_init}
     };
 
   va_list args;

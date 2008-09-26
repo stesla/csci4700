@@ -33,7 +33,9 @@ void yyerror(const char *s)
 %type <node> relational_expression equality_expression and_expression
 %type <node> exclusive_or_expression inclusive_or_expression
 %type <node> logical_and_expression logical_or_expression
-%type <node> assignment_expression expression return_stmt;
+%type <node> assignment_expression expression return_stmt
+%type <node> block expression_stmt selection_stmt iteration_stmt statement
+%type <node> statement_list external_declaration translation_unit
 %type <op> unary_operator
 
 %expect 1
@@ -41,12 +43,12 @@ void yyerror(const char *s)
 %%
 
 translation_unit
-    : external_declaration
-    | translation_unit external_declaration
+    : external_declaration { $$ = ast_create(AST_LIST, $1, NULL); }
+    | external_declaration translation_unit { $$ = ast_create(AST_LIST, $1, $2); }
     ;
 
 external_declaration
-    : identifier '(' formal_list ')' block
+    : identifier '(' formal_list ')' block { $$ = ast_create(AST_FUNCTION, $1, $3, $5); }
     | decl
     ;
 
@@ -62,15 +64,15 @@ formal
     ;
 
 block
-    : '{' '}'
-    | '{' statement_list '}'
-    | '{' decl_list '}'
-    | '{' decl_list statement_list '}'
+    : '{' '}' { $$ = ast_create(AST_BLOCK, NULL, NULL); }
+    | '{' statement_list '}' { $$ = ast_create(AST_BLOCK, NULL, $2); }
+    | '{' decl_list '}' { $$ = ast_create(AST_BLOCK, $2, NULL); }
+    | '{' decl_list statement_list '}' { $$ = ast_create(AST_BLOCK, $2, $3); }
     ;
 
 statement_list
-    : statement
-    | statement_list statement
+    : statement { $$ = ast_create(AST_LIST, $1, NULL); }
+    | statement statement_list { $$ = ast_create(AST_LIST, $1, $2); }
     ;
 
 decl_list
@@ -99,24 +101,24 @@ statement
     | selection_stmt
     | iteration_stmt
     | return_stmt
-    | READ '(' identifier ')' ';'
-    | WRITE '(' primary_expression ')' ';'
+    | READ '(' identifier ')' ';' { $$ = ast_create(AST_READ, $3); }
+    | WRITE '(' primary_expression ')' ';' { $$ = ast_create(AST_WRITE, $3); }
     ;
 
 expression_stmt
-    : ';'
-    | expression ';'
+    : ';' { $$ = NULL; }
+    | expression ';' { $$ = $1; }
     ;
 
 selection_stmt
-    : IF '(' expression ')' statement
-    | IF '(' expression ')' statement ELSE statement
+    : IF '(' expression ')' statement { $$ = ast_create(AST_CONDITIONAL, $3, $5, NULL); }
+    | IF '(' expression ')' statement ELSE statement { $$ = ast_create(AST_CONDITIONAL, $3, $5, $7); }
     ;
 
 iteration_stmt
-    : WHILE '(' expression ')' statement
-    | FOR '(' expression_stmt expression_stmt ')' statement
-    | FOR '(' expression_stmt expression_stmt expression ')' statement
+    : WHILE '(' expression ')' statement { $$ = ast_create(AST_WHILE, $3, $5); }
+    | FOR '(' expression_stmt expression_stmt ')' statement { $$ = ast_create(AST_FOR, $3, $4, NULL, $6); }
+    | FOR '(' expression_stmt expression_stmt expression ')' statement { $$ = ast_create(AST_FOR, $3, $4, $5, $7); }
     ;
 
 return_stmt
