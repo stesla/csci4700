@@ -229,10 +229,13 @@ NODE *ast_create(NODE_TYPE type, ...)
 const char *ast_to_s(NODE *node)
 {
   //TODO: Get rid of this once the AST is completed
-  if (node)
-    return M(node).to_s(node);
-  else
+  if (!node)
     return "(null)";
+
+  if (node->to_s == NULL)
+    node->to_s = M(node).to_s(node);
+
+  return node->to_s;
 }
 
 /*
@@ -251,15 +254,12 @@ static void ast_array_init(NODE *node, va_list args)
 
 static const char *ast_array_to_s(NODE *node)
 {
-  if (node->to_s == NULL)
-    {
-      const char *identifier = ast_to_s(S(node).array.identifier);
-      const char *count = ast_to_s(S(node).array.count);
-      size_t length = strlen(identifier) + strlen(count) + 3; /* first[count] */
-      node->to_s = my_malloc(length * sizeof(char));
-      snprintf((char *) node->to_s, length, "%s[%s]", identifier, count);
-    }
-  return node->to_s;
+  const char *identifier = ast_to_s(S(node).array.identifier);
+  const char *count = ast_to_s(S(node).array.count);
+  size_t length = strlen(identifier) + strlen(count) + 3; /* first[count] */
+  char *result = my_malloc(length * sizeof(char));
+  snprintf(result, length, "%s[%s]", identifier, count);
+  return result;
 }
 
 /* Binary */
@@ -275,16 +275,13 @@ static void ast_binary_init(NODE *node, va_list args)
 
 static const char *ast_binary_to_s(NODE *node)
 {
-  if (node->to_s == NULL)
-    {
-      const char *left = ast_to_s(S(node).binary.left);
-      const char *op = OP_TYPE_STR(S(node).binary.op);
-      const char *right = ast_to_s(S(node).binary.right);
-      size_t length = strlen(left) + strlen(op) + strlen(right) + 3;
-      node->to_s = my_malloc(length *sizeof(char));
-      snprintf((char *) node->to_s, length, "%s %s %s", left, op, right);
-    }
-  return node->to_s;
+  const char *left = ast_to_s(S(node).binary.left);
+  const char *op = OP_TYPE_STR(S(node).binary.op);
+  const char *right = ast_to_s(S(node).binary.right);
+  size_t length = strlen(left) + strlen(op) + strlen(right) + 3;
+  char *result = my_malloc(length *sizeof(char));
+  snprintf(result, length, "%s %s %s", left, op, right);
+  return result;
 }
 
 /* Call */
@@ -299,15 +296,12 @@ static void ast_call_init(NODE *node, va_list args)
 
 static const char *ast_call_to_s(NODE *node)
 {
-  if (node->to_s == NULL)
-    {
-      const char *func = ast_to_s(S(node).call.func);
-      const char *args = ast_to_s(S(node).call.args);
-      size_t length = strlen(func) + strlen(args) + 3;
-      node->to_s = malloc(length * sizeof(char));
-      snprintf((char *) node->to_s, length, "%s(%s)", func, args);
-    }
-  return node->to_s;
+  const char *func = ast_to_s(S(node).call.func);
+  const char *args = ast_to_s(S(node).call.args);
+  size_t length = strlen(func) + strlen(args) + 3;
+  char *result = malloc(length * sizeof(char));
+  snprintf(result, length, "%s(%s)", func, args);
+  return result;
 }
 
 /* Constant */
@@ -324,13 +318,9 @@ static void ast_constant_init(NODE *node, va_list args)
 #define MAX_DIGITS 11 /* 10 digits in a 32-bit number + 1 for trailing \0 */
 static const char *ast_constant_to_s(NODE *node)
 {
-  /* The biggest 32-bit integer is 10 digits wide */
-  if (node->to_s == NULL)
-    {
-      node->to_s = (char *) my_malloc(MAX_DIGITS * sizeof(char));
-      snprintf((char *) node->to_s, MAX_DIGITS, "%d", S(node).constant);
-    }
-  return node->to_s;
+  char *result = (char *) my_malloc(MAX_DIGITS * sizeof(char));
+  snprintf(result, MAX_DIGITS, "%d", S(node).constant);
+  return result;
 }
 
 /* Declare */
@@ -358,21 +348,20 @@ static void ast_formal_init(NODE *node, va_list args)
 
 static const char *ast_formal_to_s(NODE *node)
 {
-  if (node->to_s == NULL)
+  char *result;
+
+  if (S(node).formal.is_array)
     {
-      if (S(node).formal.is_array)
-        {
-          const char *identifier = ast_to_s(S(node).formal.identifier);
-          size_t length = strlen(identifier) + 3; /* identifier[] */
-          node->to_s = my_malloc(length * sizeof(char));
-          snprintf((char *) node->to_s, length, "%s[]", identifier);
-        }
-      else
-        {
-          node->to_s = strdup(ast_to_s(S(node).formal.identifier));
-        }
+      const char *identifier = ast_to_s(S(node).formal.identifier);
+      size_t length = strlen(identifier) + 3; /* identifier[] */
+      result = my_malloc(length * sizeof(char));
+      snprintf(result, length, "%s[]", identifier);
     }
-  return node->to_s;
+  else
+    {
+      result = strdup(ast_to_s(S(node).formal.identifier));
+    }
+  return result;
 }
 
 /* Group */
@@ -386,14 +375,11 @@ static void ast_group_init(NODE *node, va_list args)
 
 static const char *ast_group_to_s(NODE *node)
 {
-  if (node->to_s == NULL)
-    {
-      const char *group = ast_to_s(S(node).group);
-      size_t length = strlen(group) + 3;
-      node->to_s = my_malloc(length * sizeof(char));
-      snprintf((char *) node->to_s, length, "(%s)", group);
-    }
-  return node->to_s;
+  const char *group = ast_to_s(S(node).group);
+  size_t length = strlen(group) + 3;
+  char *result = my_malloc(length * sizeof(char));
+  snprintf(result, length, "(%s)", group);
+  return result;
 }
 
 /* Identifier */
@@ -422,28 +408,26 @@ static void ast_list_init(NODE *node, va_list args)
 
 static const char *ast_list_to_s(NODE *node)
 {
-  if (node->to_s == NULL)
-    {
-      if(S(node).list.first == NULL)
-        {
-          node->to_s = "(empty)"; /* empty list */
-        }
-      else if (S(node).list.rest == NULL)
-        {
-          /* Make our own copy of our child's string */
-          node->to_s = strdup(ast_to_s(S(node).list.first));
-        }
-      else
-        {
-          const char *first = ast_to_s(S(node).list.first);
-          const char *rest = ast_to_s(S(node).list.rest);
-          size_t length = strlen(first) + strlen(rest) + 3;
-          node->to_s = my_malloc(length * sizeof(char));
-          snprintf((char *) node->to_s, length, "%s, %s", first, rest);
-        }
-    }
+  char *result;
 
-  return node->to_s;
+  if(S(node).list.first == NULL)
+    {
+      result = "(empty)"; /* empty list */
+    }
+  else if (S(node).list.rest == NULL)
+    {
+      /* Make our own copy of our child's string */
+      result = strdup(ast_to_s(S(node).list.first));
+    }
+  else
+    {
+      const char *first = ast_to_s(S(node).list.first);
+      const char *rest = ast_to_s(S(node).list.rest);
+      size_t length = strlen(first) + strlen(rest) + 3;
+      result = my_malloc(length * sizeof(char));
+      snprintf(result, length, "%s, %s", first, rest);
+    }
+  return result;
 }
 
 /* Postfix Op */
@@ -458,15 +442,12 @@ static void ast_postfix_init(NODE *node, va_list args)
 
 static const char *ast_postfix_to_s(NODE *node)
 {
-  if (node->to_s == NULL)
-    {
-      const char *operand = ast_to_s(S(node).unary.operand);
-      const char *op = OP_TYPE_STR(S(node).unary.op);
-      size_t length = strlen(operand) + strlen(op) + 1;
-      node->to_s = my_malloc(length * sizeof(char));
-      snprintf((char *) node->to_s, length, "%s%s", operand, op);
-    }
-  return node->to_s;
+  const char *operand = ast_to_s(S(node).unary.operand);
+  const char *op = OP_TYPE_STR(S(node).unary.op);
+  size_t length = strlen(operand) + strlen(op) + 1;
+  char *result = my_malloc(length * sizeof(char));
+  snprintf(result, length, "%s%s", operand, op);
+  return result;
 }
 
 /* Prefix Op */
@@ -481,15 +462,12 @@ static void ast_prefix_init(NODE *node, va_list args)
 
 static const char *ast_prefix_to_s(NODE *node)
 {
-  if (node->to_s == NULL)
-    {
-      const char *operand = ast_to_s(S(node).unary.operand);
-      const char *op = OP_TYPE_STR(S(node).unary.op);
-      size_t length = strlen(operand) + strlen(op) + 1;
-      node->to_s = my_malloc(length * sizeof(char));
-      snprintf((char *) node->to_s, length, "%s%s", op, operand);
-    }
-  return node->to_s;
+  const char *operand = ast_to_s(S(node).unary.operand);
+  const char *op = OP_TYPE_STR(S(node).unary.op);
+  size_t length = strlen(operand) + strlen(op) + 1;
+  char *result = my_malloc(length * sizeof(char));
+  snprintf(result, length, "%s%s", op, operand);
+  return result;
 }
 
 /* Return */
@@ -503,21 +481,20 @@ static void ast_return_init(NODE *node, va_list args)
 
 static const char *ast_return_to_s(NODE *node)
 {
-  if (node->to_s == NULL)
+  char *result;
+
+  if(S(node).retval)
     {
-      if(S(node).retval)
-        {
-          const char *retval = ast_to_s(S(node).retval);
-          size_t length = strlen("RETURN") + strlen(retval) + 2;
-          node->to_s = my_malloc(length * sizeof(char));
-          snprintf((char *) node->to_s, length, "RETURN %s", retval);
-        }
-      else
-        {
-          node->to_s = strdup("RETURN");
-        }
+      const char *retval = ast_to_s(S(node).retval);
+      size_t length = strlen("RETURN") + strlen(retval) + 2;
+      result = my_malloc(length * sizeof(char));
+      snprintf(result, length, "RETURN %s", retval);
     }
-  return node->to_s;
+  else
+    {
+      result = strdup("RETURN");
+    }
+  return result;
 }
 
 /* String Literal */
@@ -531,5 +508,5 @@ static void ast_string_literal_init(NODE *node, va_list args)
 
 static const char *ast_string_literal_to_s(NODE *node)
 {
-  return S(node).string_literal;
+  return strdup(S(node).string_literal);
 }
