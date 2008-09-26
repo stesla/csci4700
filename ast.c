@@ -118,7 +118,7 @@ const char *ast_to_s(NODE *node)
     return "(null)";
 
   if (node->to_s == NULL)
-    node->to_s = M(node).to_s(node);
+    node->to_s = node->methods.to_s(node);
 
   return node->to_s;
 }

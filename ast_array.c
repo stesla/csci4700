@@ -4,10 +4,15 @@
 #include "ast.h"
 #include "util.h"
 
+struct slots {
+  NODE *identifier;
+  NODE *count;
+};
+
 static const char *ast_array_to_s(NODE *node)
 {
-  const char *identifier = ast_to_s(S(node).array.identifier);
-  const char *count = ast_to_s(S(node).array.count);
+  const char *identifier = ast_to_s(S(node).identifier);
+  const char *count = ast_to_s(S(node).count);
   size_t length = strlen(identifier) + strlen(count) + 3; /* first[count] */
   char *result = my_malloc(length * sizeof(char));
   snprintf(result, length, "%s[%s]", identifier, count);
@@ -16,8 +21,10 @@ static const char *ast_array_to_s(NODE *node)
 
 void ast_array_init(NODE *node, va_list args)
 {
-  S(node).array.identifier = va_arg(args, NODE *);
-  S(node).array.count = va_arg(args, NODE *);
+  ALLOC_S(node);
+
+  S(node).identifier = va_arg(args, NODE *);
+  S(node).count = va_arg(args, NODE *);
 
   SET_M(node, ast_array_to_s);
 }

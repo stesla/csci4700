@@ -4,9 +4,13 @@
 #include "ast.h"
 #include "util.h"
 
+struct slots {
+  NODE *inner;
+};
+
 static const char *ast_group_to_s(NODE *node)
 {
-  const char *group = ast_to_s(S(node).group);
+  const char *group = ast_to_s(S(node).inner);
   size_t length = strlen(group) + 3;
   char *result = my_malloc(length * sizeof(char));
   snprintf(result, length, "(%s)", group);
@@ -15,7 +19,9 @@ static const char *ast_group_to_s(NODE *node)
 
 void ast_group_init(NODE *node, va_list args)
 {
-  S(node).group = va_arg(args, NODE *);
+  ALLOC_S(node);
+
+  S(node).inner = va_arg(args, NODE *);
 
   SET_M(node, ast_group_to_s);
 }

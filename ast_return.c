@@ -4,16 +4,20 @@
 #include "ast.h"
 #include "util.h"
 
+struct slots {
+  NODE *value;
+};
+
 static const char *ast_return_to_s(NODE *node)
 {
   char *result;
 
-  if(S(node).retval)
+  if(S(node).value)
     {
-      const char *retval = ast_to_s(S(node).retval);
-      size_t length = strlen("RETURN") + strlen(retval) + 2;
+      const char *value = ast_to_s(S(node).value);
+      size_t length = strlen("RETURN") + strlen(value) + 2;
       result = my_malloc(length * sizeof(char));
-      snprintf(result, length, "RETURN %s", retval);
+      snprintf(result, length, "RETURN %s", value);
     }
   else
     {
@@ -24,7 +28,9 @@ static const char *ast_return_to_s(NODE *node)
 
 void ast_return_init(NODE *node, va_list args)
 {
-  S(node).retval = va_arg(args, NODE *);
+  ALLOC_S(node);
+
+  S(node).value = va_arg(args, NODE *);
 
   SET_M(node, ast_return_to_s);
 }
