@@ -5,125 +5,19 @@
 #include "ast.h"
 #include "util.h"
 
-/*
-** Class Definition
-*/
-
-struct _node {
-  NODE_TYPE type;
-  const char *to_s;
-
-  /* Method Table */
-  struct _methods {
-    const char *(*to_s)(NODE *);
-  } mtab;
-
-  /* Slot Table:
-  **   An entry per NODE_TYPE with the slots for that type.
-  */
-  union _slots {
-    struct {
-      NODE *identifier;
-      NODE *count;
-    } array;
-
-    struct {
-      OP_TYPE op;
-      NODE *left;
-      NODE *right;
-    } binary;
-
-    struct {
-      NODE *func;
-      NODE *args;
-    } call;
-
-    int constant;
-
-    struct {
-      NODE *list;
-    } declare;
-
-    struct {
-      NODE *identifier;
-      int is_array;
-    } formal;
-
-    NODE *group;
-
-    const char *identifier;
-
-    struct {
-      NODE *first;
-      NODE *rest;
-    } list;
-
-    struct {
-      NODE *operand;
-      OP_TYPE op;
-    } unary;
-
-    NODE *retval;
-
-    const char *string_literal;
-  } stab;
-};
-
-/*
-** FORWARD DECLARATIONS
-*/
-
-/* Array */
-static void ast_array_init(NODE *node, va_list args);
-static const char *ast_array_to_s(NODE *node);
-
-/* Binary */
-static void ast_binary_init(NODE *node, va_list args);
-static const char *ast_binary_to_s(NODE *node);
-
-/* Call */
-static void ast_call_init(NODE *node, va_list args);
-static const char *ast_call_to_s(NODE *node);
-
-/* Constant */
-static void ast_constant_init(NODE *node, va_list args);
-static const char *ast_constant_to_s(NODE *node);
-
-/* Declare */
-static void ast_declare_init(NODE *node, va_list args);
-static const char *ast_declare_to_s(NODE *node);
-
-/* Formal */
-static void ast_formal_init(NODE *node, va_list args);
-static const char *ast_formal_to_s(NODE *node);
-
-/* Group */
-static void ast_group_init(NODE *node, va_list args);
-static const char *ast_group_to_s(NODE *node);
-
-/* Identifier */
-static void ast_identifier_init(NODE *node, va_list args);
-static const char *ast_identifier_to_s(NODE *node);
-
-/* List */
-static void ast_list_init(NODE *node, va_list args);
-static const char *ast_list_to_s(NODE *node);
-
-/* Postfix Op */
-static void ast_postfix_init(NODE *node, va_list args);
-static const char *ast_postfix_to_s(NODE *node);
-
-/* Prefix Op */
-static void ast_prefix_init(NODE *node, va_list args);
-static const char *ast_prefix_to_s(NODE *node);
-
-/* Return */
-static void ast_return_init(NODE *node, va_list args);
-static const char *ast_return_to_s(NODE *node);
-
-/* String Literal */
-static void ast_string_literal_init(NODE *node, va_list args);
-static const char *ast_string_literal_to_s(NODE *node);
+#include "ast_array.h"
+#include "ast_binary.h"
+#include "ast_call.h"
+#include "ast_constant.h"
+#include "ast_declare.h"
+#include "ast_formal.h"
+#include "ast_group.h"
+#include "ast_identifier.h"
+#include "ast_list.h"
+#include "ast_postfix.h"
+#include "ast_prefix.h"
+#include "ast_return.h"
+#include "ast_string_literal.h"
 
 /*
 ** UTILITIES
@@ -135,7 +29,7 @@ static const char *_node_type_str[] =
     "AST_BINARY",
     "AST_CALL",
     "AST_CONSTANT",
-    "AST_DECLARE",
+    "AST_ECLARE",
     "AST_FORMAL",
     "AST_GROUP",
     "AST_IDENTIFIER",
@@ -172,16 +66,6 @@ static const char *_op_str[] =
     "+",  //AST_OP_PLUS,
     "&"   //AST_OP_REF
   };
-#define OP_TYPE_STR(x) (_op_str[(x)])
-
-#define M(node) (node->mtab)
-#define S(node) (node->stab)
-
-#define SET_M(node,                             \
-              _to_s)                            \
-  {                                             \
-    M(node).to_s = (_to_s);                     \
-  }
 
 static NODE * ast_alloc(NODE_TYPE type)
 {
@@ -190,10 +74,6 @@ static NODE * ast_alloc(NODE_TYPE type)
   result->type = type;
   return result;
 }
-
-/*
-** PUBLIC FUNCTIONS
-*/
 
 NODE *ast_create(NODE_TYPE type, ...)
 {
@@ -226,6 +106,11 @@ NODE *ast_create(NODE_TYPE type, ...)
   return result;
 }
 
+const char *ast_op_str(OP_TYPE type)
+{
+  return _op_str[type];
+}
+
 const char *ast_to_s(NODE *node)
 {
   //TODO: Get rid of this once the AST is completed
@@ -236,277 +121,4 @@ const char *ast_to_s(NODE *node)
     node->to_s = M(node).to_s(node);
 
   return node->to_s;
-}
-
-/*
-** PRIVATE FUNCTIONS
-*/
-
-/* Array */
-
-static void ast_array_init(NODE *node, va_list args)
-{
-  S(node).array.identifier = va_arg(args, NODE *);
-  S(node).array.count = va_arg(args, NODE *);
-
-  SET_M(node, ast_array_to_s);
-}
-
-static const char *ast_array_to_s(NODE *node)
-{
-  const char *identifier = ast_to_s(S(node).array.identifier);
-  const char *count = ast_to_s(S(node).array.count);
-  size_t length = strlen(identifier) + strlen(count) + 3; /* first[count] */
-  char *result = my_malloc(length * sizeof(char));
-  snprintf(result, length, "%s[%s]", identifier, count);
-  return result;
-}
-
-/* Binary */
-
-static void ast_binary_init(NODE *node, va_list args)
-{
-  S(node).binary.op = va_arg(args, OP_TYPE);
-  S(node).binary.left = va_arg(args, NODE *);
-  S(node).binary.right = va_arg(args, NODE *);
-
-  SET_M(node, ast_binary_to_s);
-}
-
-static const char *ast_binary_to_s(NODE *node)
-{
-  const char *left = ast_to_s(S(node).binary.left);
-  const char *op = OP_TYPE_STR(S(node).binary.op);
-  const char *right = ast_to_s(S(node).binary.right);
-  size_t length = strlen(left) + strlen(op) + strlen(right) + 3;
-  char *result = my_malloc(length *sizeof(char));
-  snprintf(result, length, "%s %s %s", left, op, right);
-  return result;
-}
-
-/* Call */
-
-static void ast_call_init(NODE *node, va_list args)
-{
-  S(node).call.func = va_arg(args, NODE *);
-  S(node).call.args = va_arg(args, NODE *);
-
-  SET_M(node, ast_call_to_s);
-}
-
-static const char *ast_call_to_s(NODE *node)
-{
-  const char *func = ast_to_s(S(node).call.func);
-  const char *args = ast_to_s(S(node).call.args);
-  size_t length = strlen(func) + strlen(args) + 3;
-  char *result = malloc(length * sizeof(char));
-  snprintf(result, length, "%s(%s)", func, args);
-  return result;
-}
-
-/* Constant */
-
-static void ast_constant_init(NODE *node, va_list args)
-{
-  char *text = va_arg(args, char *);
-  S(node).constant = atoi(text);
-  free(text);
-
-  SET_M(node, ast_constant_to_s);
-}
-
-#define MAX_DIGITS 11 /* 10 digits in a 32-bit number + 1 for trailing \0 */
-static const char *ast_constant_to_s(NODE *node)
-{
-  char *result = (char *) my_malloc(MAX_DIGITS * sizeof(char));
-  snprintf(result, MAX_DIGITS, "%d", S(node).constant);
-  return result;
-}
-
-/* Declare */
-static void ast_declare_init(NODE *node, va_list args)
-{
-  S(node).declare.list = va_arg(args, NODE *);
-
-  SET_M(node, ast_declare_to_s);
-}
-
-static const char *ast_declare_to_s(NODE *node)
-{
-  return ast_to_s(S(node).declare.list);
-}
-
-/* Formal */
-
-static void ast_formal_init(NODE *node, va_list args)
-{
-  S(node).formal.identifier = va_arg(args, NODE *);
-  S(node).formal.is_array = va_arg(args, int);
-
-  SET_M(node, ast_formal_to_s);
-}
-
-static const char *ast_formal_to_s(NODE *node)
-{
-  char *result;
-
-  if (S(node).formal.is_array)
-    {
-      const char *identifier = ast_to_s(S(node).formal.identifier);
-      size_t length = strlen(identifier) + 3; /* identifier[] */
-      result = my_malloc(length * sizeof(char));
-      snprintf(result, length, "%s[]", identifier);
-    }
-  else
-    {
-      result = strdup(ast_to_s(S(node).formal.identifier));
-    }
-  return result;
-}
-
-/* Group */
-
-static void ast_group_init(NODE *node, va_list args)
-{
-  S(node).group = va_arg(args, NODE *);
-
-  SET_M(node, ast_group_to_s);
-}
-
-static const char *ast_group_to_s(NODE *node)
-{
-  const char *group = ast_to_s(S(node).group);
-  size_t length = strlen(group) + 3;
-  char *result = my_malloc(length * sizeof(char));
-  snprintf(result, length, "(%s)", group);
-  return result;
-}
-
-/* Identifier */
-
-static void ast_identifier_init(NODE *node, va_list args)
-{
-  S(node).identifier = va_arg(args, char *);
-
-  SET_M(node, ast_identifier_to_s);
-}
-
-static const char *ast_identifier_to_s(NODE *node)
-{
-  return S(node).identifier;
-}
-
-/* List */
-
-static void ast_list_init(NODE *node, va_list args)
-{
-  S(node).list.first = va_arg(args, NODE *);
-  S(node).list.rest = va_arg(args, NODE *);
-
-  SET_M(node, ast_list_to_s);
-}
-
-static const char *ast_list_to_s(NODE *node)
-{
-  char *result;
-
-  if(S(node).list.first == NULL)
-    {
-      result = "(empty)"; /* empty list */
-    }
-  else if (S(node).list.rest == NULL)
-    {
-      /* Make our own copy of our child's string */
-      result = strdup(ast_to_s(S(node).list.first));
-    }
-  else
-    {
-      const char *first = ast_to_s(S(node).list.first);
-      const char *rest = ast_to_s(S(node).list.rest);
-      size_t length = strlen(first) + strlen(rest) + 3;
-      result = my_malloc(length * sizeof(char));
-      snprintf(result, length, "%s, %s", first, rest);
-    }
-  return result;
-}
-
-/* Postfix Op */
-
-static void ast_postfix_init(NODE *node, va_list args)
-{
-  S(node).unary.operand = va_arg(args, NODE *);
-  S(node).unary.op = va_arg(args, OP_TYPE);
-
-  SET_M(node, ast_postfix_to_s);
-}
-
-static const char *ast_postfix_to_s(NODE *node)
-{
-  const char *operand = ast_to_s(S(node).unary.operand);
-  const char *op = OP_TYPE_STR(S(node).unary.op);
-  size_t length = strlen(operand) + strlen(op) + 1;
-  char *result = my_malloc(length * sizeof(char));
-  snprintf(result, length, "%s%s", operand, op);
-  return result;
-}
-
-/* Prefix Op */
-
-static void ast_prefix_init(NODE *node, va_list args)
-{
-  S(node).unary.operand = va_arg(args, NODE *);
-  S(node).unary.op = va_arg(args, OP_TYPE);
-
-  SET_M(node, ast_prefix_to_s);
-}
-
-static const char *ast_prefix_to_s(NODE *node)
-{
-  const char *operand = ast_to_s(S(node).unary.operand);
-  const char *op = OP_TYPE_STR(S(node).unary.op);
-  size_t length = strlen(operand) + strlen(op) + 1;
-  char *result = my_malloc(length * sizeof(char));
-  snprintf(result, length, "%s%s", op, operand);
-  return result;
-}
-
-/* Return */
-
-static void ast_return_init(NODE *node, va_list args)
-{
-  S(node).retval = va_arg(args, NODE *);
-
-  SET_M(node, ast_return_to_s);
-}
-
-static const char *ast_return_to_s(NODE *node)
-{
-  char *result;
-
-  if(S(node).retval)
-    {
-      const char *retval = ast_to_s(S(node).retval);
-      size_t length = strlen("RETURN") + strlen(retval) + 2;
-      result = my_malloc(length * sizeof(char));
-      snprintf(result, length, "RETURN %s", retval);
-    }
-  else
-    {
-      result = strdup("RETURN");
-    }
-  return result;
-}
-
-/* String Literal */
-
-static void ast_string_literal_init(NODE *node, va_list args)
-{
-  S(node).string_literal = va_arg(args, char *);
-
-  SET_M(node, ast_string_literal_to_s);
-}
-
-static const char *ast_string_literal_to_s(NODE *node)
-{
-  return strdup(S(node).string_literal);
 }
