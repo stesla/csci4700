@@ -115,6 +115,7 @@ struct _node {
 */
 
 NODE *ast_create(NODE_TYPE type, ...);
+const char *ast_node_type_str(NODE_TYPE type);
 const char *ast_op_str(OP_TYPE type);
 const char *ast_to_s(NODE *node);
 

@@ -26,57 +26,6 @@
 #include "ast_while.h"
 #include "ast_write.h"
 
-static const char *_node_type_str[] =
-  {
-    "AST_ARRAY",
-    "AST_BINARY",
-    "AST_BLOCK",
-    "AST_CALL",
-    "AST_CONDITIONAL",
-    "AST_CONSTANT",
-    "AST_DECLARE",
-    "AST_FOR",
-    "AST_FORMAL",
-    "AST_FUNCTION",
-    "AST_GROUP",
-    "AST_IDENTIFIER",
-    "AST_LIST",
-    "AST_POSTFIX",
-    "AST_PREFIX",
-    "AST_READ",
-    "AST_RETURN",
-    "AST_STRING_LITERAL",
-    "AST_WHILE",
-    "AST_WRITE"
-  };
-#define NODE_TYPE_STR(x) (_node_type_str[(x)])
-
-static const char *_op_str[] =
-  {
-    "=",  //AST_OP_ASSIGN,
-    "&",  //AST_OP_BAND,
-    "|",  //AST_OP_BOR,
-    "^",  //AST_OP_BXOR,
-    "--", //AST_OP_DEC,
-    "*",  //AST_OP_DEREF,
-    "/",  //AST_OP_DIV,
-    "==", //AST_OP_EQ,
-    ">=", //AST_OP_GE,
-    ">",  //AST_OP_GT,
-    "++", //AST_OP_INC,
-    "&&", //AST_OP_LAND,
-    "<=", //AST_OP_LE,
-    "||", //AST_OP_LOR,
-    "<",  //AST_OP_LT,
-    "--", //AST_OP_MINUS,
-    "%",  //AST_OP_MOD,
-    "*",  //AST_OP_MULT,
-    "!=", //AST_OP_NE,
-    "!",  //AST_OP_NOT,
-    "+",  //AST_OP_PLUS,
-    "&"   //AST_OP_REF
-  };
-
 static NODE * ast_alloc(NODE_TYPE type)
 {
   NODE *result = (NODE *) my_malloc(sizeof(NODE));
@@ -127,20 +76,70 @@ NODE *ast_create(NODE_TYPE type, ...)
   constructor[type].init(result, args);
   va_end(args);
 
-  /* Leave this debug statement in until we're done */
-  printf("ast_create(%s): %s\n", NODE_TYPE_STR(result->type), ast_to_s(result));
-
   return result;
+}
+
+const char *ast_node_type_str(NODE_TYPE type)
+{
+  static const char *table[] =
+    {
+      "AST_ARRAY",
+      "AST_BINARY",
+      "AST_BLOCK",
+      "AST_CALL",
+      "AST_CONDITIONAL",
+      "AST_CONSTANT",
+      "AST_DECLARE",
+      "AST_FOR",
+      "AST_FORMAL",
+      "AST_FUNCTION",
+      "AST_GROUP",
+      "AST_IDENTIFIER",
+      "AST_LIST",
+      "AST_POSTFIX",
+      "AST_PREFIX",
+      "AST_READ",
+      "AST_RETURN",
+      "AST_STRING_LITERAL",
+      "AST_WHILE",
+      "AST_WRITE"
+    };
+  return table[type];
 }
 
 const char *ast_op_str(OP_TYPE type)
 {
-  return _op_str[type];
+  static const char *table[] =
+    {
+      "=",  //AST_OP_ASSIGN,
+      "&",  //AST_OP_BAND,
+      "|",  //AST_OP_BOR,
+      "^",  //AST_OP_BXOR,
+      "--", //AST_OP_DEC,
+      "*",  //AST_OP_DEREF,
+      "/",  //AST_OP_DIV,
+      "==", //AST_OP_EQ,
+      ">=", //AST_OP_GE,
+      ">",  //AST_OP_GT,
+      "++", //AST_OP_INC,
+      "&&", //AST_OP_LAND,
+      "<=", //AST_OP_LE,
+      "||", //AST_OP_LOR,
+      "<",  //AST_OP_LT,
+      "-",  //AST_OP_MINUS,
+      "%",  //AST_OP_MOD,
+      "*",  //AST_OP_MULT,
+      "!=", //AST_OP_NE,
+      "!",  //AST_OP_NOT,
+      "+",  //AST_OP_PLUS,
+      "&"   //AST_OP_REF
+    };
+
+  return table[type];
 }
 
 const char *ast_to_s(NODE *node)
 {
-  //TODO: Get rid of this once the AST is completed
   if (!node)
     return "(null)";
 
