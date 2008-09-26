@@ -4,6 +4,37 @@
 #include <string.h>
 #include "util.h"
 
+/* To add a new node type, add it to the enum (in alphabetical order). You also
+** need to add it to the table in ast_create. You need to provide two
+** functions:
+**
+**    size_t ast_NODE_size() { return SLOT_SIZE; }
+**    void ast_NODE_init(NODE *node, va_list args) { ...; SET_M(node,...); }
+**
+** The SET_M macro will initialize node's method structure with the pointers
+** provided as the rest of the arguments.
+**
+** Additionally, you should define a structure:
+**
+**    struct slots {
+**      ...
+**    };
+**
+** Then you can access the slots for a specific instance like this:
+**
+**    S(node).whatever
+**
+** You can create a new node like this:
+**
+**    N(NODE_TYPE, ...)
+**
+** The functions provided at the bottom of this header are wrappers for the
+** methods that are available. They are the recommended way of calling the
+** methods. For example:
+**
+**    ast_to_s(node);
+*/
+
 typedef enum _node_type {
   AST_ARRAY,
   AST_BINARY,
@@ -65,23 +96,26 @@ struct _node {
   } methods;
 
   /* Slot Table:
-  **    Initialize this with the ALLOC_S macro.
   **    Access using the S macro.
   */
   void *slots;
 };
 
-NODE *ast_create(NODE_TYPE type, ...);
-const char *ast_op_str(OP_TYPE type);
-const char *ast_to_s(NODE *node);
-
+#define N ast_create
+#define S(n) (*((struct slots *)(n)->slots))
 #define SET_M(node,                             \
               _to_s)                            \
   {                                             \
     (node)->methods.to_s = (_to_s);             \
   }
-
-#define S(n) (*((struct slots *)(n)->slots))
 #define SLOT_SIZE sizeof(struct slots)
+
+/*
+** Public Functions
+*/
+
+NODE *ast_create(NODE_TYPE type, ...);
+const char *ast_op_str(OP_TYPE type);
+const char *ast_to_s(NODE *node);
 
 #endif AST_H
