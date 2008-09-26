@@ -7,7 +7,7 @@ CFLAGS=-g
 LDFLAGS=
 
 AST_OBJS=ast_array.o ast_binary.o ast_call.o ast_constant.o ast_declare.o \
-         ast_formal.o ast_group.o ast_identifier.o ast_list.o ast_postfix. \
+         ast_formal.o ast_group.o ast_identifier.o ast_list.o ast_postfix.o \
          ast_prefix.o ast_return.o ast_string_literal.o
 
 OBJS=util.o ast.o input.o lexer_util.o parser.o lexer.o ${AST_OBJS}
