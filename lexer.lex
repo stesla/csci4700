@@ -17,16 +17,18 @@ E           [Ee][+-]?{D}+
 FS          (f|F|l|L)
 IS          (u|U|l|L)*
 
+%option bison-bridge
+
 %%
 
 "\/\/"      { consume_comment(); }
 
-{L}({L}|{D})* { return(identifier(yytext)); }
-0[xX]{H}+{IS}? { return(constant(yytext)); }
-0{D}+{IS}? { return(constant(yytext)); }
-{D}+{IS}? { return(constant(yytext)); }
-{D}+{E}{FS}? { return(constant(yytext)); }
-L?\"(\\.|[^\\"])*\" { return(string_literal(yytext)); }
+{L}({L}|{D})* { return(identifier(yylval, yytext)); }
+0[xX]{H}+{IS}? { return(constant(yylval, yytext)); }
+0{D}+{IS}? { return(constant(yylval, yytext)); }
+{D}+{IS}? { return(constant(yylval, yytext)); }
+{D}+{E}{FS}? { return(constant(yylval, yytext)); }
+L?\"(\\.|[^\\"])*\" { return(string_literal(yylval, yytext)); }
 "++"            {  return( INC_OP ); }
 "--"            {  return( DEC_OP ); }
 "&&"            {  return( AND_OP ); }

@@ -3,14 +3,14 @@
 #include "input.h"
 #include "parser.h"
 
-extern int yyparse(void);
-
 /* lexer debugging flag */
 extern int yyget_debug(void);
 extern void yyset_debug(int value);
 
 /* parser debugging flag */
 extern int yydebug;
+extern int yyparse(NODE **ast);
+
 
 int usage( void )
 {
@@ -26,6 +26,7 @@ int main(int argc, char **argv)
   char *filename;
   int  i;
   int result;
+  NODE *ast;
 
   /* Default debugging to off */
   yyset_debug(FALSE);
@@ -58,7 +59,7 @@ int main(int argc, char **argv)
       exit(1);
     }
 
-  result = yyparse();
+  result = yyparse(&ast);
 
   if (close_input() < 0)
     {
@@ -66,5 +67,5 @@ int main(int argc, char **argv)
       exit(1);
     }
 
-  return (result ? 1 : 0);
+  return result;
 }

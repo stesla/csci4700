@@ -11,7 +11,7 @@ int yywrap( void )
   return( 1 );
 }
 
-void yyerror(const char *s)
+void yyerror(NODE **ast, const char *s)
 {
   fprintf(stderr, "%s:%i: error: %s\n", input_file(), input_lineno(), s);
 }
@@ -40,7 +40,12 @@ void yyerror(const char *s)
 
 %expect 1
 
+%pure-parser
+%parse-param {NODE **ast}
+
 %%
+
+program : translation_unit { *ast = $1; }
 
 translation_unit
     : external_declaration { $$ = N(AST_LIST, $1, NULL); }
