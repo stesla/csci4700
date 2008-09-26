@@ -33,7 +33,7 @@ void yyerror(const char *s)
 %type <node> relational_expression equality_expression and_expression
 %type <node> exclusive_or_expression inclusive_or_expression
 %type <node> logical_and_expression logical_or_expression
-%type <node> assignment_expression expression
+%type <node> assignment_expression expression return_stmt;
 %type <op> unary_operator
 
 %expect 1
@@ -122,8 +122,8 @@ iteration_stmt
     ;
 
 return_stmt
-    : RETURN ';'
-    | RETURN expression ';'
+    : RETURN ';' { $$ = ast_create(AST_RETURN, NULL); }
+    | RETURN expression ';' { $$ = ast_create(AST_RETURN, $2); }
     ;
 
 expression

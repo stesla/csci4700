@@ -63,6 +63,8 @@ struct _node {
       OP_TYPE op;
     } unary;
 
+    NODE *retval;
+
     const char *string_literal;
   } stab;
 };
@@ -115,6 +117,10 @@ static const char *ast_postfix_to_s(NODE *node);
 static void ast_prefix_init(NODE *node, va_list args);
 static const char *ast_prefix_to_s(NODE *node);
 
+/* Return */
+static void ast_return_init(NODE *node, va_list args);
+static const char *ast_return_to_s(NODE *node);
+
 /* String Literal */
 static void ast_string_literal_init(NODE *node, va_list args);
 static const char *ast_string_literal_to_s(NODE *node);
@@ -136,6 +142,7 @@ static const char *_node_type_str[] =
     "AST_LIST",
     "AST_POSTFIX",
     "AST_PREFIX",
+    "AST_RETURN",
     "AST_STRING_LITERAL"
   };
 #define NODE_TYPE_STR(x) (_node_type_str[(x)])
@@ -205,6 +212,7 @@ NODE *ast_create(NODE_TYPE type, ...)
       ast_list_init,
       ast_postfix_init,
       ast_prefix_init,
+      ast_return_init,
       ast_string_literal_init
     };
 
@@ -480,6 +488,34 @@ static const char *ast_prefix_to_s(NODE *node)
       size_t length = strlen(operand) + strlen(op) + 1;
       node->to_s = my_malloc(length * sizeof(char));
       snprintf((char *) node->to_s, length, "%s%s", op, operand);
+    }
+  return node->to_s;
+}
+
+/* Return */
+
+static void ast_return_init(NODE *node, va_list args)
+{
+  S(node).retval = va_arg(args, NODE *);
+
+  SET_M(node, ast_return_to_s);
+}
+
+static const char *ast_return_to_s(NODE *node)
+{
+  if (node->to_s == NULL)
+    {
+      if(S(node).retval)
+        {
+          const char *retval = ast_to_s(S(node).retval);
+          size_t length = strlen("RETURN") + strlen(retval) + 2;
+          node->to_s = my_malloc(length * sizeof(char));
+          snprintf((char *) node->to_s, length, "RETURN %s", retval);
+        }
+      else
+        {
+          node->to_s = strdup("RETURN");
+        }
     }
   return node->to_s;
 }

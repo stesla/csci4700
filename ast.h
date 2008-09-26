@@ -14,6 +14,7 @@ typedef enum _node_type {
   AST_LIST,
   AST_POSTFIX,
   AST_PREFIX,
+  AST_RETURN,
   AST_STRING_LITERAL
 } NODE_TYPE;
 
