@@ -84,10 +84,8 @@ decl
     ;
 
 a_list
-    : identifier '[' constant ']' {
-      $$ = ast_create(AST_LIST, ast_create(AST_ARRAY, $1, $3), NULL); }
-    | identifier '[' constant ']' ',' a_list {
-      $$ = ast_create(AST_LIST, ast_create(AST_ARRAY, $1, $3), $6); }
+    : identifier '[' constant ']' { $$ = ast_create(AST_LIST, ast_create(AST_ARRAY, $1, $3), NULL); }
+    | identifier '[' constant ']' ',' a_list { $$ = ast_create(AST_LIST, ast_create(AST_ARRAY, $1, $3), $6); }
     ;
 
 identifier_list
