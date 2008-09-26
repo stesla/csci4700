@@ -9,6 +9,8 @@ struct slots {
   OP_TYPE op;
 };
 
+size_t ast_prefix_size() { return SLOT_SIZE; }
+
 static const char *ast_prefix_to_s(NODE *node)
 {
   const char *operand = ast_to_s(S(node).operand);
@@ -21,8 +23,6 @@ static const char *ast_prefix_to_s(NODE *node)
 
 void ast_prefix_init(NODE *node, va_list args)
 {
-  ALLOC_S(node);
-
   S(node).operand = va_arg(args, NODE *);
   S(node).op = va_arg(args, OP_TYPE);
 

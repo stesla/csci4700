@@ -8,6 +8,8 @@ struct slots {
   NODE *right;
 };
 
+size_t ast_binary_size() { return SLOT_SIZE; }
+
 static const char *ast_binary_to_s(NODE *node)
 {
   const char *left = ast_to_s(S(node).left);
@@ -21,8 +23,6 @@ static const char *ast_binary_to_s(NODE *node)
 
 void ast_binary_init(NODE *node, va_list args)
 {
-  ALLOC_S(node);
-
   S(node).op = va_arg(args, OP_TYPE);
   S(node).left = va_arg(args, NODE *);
   S(node).right = va_arg(args, NODE *);

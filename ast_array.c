@@ -9,6 +9,8 @@ struct slots {
   NODE *count;
 };
 
+size_t ast_array_size() { return SLOT_SIZE; }
+
 static const char *ast_array_to_s(NODE *node)
 {
   const char *identifier = ast_to_s(S(node).identifier);
@@ -21,8 +23,6 @@ static const char *ast_array_to_s(NODE *node)
 
 void ast_array_init(NODE *node, va_list args)
 {
-  ALLOC_S(node);
-
   S(node).identifier = va_arg(args, NODE *);
   S(node).count = va_arg(args, NODE *);
 

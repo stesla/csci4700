@@ -19,10 +19,6 @@
 #include "ast_return.h"
 #include "ast_string_literal.h"
 
-/*
-** UTILITIES
-*/
-
 static const char *_node_type_str[] =
   {
     "AST_ARRAY",
@@ -75,29 +71,39 @@ static NODE * ast_alloc(NODE_TYPE type)
   return result;
 }
 
+struct constructor {
+  size_t (*size)();
+  void (*init)(NODE *node, va_list args);
+};
+
 NODE *ast_create(NODE_TYPE type, ...)
 {
-  va_list args;
-  NODE *result = ast_alloc(type);
-  static void (*init[])(NODE *node, va_list args) =
+  static struct constructor constructor[] =
     {
-      ast_array_init,
-      ast_binary_init,
-      ast_call_init,
-      ast_constant_init,
-      ast_declare_init,
-      ast_formal_init,
-      ast_group_init,
-      ast_identifier_init,
-      ast_list_init,
-      ast_postfix_init,
-      ast_prefix_init,
-      ast_return_init,
-      ast_string_literal_init
+      {ast_array_size, ast_array_init},
+      {ast_binary_size, ast_binary_init},
+      {ast_call_size, ast_call_init},
+      {ast_constant_size, ast_constant_init},
+      {ast_declare_size, ast_declare_init},
+      {ast_formal_size, ast_formal_init},
+      {ast_group_size, ast_group_init},
+      {ast_identifier_size, ast_identifier_init},
+      {ast_list_size, ast_list_init},
+      {ast_postfix_size, ast_postfix_init},
+      {ast_prefix_size, ast_prefix_init},
+      {ast_return_size, ast_return_init},
+      {ast_string_literal_size, ast_string_literal_init}
     };
 
+  va_list args;
+  NODE *result = ast_alloc(type);
+  size_t size = constructor[type].size();
+
+  result->slots = my_malloc(size);
+  bzero(result->slots, size);
+
   va_start(args, type);
-  init[type](result, args);
+  constructor[type].init(result, args);
   va_end(args);
 
   /* Leave this debug statement in until we're done */

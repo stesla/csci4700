@@ -8,6 +8,8 @@ struct slots {
   NODE *value;
 };
 
+size_t ast_return_size() { return SLOT_SIZE; }
+
 static const char *ast_return_to_s(NODE *node)
 {
   char *result;
@@ -28,8 +30,6 @@ static const char *ast_return_to_s(NODE *node)
 
 void ast_return_init(NODE *node, va_list args)
 {
-  ALLOC_S(node);
-
   S(node).value = va_arg(args, NODE *);
 
   SET_M(node, ast_return_to_s);

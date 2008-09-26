@@ -8,6 +8,8 @@ struct slots {
   const char *identifier;
 };
 
+size_t ast_identifier_size() { return SLOT_SIZE; }
+
 static const char *ast_identifier_to_s(NODE *node)
 {
   return S(node).identifier;
@@ -15,8 +17,6 @@ static const char *ast_identifier_to_s(NODE *node)
 
 void ast_identifier_init(NODE *node, va_list args)
 {
-  ALLOC_S(node);
-
   S(node).identifier = va_arg(args, char *);
 
   SET_M(node, ast_identifier_to_s);

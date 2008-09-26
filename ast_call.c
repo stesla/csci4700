@@ -9,6 +9,8 @@ struct slots {
   NODE *args;
 };
 
+size_t ast_call_size() { return SLOT_SIZE; }
+
 static const char *ast_call_to_s(NODE *node)
 {
   const char *func = ast_to_s(S(node).func);
@@ -21,8 +23,6 @@ static const char *ast_call_to_s(NODE *node)
 
 void ast_call_init(NODE *node, va_list args)
 {
-  ALLOC_S(node);
-
   S(node).func = va_arg(args, NODE *);
   S(node).args = va_arg(args, NODE *);
 

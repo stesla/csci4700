@@ -9,6 +9,8 @@ struct slots {
   int is_array;
 };
 
+size_t ast_formal_size() { return SLOT_SIZE; }
+
 static const char *ast_formal_to_s(NODE *node)
 {
   char *result;
@@ -29,8 +31,6 @@ static const char *ast_formal_to_s(NODE *node)
 
 void ast_formal_init(NODE *node, va_list args)
 {
-  ALLOC_S(node);
-
   S(node).identifier = va_arg(args, NODE *);
   S(node).is_array = va_arg(args, int);
 

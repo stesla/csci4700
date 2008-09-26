@@ -8,6 +8,8 @@ struct slots {
   int value;
 };
 
+size_t ast_constant_size() { return SLOT_SIZE; }
+
 #define MAX_DIGITS 11 /* 10 digits in a 32-bit number + 1 for trailing \0 */
 static const char *ast_constant_to_s(NODE *node)
 {
@@ -19,8 +21,6 @@ static const char *ast_constant_to_s(NODE *node)
 void ast_constant_init(NODE *node, va_list args)
 {
   char *text = va_arg(args, char *);
-
-  ALLOC_S(node);
 
   S(node).value = atoi(text);
   free(text);

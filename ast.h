@@ -75,10 +75,6 @@ const char *ast_to_s(NODE *node);
   }
 
 #define S(n) (*((struct slots *)(n)->slots))
-#define ALLOC_S(node)                               \
-  {                                                 \
-    node->slots = my_malloc(sizeof(struct slots));  \
-    bzero(node->slots, sizeof(struct slots));       \
-  }
+#define SLOT_SIZE sizeof(struct slots)
 
 #endif AST_H

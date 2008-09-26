@@ -9,6 +9,8 @@ struct slots {
   NODE *rest;
 };
 
+size_t ast_list_size() { return SLOT_SIZE; }
+
 static const char *ast_list_to_s(NODE *node)
 {
   char *result;
@@ -35,8 +37,6 @@ static const char *ast_list_to_s(NODE *node)
 
 void ast_list_init(NODE *node, va_list args)
 {
-  ALLOC_S(node);
-
   S(node).first = va_arg(args, NODE *);
   S(node).rest = va_arg(args, NODE *);
 
