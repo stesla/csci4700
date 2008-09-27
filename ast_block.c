@@ -7,6 +7,8 @@
 struct slots {
   NODE *declarations;
   NODE *statements;
+  int start_line;
+  int end_line;
 };
 
 size_t ast_block_size() { return SLOT_SIZE; }
@@ -34,6 +36,8 @@ void ast_block_init(NODE *node, va_list args)
 {
   S(node).declarations = va_arg(args, NODE *);
   S(node).statements = va_arg(args, NODE *);
+  S(node).start_line = va_arg(args, int);
+  S(node).end_line = va_arg(args, int);
 
   SET_M(node,
         ast_block_print,

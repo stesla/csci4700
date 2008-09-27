@@ -12,10 +12,25 @@ struct yystype {
   char *text;
 };
 
-#ifdef  YYSTYPE
-#undef  YYSTYPE
+#ifdef YYSTYPE
+#undef YYSTYPE
 #endif
 #define YYSTYPE struct yystype
+
+struct yyltype
+{
+  int first_line;
+  int first_column;
+  int last_line;
+  int last_column;
+};
+
+#ifdef YYLTYPE
+#undef YYLTYPE
+#endif
+#define YYLTYPE struct yyltype
+# define YYLTYPE_IS_DECLARED 1
+# define YYLTYPE_IS_TRIVIAL 1
 
 NODE *semantic_analysis(const char *file, int lexer_debug, int parser_debug);
 

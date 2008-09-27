@@ -8,7 +8,6 @@ int usage( void )
   printf("usage: whatever <file> [-l] [-y]\n");
   printf("-a -- Produce a GraphViz representation of the AST in the file ast.dot.\n");
   printf("-l -- Enable lexer debugging.\n");
-  printf("-s -- Enable source listing.\n");
   printf("-y -- Enable parser debugging.\n");
   return( 1 );
 }
@@ -36,9 +35,6 @@ int main(int argc, char **argv)
             break;
           case 'l':
             lexer_debug = !lexer_debug;
-            break;
-          case 's':
-            toggle_listing();
             break;
           case 'y':
             parser_debug = !parser_debug;

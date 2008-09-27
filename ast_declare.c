@@ -6,6 +6,7 @@
 
 struct slots {
   NODE *list;
+  int line;
 };
 
 size_t ast_declare_size() { return SLOT_SIZE; }
@@ -24,6 +25,7 @@ static const char *ast_declare_to_s(NODE *node)
 void ast_declare_init(NODE *node, va_list args)
 {
   S(node).list = va_arg(args, NODE *);
+  S(node).line = va_arg(args, int);
 
   SET_M(node,
         ast_declare_print,

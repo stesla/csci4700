@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "ast.h"
-#include "input.h"
 #include "parser.h"
 
 int yywrap( void )
@@ -11,9 +10,10 @@ int yywrap( void )
   return( 1 );
 }
 
-void yyerror(void *scanner, NODE **ast, const char *s)
+void yyerror(YYLTYPE *yyloc, void *scanner,
+             NODE **ast, const char *filename, const char *s)
 {
-  fprintf(stderr, "%s:%i: error: %s\n", input_file(), input_lineno(), s);
+  fprintf(stderr, "%s:%i: error: %s\n", filename, yyloc->last_line + 1, s);
 }
 
 %}
@@ -44,6 +44,7 @@ void yyerror(void *scanner, NODE **ast, const char *s)
 %parse-param {void *scanner}
 %lex-param {void *scanner}
 %parse-param {NODE **ast}
+%parse-param {const char *filename}
 
 %%
 
@@ -71,10 +72,10 @@ formal
     ;
 
 block
-    : '{' '}' { $$ = N(AST_BLOCK, NULL, NULL); }
-    | '{' statement_list '}' { $$ = N(AST_BLOCK, NULL, $2); }
-    | '{' decl_list '}' { $$ = N(AST_BLOCK, $2, NULL); }
-    | '{' decl_list statement_list '}' { $$ = N(AST_BLOCK, $2, $3); }
+    : '{' '}' { $$ = N(AST_BLOCK, NULL, NULL, @$.first_line, @$.last_line); }
+    | '{' statement_list '}' { $$ = N(AST_BLOCK, NULL, $2, @$.first_line, @$.last_line); }
+    | '{' decl_list '}' { $$ = N(AST_BLOCK, $2, NULL, @$.first_line, @$.last_line); }
+    | '{' decl_list statement_list '}' { $$ = N(AST_BLOCK, $2, $3, @$.first_line, @$.last_line); }
     ;
 
 statement_list
@@ -88,8 +89,8 @@ decl_list
     ;
 
 decl
-    : ARRAY a_list ';' { $$ = N(AST_DECLARE, $2); }
-    | GLOBAL identifier_list ';' { $$ = N(AST_DECLARE, $2); }
+    : ARRAY a_list ';' { $$ = N(AST_DECLARE, $2, @$.last_line); }
+    | GLOBAL identifier_list ';' { $$ = N(AST_DECLARE, $2, @$.last_line); }
     ;
 
 a_list
@@ -240,24 +241,22 @@ NODE *semantic_analysis(const char *filename, int lexer_debug, int parser_debug)
   int success;
   void *scanner;
   NODE *ast;
+  FILE *file;
 
-  if (open_input(filename) < 0)
+  if ((file = fopen(filename, "r")) == NULL)
     {
-      perror("open_input");
+      perror("file");
       exit(1);
     }
 
   yylex_init(&scanner);
+  yyset_in(file, scanner);
   yyset_debug(lexer_debug, scanner);
   yydebug = parser_debug;
-  success = yyparse(scanner, &ast);
+  success = yyparse(scanner, &ast, filename);
   yylex_destroy(scanner);
 
-  if (close_input() < 0)
-    {
-      perror("close_input");
-      exit(1);
-    }
+  fclose(file);
 
   return success ? NULL : ast;
 }

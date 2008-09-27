@@ -63,6 +63,12 @@ TOKEN identifier(YYSTYPE *yylval, const char *text)
     }
 }
 
+void new_line(YYLTYPE *yylloc)
+{
+  yylloc->first_line++;
+  yylloc->last_line++;
+}
+
 TOKEN string_literal(YYSTYPE *yylval, const char *text)
 {
   char *temp = strdup(text);

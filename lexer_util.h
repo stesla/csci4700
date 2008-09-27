@@ -9,4 +9,6 @@ TOKEN constant(YYSTYPE *yylval, const char *text);
 TOKEN identifier(YYSTYPE *yylval, const char *text);
 TOKEN string_literal(YYSTYPE *yylval, const char *text);
 
+void new_line(YYLTYPE *yylloc);
+
 #endif LEXER_UTIL_H

@@ -1,12 +1,8 @@
 %{
 #include <stdio.h>
-#include "input.h"
 #include "lexer_util.h"
 #include "parser.h"
 #include "y.tab.h"
-
-#undef YY_INPUT
-#define YY_INPUT(buf,result,max_size) result = my_input( (unsigned char *) buf, max_size );
 
 %}
 
@@ -17,8 +13,7 @@ E           [Ee][+-]?{D}+
 FS          (f|F|l|L)
 IS          (u|U|l|L)*
 
-%option bison-bridge
-%option reentrant
+%option reentrant bison-bridge bison-locations
 
 %%
 
@@ -61,8 +56,10 @@ L?\"(\\.|[^\\"])*\" { return(string_literal(yylval, yytext)); }
 "|"         {  return( '|' ); }
 "?"         {  return( '?' ); }
 
+\n          { new_line(yylloc); }
+
 "\/\/".*    { /* ignore comments */ }
-[ \t\v\n\f] { /* ignore whitespace */}
+[ \t\v\f]   { /* ignore whitespace */ }
 .           { /* ignore bad characters */ }
 
 %%
