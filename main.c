@@ -3,15 +3,6 @@
 #include "input.h"
 #include "parser.h"
 
-/* lexer debugging flag */
-extern int yyget_debug(void);
-extern void yyset_debug(int value);
-
-/* parser debugging flag */
-extern int yydebug;
-extern int yyparse(NODE **ast);
-
-
 int usage( void )
 {
   printf("usage: whatever <file> [-l] [-y]\n");
@@ -24,12 +15,11 @@ int usage( void )
 int main(int argc, char **argv)
 {
   char *filename;
-  int  i;
-  int result;
+  int  i, success;
   NODE *ast;
 
-  /* Default debugging to off */
-  yyset_debug(FALSE);
+  int lexer_debug = FALSE;
+  int parser_debug = FALSE;
 
   if ( argc < 2 )
     exit( usage() );
@@ -39,13 +29,13 @@ int main(int argc, char **argv)
         switch( argv[ i ][ 1 ] )
           {
           case 'l':
-            yyset_debug(!yyget_debug());
+            lexer_debug = !lexer_debug;
             break;
           case 's':
             toggle_listing();
             break;
           case 'y':
-            yydebug = ! yydebug;
+            parser_debug = !parser_debug;
             break;
           default:
             exit(usage());
@@ -59,7 +49,7 @@ int main(int argc, char **argv)
       exit(1);
     }
 
-  result = yyparse(&ast);
+  success = semantic_analysis(&ast, lexer_debug, parser_debug);
 
   if (close_input() < 0)
     {
@@ -67,5 +57,5 @@ int main(int argc, char **argv)
       exit(1);
     }
 
-  return result;
+  return success;
 }

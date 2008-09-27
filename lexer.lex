@@ -18,6 +18,7 @@ FS          (f|F|l|L)
 IS          (u|U|l|L)*
 
 %option bison-bridge
+%option reentrant
 
 %%
 

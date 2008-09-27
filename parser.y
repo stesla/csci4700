@@ -11,7 +11,7 @@ int yywrap( void )
   return( 1 );
 }
 
-void yyerror(NODE **ast, const char *s)
+void yyerror(void *scanner, NODE **ast, const char *s)
 {
   fprintf(stderr, "%s:%i: error: %s\n", input_file(), input_lineno(), s);
 }
@@ -41,6 +41,8 @@ void yyerror(NODE **ast, const char *s)
 %expect 1
 
 %pure-parser
+%parse-param {void *scanner}
+%lex-param {void *scanner}
 %parse-param {NODE **ast}
 
 %%
@@ -232,3 +234,17 @@ identifier : IDENTIFIER { $$ = N(AST_IDENTIFIER, $1); }
 string_literal : STRING_LITERAL { $$ = N(AST_STRING_LITERAL, $1); }
 
 %%
+
+int semantic_analysis(NODE **ast, int lexer_debug, int parser_debug)
+{
+  int result;
+  void *scanner;
+
+  yylex_init(&scanner);
+  yyset_debug(lexer_debug, scanner);
+  yydebug = parser_debug;
+  result = yyparse(scanner, ast);
+  yylex_destroy(scanner);
+
+  return result;
+}
