@@ -138,6 +138,16 @@ const char *ast_op_str(OP_TYPE type)
   return table[type];
 }
 
+void ast_print(NODE *node, FILE *out)
+{
+  /* We assume that node is not NULL */
+  fprintf(out, "digraph AST {\n");
+  fprintf(out, "node[shape=box];\n");
+  fprintf(out, "edge[style=solid];\n");
+  node->methods.print(node, out);
+  fprintf(out, "}\n");
+}
+
 const char *ast_to_s(NODE *node)
 {
   if (!node)

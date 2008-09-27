@@ -10,6 +10,17 @@ struct slots {
 
 size_t ast_identifier_size() { return SLOT_SIZE; }
 
+static void ast_identifier_print(NODE *node, FILE *out)
+{
+  size_t length = strlen("AST_IDENTIFIER") + strlen(S(node).identifier) + 2;
+  char *label = my_malloc(length * sizeof(char));
+  snprintf(label, length, "AST_IDENTIFIER %s", S(node).identifier);
+
+  PRINT_NODE(out, node, label);
+
+  free(label);
+}
+
 static const char *ast_identifier_to_s(NODE *node)
 {
   return S(node).identifier;
@@ -19,5 +30,7 @@ void ast_identifier_init(NODE *node, va_list args)
 {
   S(node).identifier = va_arg(args, char *);
 
-  SET_M(node, ast_identifier_to_s);
+  SET_M(node,
+        ast_identifier_print,
+        ast_identifier_to_s);
 }

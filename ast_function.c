@@ -12,6 +12,15 @@ struct slots {
 
 size_t ast_function_size() { return SLOT_SIZE; }
 
+static void ast_function_print(NODE *node, FILE *out)
+{
+  PRINT_NODE(out, node, "AST_FUNCTION");
+
+  PRINT_EDGE(out, node, S(node).identifier);
+  PRINT_EDGE(out, node, S(node).params);
+  PRINT_EDGE(out, node, S(node).body);
+}
+
 static const char *ast_function_to_s(NODE *node)
 {
   char *result;
@@ -29,5 +38,7 @@ void ast_function_init(NODE *node, va_list args)
   S(node).params = va_arg(args, NODE *);
   S(node).body = va_arg(args, NODE *);
 
-  SET_M(node, ast_function_to_s);
+  SET_M(node,
+        ast_function_print,
+        ast_function_to_s);
 }

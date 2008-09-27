@@ -10,6 +10,13 @@ struct slots {
 
 size_t ast_constant_size() { return SLOT_SIZE; }
 
+static void ast_constant_print(NODE *node, FILE *out)
+{
+  char label[24]; /* AST_CONSTANT 1234567890\0 */
+  snprintf(label, 24, "AST_CONSTANT %d", S(node).value);
+  PRINT_NODE(out, node, label);
+}
+
 #define MAX_DIGITS 11 /* 10 digits in a 32-bit number + 1 for trailing \0 */
 static const char *ast_constant_to_s(NODE *node)
 {
@@ -25,5 +32,7 @@ void ast_constant_init(NODE *node, va_list args)
   S(node).value = atoi(text);
   free(text);
 
-  SET_M(node, ast_constant_to_s);
+  SET_M(node,
+        ast_constant_print,
+        ast_constant_to_s);
 }

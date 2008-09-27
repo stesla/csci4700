@@ -11,6 +11,16 @@ struct slots {
 
 size_t ast_formal_size() { return SLOT_SIZE; }
 
+static void ast_formal_print(NODE *node, FILE *out)
+{
+  char label[17]; /* AST_FORMAL ARRAY */
+  snprintf(label, 17, "AST_FORMAL%s", S(node).is_array ? " ARRAY" : "");
+
+  PRINT_NODE(out, node, label);
+
+  PRINT_EDGE(out, node, S(node).identifier);
+}
+
 static const char *ast_formal_to_s(NODE *node)
 {
   char *result;
@@ -34,5 +44,7 @@ void ast_formal_init(NODE *node, va_list args)
   S(node).identifier = va_arg(args, NODE *);
   S(node).is_array = va_arg(args, int);
 
-  SET_M(node, ast_formal_to_s);
+  SET_M(node,
+        ast_formal_print,
+        ast_formal_to_s);
 }

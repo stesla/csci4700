@@ -24,11 +24,6 @@ lexer.c: lexer.lex
 parser.c: parser.y
 	${YACC} -t --defines=y.tab.h -o $@ $^
 
-lexer.o: lexer.c y.tab.h parser.h
-lexer_util.o: y.tab.h parser.h
-main.o: parser.h
-y.tab.h: parser.c
-
 ## Tests
 
 TEST_OBJS=
@@ -43,3 +38,31 @@ run-test: ${OBJS} ${TEST_OBJS} test.o
 
 clean:
 	rm *.o c-- run-test parser.c lexer.c y.tab.h
+
+## File Dependencies
+
+lexer.o: lexer.c y.tab.h parser.h
+lexer_util.o: y.tab.h parser.h
+main.o: parser.h
+y.tab.h: parser.c
+
+ast_array.o: ast.h
+ast_binary.o: ast.h
+ast_block.o: ast.h
+ast_call.o: ast.h
+ast_constant.o: ast.h
+ast_conditional.o: ast.h
+ast_declare.o: ast.h
+ast_for.o: ast.h
+ast_formal.o: ast.h
+ast_function.o: ast.h
+ast_group.o: ast.h
+ast_identifier.o: ast.h
+ast_list.o: ast.h
+ast_postfix.o: ast.h
+ast_prefix.o: ast.h
+ast_read.o: ast.h
+ast_return.o: ast.h
+ast_string_literal.o: ast.h
+ast_while.o: ast.h
+ast_write.o: ast.h

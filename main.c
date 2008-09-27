@@ -1,13 +1,15 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include "ast.h"
 #include "parser.h"
 
 int usage( void )
 {
   printf("usage: whatever <file> [-l] [-y]\n");
-  printf("-l == turns on lex debug flag\n");
-  printf("-s == enable a listing of program being compiled\n");
-  printf("-y == turns on yydebug flag\n");
+  printf("-a -- Produce a GraphViz representation of the AST in the file ast.dot.\n");
+  printf("-l -- Enable lexer debugging.\n");
+  printf("-s -- Enable source listing.\n");
+  printf("-y -- Enable parser debugging.\n");
   return( 1 );
 }
 
@@ -19,6 +21,7 @@ int main(int argc, char **argv)
 
   /* CLI flags */
   int lexer_debug = FALSE;
+  int output_ast = FALSE;
   int parser_debug = FALSE;
 
   if ( argc < 2 )
@@ -28,6 +31,9 @@ int main(int argc, char **argv)
       if ( argv[ i ][ 0 ] == '-' )
         switch( argv[ i ][ 1 ] )
           {
+          case 'a':
+            output_ast = !output_ast;
+            break;
           case 'l':
             lexer_debug = !lexer_debug;
             break;
@@ -46,6 +52,13 @@ int main(int argc, char **argv)
   /* Parse */
   if ((ast = semantic_analysis(filename, lexer_debug, parser_debug)) == NULL)
     return 1;
+
+  if (output_ast)
+    {
+      FILE *ast_file = fopen("ast.dot", "w");
+      ast_print(ast, ast_file);
+      fclose(ast_file);
+    }
 
   return 0;
 }

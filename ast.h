@@ -1,6 +1,7 @@
 #ifndef AST_H
 #define AST_H
 
+#include <stdio.h>
 #include <string.h>
 #include "util.h"
 
@@ -92,6 +93,7 @@ struct _node {
   **    Set these using the SET_M macro.
   */
   struct _methods {
+    void (*print)(NODE *, FILE *);
     const char *(*to_s)(NODE *);
   } methods;
 
@@ -104,19 +106,33 @@ struct _node {
 #define N ast_create
 #define S(n) (*((struct slots *)(n)->slots))
 #define SET_M(node,                             \
+              _print,                           \
               _to_s)                            \
   {                                             \
+    (node)->methods.print = (_print);           \
     (node)->methods.to_s = (_to_s);             \
   }
 #define SLOT_SIZE sizeof(struct slots)
+
+#define PRINT_NODE(out, node, label) {                       \
+    fprintf(out, "\"%p\" [label=\"%s\"];\n", node, label);   \
+  }
+#define PRINT_EDGE(out, tail, head) {                   \
+    if (head) {                                         \
+      fprintf(out, "\"%p\" -> \"%p\";\n", tail, head);    \
+      head->methods.print(head, out);                   \
+    }                                                   \
+  }
 
 /*
 ** Public Functions
 */
 
-NODE *ast_create(NODE_TYPE type, ...);
 const char *ast_node_type_str(NODE_TYPE type);
 const char *ast_op_str(OP_TYPE type);
+
+NODE *ast_create(NODE_TYPE type, ...);
+void ast_print(NODE *node, FILE *out);
 const char *ast_to_s(NODE *node);
 
 #endif AST_H

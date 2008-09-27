@@ -65,6 +65,10 @@ TOKEN identifier(YYSTYPE *yylval, const char *text)
 
 TOKEN string_literal(YYSTYPE *yylval, const char *text)
 {
-  set_text(yylval, text);
+  char *temp = strdup(text);
+  temp[strlen(temp) - 1] = 0; /* Remove trailing quote */
+  strcpy(temp, temp + 1);     /* Remove leading quote */
+  set_text(yylval, temp);
+  free(temp);
   return STRING_LITERAL;
 }

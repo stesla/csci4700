@@ -12,6 +12,16 @@ struct slots {
 
 size_t ast_conditional_size() { return SLOT_SIZE; }
 
+static void ast_conditional_print(NODE *node, FILE *out)
+{
+  PRINT_NODE(out, node, "AST_CONDITIONAL");
+
+  PRINT_EDGE(out, node, S(node).condition);
+  PRINT_EDGE(out, node, S(node).if_branch);
+  if (S(node).else_branch)
+    PRINT_EDGE(out, node, S(node).else_branch);
+}
+
 static const char *ast_conditional_to_s(NODE *node)
 {
   char *result;
@@ -40,5 +50,7 @@ void ast_conditional_init(NODE *node, va_list args)
   S(node).if_branch = va_arg(args, NODE *);
   S(node).else_branch = va_arg(args, NODE *);
 
-  SET_M(node, ast_conditional_to_s);
+  SET_M(node,
+        ast_conditional_print,
+        ast_conditional_to_s);
 }
