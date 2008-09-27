@@ -24,18 +24,6 @@ static void set_text(YYSTYPE *yylval, const char *text)
     }
 }
 
-void consume_comment(void)
-{
-  /* These are defined in lexer.c */
-  extern int yy_flex_debug;
-  extern int next_char(void);
-
-  while (next_char() != '\n')
-    ;
-  if (yy_flex_debug)
-    printf("Removed comment from input stream.\n");
-}
-
 TOKEN constant(YYSTYPE *yylval, const char *text)
 {
   set_text(yylval, text);

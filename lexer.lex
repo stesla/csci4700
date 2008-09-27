@@ -21,8 +21,6 @@ IS          (u|U|l|L)*
 
 %%
 
-"\/\/"      { consume_comment(); }
-
 {L}({L}|{D})* { return(identifier(yylval, yytext)); }
 0[xX]{H}+{IS}? { return(constant(yylval, yytext)); }
 0{D}+{IS}? { return(constant(yylval, yytext)); }
@@ -62,10 +60,8 @@ L?\"(\\.|[^\\"])*\" { return(string_literal(yylval, yytext)); }
 "|"         {  return( '|' ); }
 "?"         {  return( '?' ); }
 
-[ \t\v\n\f]     {  }
+"\/\/".*    { /* ignore comments */ }
+[ \t\v\n\f] { /* ignore whitespace */}
 .           { /* ignore bad characters */ }
 
 %%
-
-/* Flex defines input() as static, so wrap it for lexer_util */
-int next_char(void) { return(input()); }
