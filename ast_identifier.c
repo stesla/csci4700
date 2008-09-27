@@ -12,9 +12,9 @@ size_t ast_identifier_size() { return SLOT_SIZE; }
 
 static void ast_identifier_print(NODE *node, FILE *out)
 {
-  size_t length = strlen("AST_IDENTIFIER") + strlen(S(node).identifier) + 2;
+  size_t length = strlen("AST_IDENTIFIER") + strlen(S(node).identifier) + 3;
   char *label = my_malloc(length * sizeof(char));
-  snprintf(label, length, "AST_IDENTIFIER %s", S(node).identifier);
+  snprintf(label, length, "AST_IDENTIFIER\\n%s", S(node).identifier);
 
   PRINT_NODE(out, node, label);
 

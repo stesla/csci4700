@@ -10,9 +10,9 @@ size_t ast_string_literal_size() { return SLOT_SIZE; }
 
 static void ast_string_literal_print(NODE *node, FILE *out)
 {
-  size_t length = strlen("AST_STRING_LITERAL") + strlen(S(node).value) + 6;
+  size_t length = strlen("AST_STRING_LITERAL") + strlen(S(node).value) + 7;
   char *label = my_malloc(length * sizeof(char));
-  snprintf(label, length, "AST_STRING_LITERAL \\\"%s\\\"", S(node).value);
+  snprintf(label, length, "AST_STRING_LITERAL\\n\\\"%s\\\"", S(node).value);
   PRINT_NODE(out, node, label);
 
   free(label);

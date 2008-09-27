@@ -12,8 +12,8 @@ size_t ast_binary_size() { return SLOT_SIZE; }
 
 static void ast_binary_print(NODE *node, FILE *out)
 {
-  char label[14]; /* AST_BINARY ++ */
-  snprintf(label, 14, "AST_BINARY %s", ast_op_str(S(node).op));
+  char label[15]; /* AST_BINARY ++ */
+  snprintf(label, 14, "AST_BINARY\\n%s", ast_op_str(S(node).op));
 
   PRINT_NODE(out, node, label);
   PRINT_EDGE(out, node, S(node).left);

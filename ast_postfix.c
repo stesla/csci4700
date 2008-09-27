@@ -13,8 +13,8 @@ size_t ast_postfix_size() { return SLOT_SIZE; }
 
 static void ast_postfix_print(NODE *node, FILE *out)
 {
-  char label[15]; /* AST_POSTFIX ++ */
-  snprintf(label, 15, "AST_POSTFIX %s", ast_op_str(S(node).op));
+  char label[16]; /* AST_POSTFIX ++ */
+  snprintf(label, 15, "AST_POSTFIX\\n%s", ast_op_str(S(node).op));
 
   PRINT_NODE(out, node, label);
 

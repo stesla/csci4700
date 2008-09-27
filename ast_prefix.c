@@ -13,8 +13,8 @@ size_t ast_prefix_size() { return SLOT_SIZE; }
 
 static void ast_prefix_print(NODE *node, FILE *out)
 {
-  char label[14]; /* AST_PREFIX ++ */
-  snprintf(label, 14, "AST_PREFIX %s", ast_op_str(S(node).op));
+  char label[15]; /* AST_PREFIX ++ */
+  snprintf(label, 14, "AST_PREFIX\\n%s", ast_op_str(S(node).op));
 
   PRINT_NODE(out, node, label);
 

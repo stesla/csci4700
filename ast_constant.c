@@ -12,8 +12,8 @@ size_t ast_constant_size() { return SLOT_SIZE; }
 
 static void ast_constant_print(NODE *node, FILE *out)
 {
-  char label[24]; /* AST_CONSTANT 1234567890\0 */
-  snprintf(label, 24, "AST_CONSTANT %d", S(node).value);
+  char label[25]; /* AST_CONSTANT 1234567890\0 */
+  snprintf(label, 24, "AST_CONSTANT\\n%d", S(node).value);
   PRINT_NODE(out, node, label);
 }
 
