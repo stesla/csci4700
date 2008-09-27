@@ -17,6 +17,6 @@ struct yystype {
 #endif
 #define YYSTYPE struct yystype
 
-int semantic_analsysis(NODE **ast, int lexer_debug, int parser_debug);
+NODE *semantic_analysis(const char *file, int lexer_debug, int parser_debug);
 
 #endif PARSER_H

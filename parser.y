@@ -235,16 +235,29 @@ string_literal : STRING_LITERAL { $$ = N(AST_STRING_LITERAL, $1); }
 
 %%
 
-int semantic_analysis(NODE **ast, int lexer_debug, int parser_debug)
+NODE *semantic_analysis(const char *filename, int lexer_debug, int parser_debug)
 {
-  int result;
+  int success;
   void *scanner;
+  NODE *ast;
+
+  if (open_input(filename) < 0)
+    {
+      perror("open_input");
+      exit(1);
+    }
 
   yylex_init(&scanner);
   yyset_debug(lexer_debug, scanner);
   yydebug = parser_debug;
-  result = yyparse(scanner, ast);
+  success = yyparse(scanner, &ast);
   yylex_destroy(scanner);
 
-  return result;
+  if (close_input() < 0)
+    {
+      perror("close_input");
+      exit(1);
+    }
+
+  return success ? NULL : ast;
 }

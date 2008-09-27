@@ -1,6 +1,5 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include "input.h"
 #include "parser.h"
 
 int usage( void )
@@ -14,10 +13,11 @@ int usage( void )
 
 int main(int argc, char **argv)
 {
-  char *filename;
+  const char *filename;
   int  i, success;
-  NODE *ast;
+  NODE *ast = NULL;
 
+  /* CLI flags */
   int lexer_debug = FALSE;
   int parser_debug = FALSE;
 
@@ -43,19 +43,9 @@ int main(int argc, char **argv)
       else
         filename = argv[ i ];
 
-  if (open_input(filename) < 0)
-    {
-      perror("open_input");
-      exit(1);
-    }
+  /* Parse */
+  if ((ast = semantic_analysis(filename, lexer_debug, parser_debug)) == NULL)
+    return 1;
 
-  success = semantic_analysis(&ast, lexer_debug, parser_debug);
-
-  if (close_input() < 0)
-    {
-      perror("close_input");
-      exit(1);
-    }
-
-  return success;
+  return 0;
 }
