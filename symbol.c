@@ -68,29 +68,10 @@ void *symbol_table_create(void *table)
 {
   TABLE *result = my_malloc(sizeof(TABLE));
   result->parent = table;
-  printf("symbol_table_create(%p)\n", table);
+  printf("%s(%p)\n", __FUNCTION__, table);
   return result;
 }
 
-void symbol_table_add_array(void *table, const char *id, size_t count)
-{
-  TABLE *globals = symbol_table_find_global_table(table);
-
-  if (symbol_table_find(globals, id))
-    return;
-
-  printf("symbol_table_add_array(%p, \"%s\", %i)\n", table, id, count);
-  symbol_table_add_symbol(globals, id, TRUE, count, INTEGER_SIZE);
-}
-
-void symbol_table_add_local(void *table, const char *id)
-{
-  if (symbol_table_find(table, id))
-    return;
-
-  printf("symbol_table_add_local(%p, \"%s\")\n", table, id);
-  symbol_table_add_symbol((TABLE *) table, id, FALSE, 1, INTEGER_SIZE);
-}
 
 void symbol_table_add_global(void *table, const char *id)
 {
@@ -99,8 +80,35 @@ void symbol_table_add_global(void *table, const char *id)
   if (symbol_table_find(globals, id))
     return;
 
-  printf("symbol_table_add_global(%p, \"%s\")\n", table, id);
+  printf("%s(%p, \"%s\")\n", __FUNCTION__, table, id);
   symbol_table_add_symbol(globals, id, FALSE, 1, INTEGER_SIZE);
+}
+
+void symbol_table_add_global_array(void *table, const char *id, size_t count)
+{
+  TABLE *globals = symbol_table_find_global_table(table);
+
+  if (symbol_table_find(globals, id))
+    return;
+
+  printf("%s(%p, \"%s\", %i)\n", __FUNCTION__, table, id, count);
+  symbol_table_add_symbol(globals, id, TRUE, count, INTEGER_SIZE);
+}
+
+void symbol_table_add_local(void *table, const char *id)
+{
+  if (symbol_table_find(table, id))
+    return;
+
+  printf("%s(%p, \"%s\")\n", __FUNCTION__, table, id);
+  symbol_table_add_symbol((TABLE *) table, id, FALSE, 1, INTEGER_SIZE);
+}
+
+void symbol_table_add_param(void *table, const char *id, int is_array)
+{
+  printf("%s(%p, \"%s\", %s)\n", __FUNCTION__, table, id, is_array ? "TRUE" : "FALSE");
+  /* TODO: Should I be recording a count here? */
+  symbol_table_add_symbol((TABLE *) table, id, is_array, 1, INTEGER_SIZE);
 }
 
 void *symbol_table_find(void *table, const char *id)

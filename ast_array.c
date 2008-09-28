@@ -15,7 +15,7 @@ static void add_symbols(NODE *node, void *symbols)
 {
   const char *id = ast_to_s(S(node).identifier);
   size_t count = atoi(ast_to_s(S(node).count));
-  symbol_table_add_array(symbols, id, count);
+  symbol_table_add_global_array(symbols, id, count);
 }
 
 static void find_symbols(NODE *node, void *symbols)

@@ -3,11 +3,13 @@
 #include <strings.h>
 #include "ast.h"
 #include "util.h"
+#include "symbol.h"
 
 struct slots {
   NODE *identifier;
   NODE *params;
   NODE *body;
+  void *symbols;
 };
 
 size_t ast_function_size() { return SLOT_SIZE; }
@@ -16,8 +18,9 @@ static void find_symbols(NODE *node, void *symbols)
 {
   /* TODO */
   /* ast_find_symbols(S(node).identifier, symbols); */
-  ast_find_symbols(S(node).params, symbols);
-  ast_find_symbols(S(node).body, symbols);
+  S(node).symbols = symbol_table_create(symbols);
+  ast_find_symbols(S(node).params, S(node).symbols);
+  ast_find_symbols(S(node).body, S(node).symbols);
 }
 
 static void print(NODE *node, FILE *out)

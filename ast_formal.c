@@ -13,7 +13,8 @@ size_t ast_formal_size() { return SLOT_SIZE; }
 
 static void find_symbols(NODE *node, void *symbols)
 {
-  /* TODO */
+  const char *id = ast_to_s(S(node).identifier);
+  symbol_table_add_param(symbols, id, S(node).is_array);
 }
 
 static void print(NODE *node, FILE *out)
