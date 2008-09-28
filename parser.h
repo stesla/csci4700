@@ -3,9 +3,6 @@
 
 #include "ast.h"
 
-#define TRUE 1
-#define FALSE 0
-
 struct yystype {
   NODE *node;
   OP_TYPE op;

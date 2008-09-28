@@ -29,7 +29,6 @@
 static NODE * ast_alloc(NODE_TYPE type)
 {
   NODE *result = (NODE *) my_malloc(sizeof(NODE));
-  bzero(result, sizeof(NODE));
   result->type = type;
   return result;
 }
@@ -70,7 +69,6 @@ NODE *ast_create(NODE_TYPE type, ...)
   size_t size = constructor[type].size();
 
   result->slots = my_malloc(size);
-  bzero(result->slots, size);
 
   va_start(args, type);
   constructor[type].init(result, args);
