@@ -33,6 +33,10 @@ static NODE * ast_alloc(NODE_TYPE type)
   return result;
 }
 
+static void ast_default_add_symbols(NODE *node, void *symbols)
+{
+}
+
 struct constructor {
   size_t (*size)();
   void (*init)(NODE *node, va_list args);
@@ -70,11 +74,18 @@ NODE *ast_create(NODE_TYPE type, ...)
 
   result->slots = my_malloc(size);
 
+  SET_METHOD(result, add_symbols, ast_default_add_symbols);
+
   va_start(args, type);
   constructor[type].init(result, args);
   va_end(args);
 
   return result;
+}
+
+void ast_add_symbols(NODE *node, void *symbols)
+{
+  node->methods.add_symbols(node, symbols);
 }
 
 void ast_find_symbols(NODE *node, void *symbols)

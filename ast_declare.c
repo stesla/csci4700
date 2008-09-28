@@ -13,7 +13,7 @@ size_t ast_declare_size() { return SLOT_SIZE; }
 
 static void find_symbols(NODE *node, void *symbols)
 {
-  /* TODO */
+  ast_add_symbols(S(node).list, symbols);
 }
 
 static void print(NODE *node, FILE *out)

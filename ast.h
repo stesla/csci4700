@@ -93,6 +93,7 @@ struct _node {
   **    Set these using the SET_METHODS macro.
   */
   struct _methods {
+    void (*add_symbols)(NODE *, void *);
     void (*find_symbols)(NODE *, void *);
     void (*print)(NODE *, FILE *);
     const char *(*to_s)(NODE *);
@@ -105,6 +106,7 @@ struct _node {
 };
 
 #define N ast_create
+#define OVERRIDE(node, method) SET_METHOD(node, method, method)
 #define S(n) (*((struct slots *)(n)->slots))
 #define SET_METHOD(node, method, func) { (node)->methods.method = (func); }
 #define SET_METHODS(node)                           \
@@ -133,6 +135,7 @@ const char *ast_node_type_str(NODE_TYPE type);
 const char *ast_op_str(OP_TYPE type);
 
 NODE *ast_create(NODE_TYPE type, ...);
+void ast_add_symbols(NODE *node, void *symbols);
 void ast_find_symbols(NODE *node, void *symbols);
 void ast_print(NODE *node, FILE *out);
 const char *ast_to_s(NODE *node);

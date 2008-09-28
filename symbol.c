@@ -99,7 +99,7 @@ void symbol_table_add_global(void *table, const char *id)
   if (symbol_table_find(globals, id))
     return;
 
-  printf("symbol_table_add_global(%p, \"%s\")", table, id);
+  printf("symbol_table_add_global(%p, \"%s\")\n", table, id);
   symbol_table_add_symbol(globals, id, FALSE, 1, INTEGER_SIZE);
 }
 

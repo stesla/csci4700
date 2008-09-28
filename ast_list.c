@@ -11,6 +11,14 @@ struct slots {
 
 size_t ast_list_size() { return SLOT_SIZE; }
 
+static void add_symbols(NODE *node, void *symbols)
+{
+  if (S(node).first)
+    ast_add_symbols(S(node).first, symbols);
+  if (S(node).rest)
+    ast_add_symbols(S(node).rest, symbols);
+}
+
 static void find_symbols(NODE *node, void *symbols)
 {
   if (S(node).first)
@@ -57,4 +65,5 @@ void ast_list_init(NODE *node, va_list args)
   S(node).rest = va_arg(args, NODE *);
 
   SET_METHODS(node);
+  OVERRIDE(node, add_symbols);
 }
