@@ -11,7 +11,7 @@ struct slots {
 
 size_t ast_while_size() { return SLOT_SIZE; }
 
-static void ast_while_print(NODE *node, FILE *out)
+static void print(NODE *node, FILE *out)
 {
   PRINT_NODE(out, node, "AST_WHILE");
 
@@ -19,7 +19,7 @@ static void ast_while_print(NODE *node, FILE *out)
   PRINT_EDGE(out, node, S(node).body);
 }
 
-static const char *ast_while_to_s(NODE *node)
+static const char *to_s(NODE *node)
 {
   return strdup("WHILE");
 }
@@ -30,6 +30,6 @@ void ast_while_init(NODE *node, va_list args)
   S(node).body = va_arg(args, NODE *);
 
   SET_M(node,
-        ast_while_print,
-        ast_while_to_s);
+        print,
+        to_s);
 }

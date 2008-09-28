@@ -11,7 +11,7 @@ struct slots {
 
 size_t ast_prefix_size() { return SLOT_SIZE; }
 
-static void ast_prefix_print(NODE *node, FILE *out)
+static void print(NODE *node, FILE *out)
 {
   char label[15]; /* AST_PREFIX ++ */
   snprintf(label, 14, "AST_PREFIX\\n%s", ast_op_str(S(node).op));
@@ -21,7 +21,7 @@ static void ast_prefix_print(NODE *node, FILE *out)
   PRINT_EDGE(out, node, S(node).operand);
 }
 
-static const char *ast_prefix_to_s(NODE *node)
+static const char *to_s(NODE *node)
 {
   const char *operand = ast_to_s(S(node).operand);
   const char *op = ast_op_str(S(node).op);
@@ -37,6 +37,6 @@ void ast_prefix_init(NODE *node, va_list args)
   S(node).op = va_arg(args, OP_TYPE);
 
   SET_M(node,
-        ast_prefix_print,
-        ast_prefix_to_s);
+        print,
+        to_s);
 }

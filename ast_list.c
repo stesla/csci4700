@@ -11,7 +11,7 @@ struct slots {
 
 size_t ast_list_size() { return SLOT_SIZE; }
 
-static void ast_list_print(NODE *node, FILE *out)
+static void print(NODE *node, FILE *out)
 {
   PRINT_NODE(out, node, "AST_LIST");
 
@@ -19,7 +19,7 @@ static void ast_list_print(NODE *node, FILE *out)
   PRINT_EDGE(out, node, S(node).rest);
 }
 
-static const char *ast_list_to_s(NODE *node)
+static const char *to_s(NODE *node)
 {
   char *result;
 
@@ -49,6 +49,6 @@ void ast_list_init(NODE *node, va_list args)
   S(node).rest = va_arg(args, NODE *);
 
   SET_M(node,
-        ast_list_print,
-        ast_list_to_s);
+        print,
+        to_s);
 }

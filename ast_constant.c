@@ -10,7 +10,7 @@ struct slots {
 
 size_t ast_constant_size() { return SLOT_SIZE; }
 
-static void ast_constant_print(NODE *node, FILE *out)
+static void print(NODE *node, FILE *out)
 {
   char label[25]; /* AST_CONSTANT 1234567890\0 */
   snprintf(label, 24, "AST_CONSTANT\\n%d", S(node).value);
@@ -18,7 +18,7 @@ static void ast_constant_print(NODE *node, FILE *out)
 }
 
 #define MAX_DIGITS 11 /* 10 digits in a 32-bit number + 1 for trailing \0 */
-static const char *ast_constant_to_s(NODE *node)
+static const char *to_s(NODE *node)
 {
   char *result = (char *) my_malloc(MAX_DIGITS * sizeof(char));
   snprintf(result, MAX_DIGITS, "%d", S(node).value);
@@ -33,6 +33,6 @@ void ast_constant_init(NODE *node, va_list args)
   free(text);
 
   SET_M(node,
-        ast_constant_print,
-        ast_constant_to_s);
+        print,
+        to_s);
 }

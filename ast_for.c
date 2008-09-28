@@ -13,7 +13,7 @@ struct slots {
 
 size_t ast_for_size() { return SLOT_SIZE; }
 
-void ast_for_print(NODE *node, FILE *out)
+void print(NODE *node, FILE *out)
 {
   PRINT_NODE(out, node, "AST_FOR");
 
@@ -24,7 +24,7 @@ void ast_for_print(NODE *node, FILE *out)
   PRINT_EDGE(out, node, S(node).body);
 }
 
-static const char *ast_for_to_s(NODE *node)
+static const char *to_s(NODE *node)
 {
   return strdup("FOR");
 }
@@ -37,6 +37,6 @@ void ast_for_init(NODE *node, va_list args)
   S(node).body = va_arg(args, NODE *);
 
   SET_M(node,
-        ast_for_print,
-        ast_for_to_s);
+        print,
+        to_s);
 }

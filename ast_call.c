@@ -11,14 +11,14 @@ struct slots {
 
 size_t ast_call_size() { return SLOT_SIZE; }
 
-static void ast_call_print(NODE *node, FILE *out)
+static void print(NODE *node, FILE *out)
 {
   PRINT_NODE(out, node, "AST_CALL");
   PRINT_EDGE(out, node, S(node).func);
   PRINT_EDGE(out, node, S(node).args);
 }
 
-static const char *ast_call_to_s(NODE *node)
+static const char *to_s(NODE *node)
 {
   const char *func = ast_to_s(S(node).func);
   const char *args = ast_to_s(S(node).args);
@@ -34,6 +34,6 @@ void ast_call_init(NODE *node, va_list args)
   S(node).args = va_arg(args, NODE *);
 
   SET_M(node,
-        ast_call_print,
-        ast_call_to_s);
+        print,
+        to_s);
 }

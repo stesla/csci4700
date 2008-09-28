@@ -10,7 +10,7 @@ struct slots {
 
 size_t ast_binary_size() { return SLOT_SIZE; }
 
-static void ast_binary_print(NODE *node, FILE *out)
+static void print(NODE *node, FILE *out)
 {
   char label[15]; /* AST_BINARY ++ */
   snprintf(label, 14, "AST_BINARY\\n%s", ast_op_str(S(node).op));
@@ -20,7 +20,7 @@ static void ast_binary_print(NODE *node, FILE *out)
   PRINT_EDGE(out, node, S(node).right);
 }
 
-static const char *ast_binary_to_s(NODE *node)
+static const char *to_s(NODE *node)
 {
   const char *left = ast_to_s(S(node).left);
   const char *op = ast_op_str(S(node).op);
@@ -38,6 +38,6 @@ void ast_binary_init(NODE *node, va_list args)
   S(node).right = va_arg(args, NODE *);
 
   SET_M(node,
-        ast_binary_print,
-        ast_binary_to_s);
+        print,
+        to_s);
 }

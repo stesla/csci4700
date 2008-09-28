@@ -13,14 +13,14 @@ struct slots {
 
 size_t ast_block_size() { return SLOT_SIZE; }
 
-static void ast_block_print(NODE *node, FILE *out)
+static void print(NODE *node, FILE *out)
 {
   PRINT_NODE(out, node, "AST_BLOCK");
   PRINT_EDGE(out, node, S(node).declarations);
   PRINT_EDGE(out, node, S(node).statements);
 }
 
-static const char *ast_block_to_s(NODE *node)
+static const char *to_s(NODE *node)
 {
   const char *result;
 
@@ -40,6 +40,6 @@ void ast_block_init(NODE *node, va_list args)
   S(node).end_line = va_arg(args, int);
 
   SET_M(node,
-        ast_block_print,
-        ast_block_to_s);
+        print,
+        to_s);
 }

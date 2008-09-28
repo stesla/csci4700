@@ -11,14 +11,14 @@ struct slots {
 
 size_t ast_array_size() { return SLOT_SIZE; }
 
-static void ast_array_print(NODE *node, FILE *out)
+static void print(NODE *node, FILE *out)
 {
   PRINT_NODE(out, node, "AST_ARRAY");
   PRINT_EDGE(out, node, S(node).identifier);
   PRINT_EDGE(out, node, S(node).count);
 }
 
-static const char *ast_array_to_s(NODE *node)
+static const char *to_s(NODE *node)
 {
   const char *identifier = ast_to_s(S(node).identifier);
   const char *count = ast_to_s(S(node).count);
@@ -34,6 +34,6 @@ void ast_array_init(NODE *node, va_list args)
   S(node).count = va_arg(args, NODE *);
 
   SET_M(node,
-        ast_array_print,
-        ast_array_to_s);
+        print,
+        to_s);
 }

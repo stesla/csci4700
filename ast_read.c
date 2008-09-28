@@ -10,14 +10,14 @@ struct slots {
 
 size_t ast_read_size() { return SLOT_SIZE; }
 
-static void ast_read_print(NODE *node, FILE *out)
+static void print(NODE *node, FILE *out)
 {
   PRINT_NODE(out, node, "AST_READ");
 
   PRINT_EDGE(out, node, S(node).identifier);
 }
 
-static const char *ast_read_to_s(NODE *node)
+static const char *to_s(NODE *node)
 {
   char *result;
   const char *identifier = ast_to_s(S(node).identifier);
@@ -32,6 +32,6 @@ void ast_read_init(NODE *node, va_list args)
   S(node).identifier = va_arg(args, NODE *);
 
   SET_M(node,
-        ast_read_print,
-        ast_read_to_s);
+        print,
+        to_s);
 }
