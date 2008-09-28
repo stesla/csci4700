@@ -2,16 +2,27 @@
 #include <stdio.h>
 #include <strings.h>
 #include "ast.h"
+#include "symbol.h"
 #include "util.h"
 
 struct slots {
   NODE *declarations;
   NODE *statements;
+  void *symbols;
   int start_line;
   int end_line;
 };
 
 size_t ast_block_size() { return SLOT_SIZE; }
+
+static void fill_symbols(NODE *node, void *symbols)
+{
+  S(node).symbols = symbol_table_create(symbols);
+  if (S(node).declarations)
+    ast_fill_symbols(S(node).declarations, S(node).symbols);
+  if (S(node).statements)
+    ast_fill_symbols(S(node).statements, S(node).symbols);
+}
 
 static void print(NODE *node, FILE *out)
 {

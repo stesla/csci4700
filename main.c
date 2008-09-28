@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include "ast.h"
 #include "parser.h"
+#include "symbol.h"
 
 int usage( void )
 {
@@ -17,6 +18,7 @@ int main(int argc, char **argv)
   const char *filename;
   int  i, success;
   NODE *ast = NULL;
+  void *symbols = symbol_table_create(NULL);
 
   /* CLI flags */
   int lexer_debug = FALSE;
@@ -49,12 +51,16 @@ int main(int argc, char **argv)
   if ((ast = semantic_analysis(filename, lexer_debug, parser_debug)) == NULL)
     return 1;
 
+  /* Output AST */
   if (output_ast)
     {
       FILE *ast_file = fopen("ast.dot", "w");
       ast_print(ast, ast_file);
       fclose(ast_file);
     }
+
+  /* Fill Symbol Table */
+  ast_fill_symbols(ast, symbols);
 
   return 0;
 }

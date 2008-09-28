@@ -11,6 +11,11 @@ struct slots {
 
 size_t ast_postfix_size() { return SLOT_SIZE; }
 
+static void fill_symbols(NODE *node, void *symbols)
+{
+  ast_fill_symbols(S(node).operand, symbols);
+}
+
 static void print(NODE *node, FILE *out)
 {
   char label[16]; /* AST_POSTFIX ++ */

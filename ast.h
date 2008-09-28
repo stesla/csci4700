@@ -93,6 +93,7 @@ struct _node {
   **    Set these using the SET_METHODS macro.
   */
   struct _methods {
+    void (*fill_symbols)(NODE *, void *);
     void (*print)(NODE *, FILE *);
     const char *(*to_s)(NODE *);
   } methods;
@@ -106,10 +107,11 @@ struct _node {
 #define N ast_create
 #define S(n) (*((struct slots *)(n)->slots))
 #define SET_METHOD(node, method, func) { (node)->methods.method = (func); }
-#define SET_METHODS(node)                       \
-  {                                             \
-    SET_METHOD(node, print, print);             \
-    SET_METHOD(node, to_s, to_s);               \
+#define SET_METHODS(node)                           \
+  {                                                 \
+    SET_METHOD(node, print, print);                 \
+    SET_METHOD(node, to_s, to_s);                   \
+    SET_METHOD(node, fill_symbols, fill_symbols);   \
   }
 #define SLOT_SIZE sizeof(struct slots)
 
@@ -131,6 +133,7 @@ const char *ast_node_type_str(NODE_TYPE type);
 const char *ast_op_str(OP_TYPE type);
 
 NODE *ast_create(NODE_TYPE type, ...);
+void ast_fill_symbols(NODE *node, void *symbols);
 void ast_print(NODE *node, FILE *out);
 const char *ast_to_s(NODE *node);
 

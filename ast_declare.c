@@ -11,6 +11,11 @@ struct slots {
 
 size_t ast_declare_size() { return SLOT_SIZE; }
 
+static void fill_symbols(NODE *node, void *symbols)
+{
+  /* TODO */
+}
+
 static void print(NODE *node, FILE *out)
 {
   PRINT_NODE(out, node, "AST_DECLARE");

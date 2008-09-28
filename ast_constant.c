@@ -10,6 +10,10 @@ struct slots {
 
 size_t ast_constant_size() { return SLOT_SIZE; }
 
+static void fill_symbols(NODE *node, void *symbols)
+{
+}
+
 static void print(NODE *node, FILE *out)
 {
   char label[25]; /* AST_CONSTANT 1234567890\0 */

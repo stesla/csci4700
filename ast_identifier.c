@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <strings.h>
 #include "ast.h"
+#include "symbol.h"
 #include "util.h"
 
 struct slots {
@@ -9,6 +10,11 @@ struct slots {
 };
 
 size_t ast_identifier_size() { return SLOT_SIZE; }
+
+static void fill_symbols(NODE *node, void *symbols)
+{
+  symbol_table_add_local(symbols, S(node).identifier);
+}
 
 static void print(NODE *node, FILE *out)
 {

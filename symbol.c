@@ -4,6 +4,7 @@
 void *symbol_table_create(void *table)
 {
   printf("symbol_table_create(%p)\n", table);
+  return NULL;
 }
 
 void symbol_table_add_array(void *table, const char *id, size_t size)

@@ -10,6 +10,11 @@ struct slots {
 
 size_t ast_group_size() { return SLOT_SIZE; }
 
+static void fill_symbols(NODE *node, void *symbols)
+{
+  ast_fill_symbols(S(node).inner, symbols);
+}
+
 static void print(NODE *node, FILE *out)
 {
   PRINT_NODE(out, node, "AST_GROUP");

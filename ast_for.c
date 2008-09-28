@@ -13,6 +13,15 @@ struct slots {
 
 size_t ast_for_size() { return SLOT_SIZE; }
 
+static void fill_symbols(NODE *node, void *symbols)
+{
+  ast_fill_symbols(S(node).initializer, symbols);
+  ast_fill_symbols(S(node).condition, symbols);
+  if (S(node).increment)
+    ast_fill_symbols(S(node).increment, symbols);
+  ast_fill_symbols(S(node).body, symbols);
+}
+
 void print(NODE *node, FILE *out)
 {
   PRINT_NODE(out, node, "AST_FOR");
