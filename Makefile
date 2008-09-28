@@ -11,7 +11,7 @@ AST_OBJS=ast_array.o ast_binary.o ast_block.o ast_call.o ast_constant.o \
 	     ast_group.o ast_identifier.o ast_list.o ast_postfix.o ast_prefix.o \
 	     ast_read.o ast_return.o ast_string_literal.o ast_while.o ast_write.o
 
-OBJS=util.o ast.o lexer_util.o parser.o lexer.o ${AST_OBJS}
+OBJS=symbol.o util.o ast.o lexer_util.o parser.o lexer.o ${AST_OBJS}
 
 ## Main Program
 
