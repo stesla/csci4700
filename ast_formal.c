@@ -44,7 +44,5 @@ void ast_formal_init(NODE *node, va_list args)
   S(node).identifier = va_arg(args, NODE *);
   S(node).is_array = va_arg(args, int);
 
-  SET_M(node,
-        print,
-        to_s);
+  SET_METHODS(node);
 }

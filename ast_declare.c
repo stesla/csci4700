@@ -27,7 +27,5 @@ void ast_declare_init(NODE *node, va_list args)
   S(node).list = va_arg(args, NODE *);
   S(node).line = va_arg(args, int);
 
-  SET_M(node,
-        print,
-        to_s);
+  SET_METHODS(node);
 }

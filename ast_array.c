@@ -33,7 +33,5 @@ void ast_array_init(NODE *node, va_list args)
   S(node).identifier = va_arg(args, NODE *);
   S(node).count = va_arg(args, NODE *);
 
-  SET_M(node,
-        print,
-        to_s);
+  SET_METHODS(node);
 }

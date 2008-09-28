@@ -50,7 +50,5 @@ void ast_conditional_init(NODE *node, va_list args)
   S(node).if_branch = va_arg(args, NODE *);
   S(node).else_branch = va_arg(args, NODE *);
 
-  SET_M(node,
-        print,
-        to_s);
+  SET_METHODS(node);
 }

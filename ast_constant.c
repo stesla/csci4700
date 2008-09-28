@@ -32,7 +32,5 @@ void ast_constant_init(NODE *node, va_list args)
   S(node).value = atoi(text);
   free(text);
 
-  SET_M(node,
-        print,
-        to_s);
+  SET_METHODS(node);
 }

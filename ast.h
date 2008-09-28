@@ -10,9 +10,9 @@
 ** functions:
 **
 **    size_t ast_NODE_size() { return SLOT_SIZE; }
-**    void ast_NODE_init(NODE *node, va_list args) { ...; SET_M(node,...); }
+**    void ast_NODE_init(NODE *node, va_list args) { ...; SET_METHODS(node); }
 **
-** The SET_M macro will initialize node's method structure with the pointers
+** The SET_METHODS macro will initialize node's method structure with the pointers
 ** provided as the rest of the arguments.
 **
 ** Additionally, you should define a structure:
@@ -90,7 +90,7 @@ struct _node {
   const char *to_s;
 
   /* Method Table:
-  **    Set these using the SET_M macro.
+  **    Set these using the SET_METHODS macro.
   */
   struct _methods {
     void (*print)(NODE *, FILE *);
@@ -105,12 +105,10 @@ struct _node {
 
 #define N ast_create
 #define S(n) (*((struct slots *)(n)->slots))
-#define SET_M(node,                             \
-              _print,                           \
-              _to_s)                            \
+#define SET_METHODS(node)                       \
   {                                             \
-    (node)->methods.print = (_print);           \
-    (node)->methods.to_s = (_to_s);             \
+    (node)->methods.print = (print);            \
+    (node)->methods.to_s = (to_s);              \
   }
 #define SLOT_SIZE sizeof(struct slots)
 

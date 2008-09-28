@@ -29,7 +29,5 @@ void ast_group_init(NODE *node, va_list args)
 {
   S(node).inner = va_arg(args, NODE *);
 
-  SET_M(node,
-        print,
-        to_s);
+  SET_METHODS(node);
 }

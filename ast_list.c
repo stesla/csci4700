@@ -48,7 +48,5 @@ void ast_list_init(NODE *node, va_list args)
   S(node).first = va_arg(args, NODE *);
   S(node).rest = va_arg(args, NODE *);
 
-  SET_M(node,
-        print,
-        to_s);
+  SET_METHODS(node);
 }

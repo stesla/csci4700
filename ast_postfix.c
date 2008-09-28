@@ -36,7 +36,5 @@ void ast_postfix_init(NODE *node, va_list args)
   S(node).operand = va_arg(args, NODE *);
   S(node).op = va_arg(args, OP_TYPE);
 
-  SET_M(node,
-        print,
-        to_s);
+  SET_METHODS(node);
 }

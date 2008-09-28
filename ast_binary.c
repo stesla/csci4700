@@ -37,7 +37,5 @@ void ast_binary_init(NODE *node, va_list args)
   S(node).left = va_arg(args, NODE *);
   S(node).right = va_arg(args, NODE *);
 
-  SET_M(node,
-        print,
-        to_s);
+  SET_METHODS(node);
 }

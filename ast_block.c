@@ -39,7 +39,5 @@ void ast_block_init(NODE *node, va_list args)
   S(node).start_line = va_arg(args, int);
   S(node).end_line = va_arg(args, int);
 
-  SET_M(node,
-        print,
-        to_s);
+  SET_METHODS(node);
 }

@@ -38,7 +38,5 @@ void ast_function_init(NODE *node, va_list args)
   S(node).params = va_arg(args, NODE *);
   S(node).body = va_arg(args, NODE *);
 
-  SET_M(node,
-        print,
-        to_s);
+  SET_METHODS(node);
 }
