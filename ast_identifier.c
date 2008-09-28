@@ -7,6 +7,7 @@
 
 struct slots {
   const char *identifier;
+  int line;
 };
 
 size_t ast_identifier_size() { return SLOT_SIZE; }
@@ -14,11 +15,13 @@ size_t ast_identifier_size() { return SLOT_SIZE; }
 static void add_symbols(NODE *node, void *symbols)
 {
   symbol_table_add_global(symbols, S(node).identifier);
+  printf("ADD %s at line %i\n", S(node).identifier, S(node).line);
 }
 
 static void find_symbols(NODE *node, void *symbols)
 {
-  symbol_table_add_local(symbols, S(node).identifier);
+  if (symbol_table_add_local(symbols, S(node).identifier))
+    printf("ADD %s at line %i\n", S(node).identifier, S(node).line);
 }
 
 static void print(NODE *node, FILE *out)
@@ -40,6 +43,7 @@ static const char *to_s(NODE *node)
 void ast_identifier_init(NODE *node, va_list args)
 {
   S(node).identifier = va_arg(args, char *);
+  S(node).line = va_arg(args, int);
 
   SET_METHODS(node);
   OVERRIDE(node, add_symbols);

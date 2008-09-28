@@ -7,6 +7,7 @@
 struct slots {
   NODE *identifier;
   NODE *count;
+  int line;
 };
 
 size_t ast_array_size() { return SLOT_SIZE; }
@@ -16,6 +17,7 @@ static void add_symbols(NODE *node, void *symbols)
   const char *id = ast_to_s(S(node).identifier);
   size_t count = atoi(ast_to_s(S(node).count));
   symbol_table_add_global_array(symbols, id, count);
+  printf("ADD %s[%i] at line %i\n", id, count, S(node).line);
 }
 
 static void find_symbols(NODE *node, void *symbols)
@@ -44,6 +46,7 @@ void ast_array_init(NODE *node, va_list args)
 {
   S(node).identifier = va_arg(args, NODE *);
   S(node).count = va_arg(args, NODE *);
+  S(node).line = va_arg(args, int);
 
   SET_METHODS(node);
   OVERRIDE(node, add_symbols);

@@ -67,8 +67,8 @@ formal_list
     ;
 
 formal
-    : identifier '[' ']' { $$ = N(AST_FORMAL, $1, TRUE); }
-    | identifier { $$ = N(AST_FORMAL, $1, FALSE); }
+    : identifier '[' ']' { $$ = N(AST_FORMAL, $1, TRUE, @$.last_line); }
+    | identifier { $$ = N(AST_FORMAL, $1, FALSE, @$.last_line); }
     ;
 
 block
@@ -94,8 +94,8 @@ decl
     ;
 
 a_list
-    : identifier '[' constant ']' { $$ = N(AST_LIST, N(AST_ARRAY, $1, $3), NULL); }
-    | identifier '[' constant ']' ',' a_list { $$ = N(AST_LIST, N(AST_ARRAY, $1, $3), $6); }
+    : identifier '[' constant ']' { $$ = N(AST_LIST, N(AST_ARRAY, $1, $3, @$.last_line), NULL); }
+    | identifier '[' constant ']' ',' a_list { $$ = N(AST_LIST, N(AST_ARRAY, $1, $3, @4.last_line), $6); }
     ;
 
 identifier_list
@@ -231,7 +231,7 @@ assignment_expression
     ;
 
 constant : CONSTANT { $$ = N(AST_CONSTANT, $1); }
-identifier : IDENTIFIER { $$ = N(AST_IDENTIFIER, $1); }
+identifier : IDENTIFIER { $$ = N(AST_IDENTIFIER, $1, @$.last_line); }
 string_literal : STRING_LITERAL { $$ = N(AST_STRING_LITERAL, $1); }
 
 %%

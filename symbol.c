@@ -68,7 +68,6 @@ void *symbol_table_create(void *table)
 {
   TABLE *result = my_malloc(sizeof(TABLE));
   result->parent = table;
-  printf("%s(%p)\n", __FUNCTION__, table);
   return result;
 }
 
@@ -80,7 +79,6 @@ void symbol_table_add_global(void *table, const char *id)
   if (symbol_table_find(globals, id))
     return;
 
-  printf("%s(%p, \"%s\")\n", __FUNCTION__, table, id);
   symbol_table_add_symbol(globals, id, FALSE, 1, INTEGER_SIZE);
 }
 
@@ -91,22 +89,20 @@ void symbol_table_add_global_array(void *table, const char *id, size_t count)
   if (symbol_table_find(globals, id))
     return;
 
-  printf("%s(%p, \"%s\", %i)\n", __FUNCTION__, table, id, count);
   symbol_table_add_symbol(globals, id, TRUE, count, INTEGER_SIZE);
 }
 
-void symbol_table_add_local(void *table, const char *id)
+int symbol_table_add_local(void *table, const char *id)
 {
   if (symbol_table_find(table, id))
-    return;
+    return FALSE;
 
-  printf("%s(%p, \"%s\")\n", __FUNCTION__, table, id);
   symbol_table_add_symbol((TABLE *) table, id, FALSE, 1, INTEGER_SIZE);
+  return TRUE;
 }
 
 void symbol_table_add_param(void *table, const char *id, int is_array)
 {
-  printf("%s(%p, \"%s\", %s)\n", __FUNCTION__, table, id, is_array ? "TRUE" : "FALSE");
   /* TODO: Should I be recording a count here? */
   symbol_table_add_symbol((TABLE *) table, id, is_array, 1, INTEGER_SIZE);
 }

@@ -7,6 +7,7 @@
 struct slots {
   NODE *identifier;
   int is_array;
+  int line;
 };
 
 size_t ast_formal_size() { return SLOT_SIZE; }
@@ -15,6 +16,7 @@ static void find_symbols(NODE *node, void *symbols)
 {
   const char *id = ast_to_s(S(node).identifier);
   symbol_table_add_param(symbols, id, S(node).is_array);
+  printf("ADD %s at line %i\n", ast_to_s(node), S(node).line);
 }
 
 static void print(NODE *node, FILE *out)
@@ -49,6 +51,7 @@ void ast_formal_init(NODE *node, va_list args)
 {
   S(node).identifier = va_arg(args, NODE *);
   S(node).is_array = va_arg(args, int);
+  S(node).line = va_arg(args, int);
 
   SET_METHODS(node);
 }
