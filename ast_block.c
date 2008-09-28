@@ -15,13 +15,13 @@ struct slots {
 
 size_t ast_block_size() { return SLOT_SIZE; }
 
-static void fill_symbols(NODE *node, void *symbols)
+static void find_symbols(NODE *node, void *symbols)
 {
   S(node).symbols = symbol_table_create(symbols);
   if (S(node).declarations)
-    ast_fill_symbols(S(node).declarations, S(node).symbols);
+    ast_find_symbols(S(node).declarations, S(node).symbols);
   if (S(node).statements)
-    ast_fill_symbols(S(node).statements, S(node).symbols);
+    ast_find_symbols(S(node).statements, S(node).symbols);
 }
 
 static void print(NODE *node, FILE *out)

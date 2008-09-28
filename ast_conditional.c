@@ -12,12 +12,12 @@ struct slots {
 
 size_t ast_conditional_size() { return SLOT_SIZE; }
 
-static void fill_symbols(NODE *node, void *symbols)
+static void find_symbols(NODE *node, void *symbols)
 {
-  ast_fill_symbols(S(node).condition, symbols);
-  ast_fill_symbols(S(node).if_branch, symbols);
+  ast_find_symbols(S(node).condition, symbols);
+  ast_find_symbols(S(node).if_branch, symbols);
   if (S(node).else_branch)
-    ast_fill_symbols(S(node).else_branch, symbols);
+    ast_find_symbols(S(node).else_branch, symbols);
 }
 
 static void print(NODE *node, FILE *out)

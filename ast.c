@@ -77,9 +77,9 @@ NODE *ast_create(NODE_TYPE type, ...)
   return result;
 }
 
-void ast_fill_symbols(NODE *node, void *symbols)
+void ast_find_symbols(NODE *node, void *symbols)
 {
-  node->methods.fill_symbols(node, symbols);
+  node->methods.find_symbols(node, symbols);
 }
 
 const char *ast_node_type_str(NODE_TYPE type)

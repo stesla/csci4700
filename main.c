@@ -60,7 +60,7 @@ int main(int argc, char **argv)
     }
 
   /* Fill Symbol Table */
-  ast_fill_symbols(ast, symbols);
+  ast_find_symbols(ast, symbols);
 
   return 0;
 }

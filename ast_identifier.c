@@ -11,7 +11,7 @@ struct slots {
 
 size_t ast_identifier_size() { return SLOT_SIZE; }
 
-static void fill_symbols(NODE *node, void *symbols)
+static void find_symbols(NODE *node, void *symbols)
 {
   symbol_table_add_local(symbols, S(node).identifier);
 }

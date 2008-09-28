@@ -8,7 +8,7 @@ struct slots {
 
 size_t ast_string_literal_size() { return SLOT_SIZE; }
 
-static void fill_symbols(NODE *node, void *symbols)
+static void find_symbols(NODE *node, void *symbols)
 {
 }
 

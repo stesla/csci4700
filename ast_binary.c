@@ -10,10 +10,10 @@ struct slots {
 
 size_t ast_binary_size() { return SLOT_SIZE; }
 
-static void fill_symbols(NODE *node, void *symbols)
+static void find_symbols(NODE *node, void *symbols)
 {
-  ast_fill_symbols(S(node).left, symbols);
-  ast_fill_symbols(S(node).right, symbols);
+  ast_find_symbols(S(node).left, symbols);
+  ast_find_symbols(S(node).right, symbols);
 }
 
 static void print(NODE *node, FILE *out)
