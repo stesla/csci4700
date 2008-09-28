@@ -105,10 +105,11 @@ struct _node {
 
 #define N ast_create
 #define S(n) (*((struct slots *)(n)->slots))
+#define SET_METHOD(node, method, func) { (node)->methods.method = (func); }
 #define SET_METHODS(node)                       \
   {                                             \
-    (node)->methods.print = (print);            \
-    (node)->methods.to_s = (to_s);              \
+    SET_METHOD(node, print, print);             \
+    SET_METHOD(node, to_s, to_s);               \
   }
 #define SLOT_SIZE sizeof(struct slots)
 
