@@ -140,4 +140,4 @@ void ast_find_symbols(NODE *node, void *symbols);
 void ast_print(NODE *node, FILE *out);
 const char *ast_to_s(NODE *node);
 
-#endif AST_H
+#endif

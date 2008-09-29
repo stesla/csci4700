@@ -4,4 +4,4 @@
 size_t ast_function_size();
 void ast_function_init(NODE *node, va_list args);
 
-#endif AST_FUNCTION_H
+#endif

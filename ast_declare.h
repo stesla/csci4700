@@ -4,4 +4,4 @@
 size_t ast_declare_size();
 void ast_declare_init(NODE *node, va_list args);
 
-#endif AST_DECLARE_H
+#endif

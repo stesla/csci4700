@@ -4,4 +4,4 @@
 size_t ast_block_size();
 void ast_block_init(NODE *node, va_list args);
 
-#endif AST_BLOCK_H
+#endif

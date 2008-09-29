@@ -3,4 +3,4 @@
 
 #define INTEGER_SIZE 4
 
-#endif SIZES_H
+#endif

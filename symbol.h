@@ -18,4 +18,4 @@ void symbol_table_next(void **cursor);
 /* Accessors */
 const char *symbol_id(void *cursor);
 
-#endif SYMBOL_H
+#endif

@@ -4,4 +4,4 @@
 size_t ast_array_size();
 void ast_array_init(NODE *node, va_list args);
 
-#endif AST_ARRAY_H
+#endif

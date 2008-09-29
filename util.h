@@ -6,4 +6,4 @@
 
 void *my_malloc(size_t size);
 
-#endif UTIL_H
+#endif

@@ -4,4 +4,4 @@
 size_t ast_binary_size();
 void ast_binary_init(NODE *node, va_list args);
 
-#endif AST_BINARY_H
+#endif
