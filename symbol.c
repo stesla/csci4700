@@ -22,6 +22,7 @@ struct _table {
   TABLE *parent;
 };
 
+#define E(x) (*((ENTRY *) (x)))
 #define T(x) (*((TABLE *) (x)))
 
 /*
@@ -63,6 +64,11 @@ static TABLE *symbol_table_find_global_table(void *table)
 /*
 ** Public Functions
 */
+
+const char *symbol_id(void *cursor)
+{
+  return E(cursor).first->id;
+}
 
 void *symbol_table_create(void *table)
 {
@@ -125,4 +131,14 @@ void *symbol_table_find(void *table, const char *id)
     return symbol_table_find(T(table).parent, id);
   else
     return NULL;
+}
+
+void symbol_table_first(void *table, void **cursor)
+{
+  *cursor = T(table).head;
+}
+
+void symbol_table_next(void **cursor)
+{
+  *cursor = E(*cursor).rest;
 }

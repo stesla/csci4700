@@ -10,17 +10,27 @@ struct slots {
   NODE *params;
   NODE *body;
   void *symbols;
+  int end_line;
 };
 
 size_t ast_function_size() { return SLOT_SIZE; }
 
 static void find_symbols(NODE *node, void *symbols)
 {
+  void *cur;
+
   /* TODO */
   /* ast_find_symbols(S(node).identifier, symbols); */
   S(node).symbols = symbol_table_create(symbols);
   ast_find_symbols(S(node).params, S(node).symbols);
   ast_find_symbols(S(node).body, S(node).symbols);
+
+  symbol_table_first(S(node).symbols, &cur);
+  while (cur)
+    {
+      printf("REMOVE %s at line %i\n", symbol_id(cur), S(node).end_line);
+      symbol_table_next(&cur);
+    }
 }
 
 static void print(NODE *node, FILE *out)
@@ -48,6 +58,7 @@ void ast_function_init(NODE *node, va_list args)
   S(node).identifier = va_arg(args, NODE *);
   S(node).params = va_arg(args, NODE *);
   S(node).body = va_arg(args, NODE *);
+  S(node).end_line = va_arg(args, int);
 
   SET_METHODS(node);
 }

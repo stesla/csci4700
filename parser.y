@@ -56,7 +56,7 @@ translation_unit
     ;
 
 external_declaration
-    : identifier '(' formal_list ')' block { $$ = N(AST_FUNCTION, $1, $3, $5); }
+    : identifier '(' formal_list ')' block { $$ = N(AST_FUNCTION, $1, $3, $5, @$.last_line); }
     | decl
     ;
 

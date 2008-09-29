@@ -17,11 +17,20 @@ size_t ast_block_size() { return SLOT_SIZE; }
 
 static void find_symbols(NODE *node, void *symbols)
 {
+  void *cur;
+
   S(node).symbols = symbol_table_create(symbols);
   if (S(node).declarations)
     ast_find_symbols(S(node).declarations, S(node).symbols);
   if (S(node).statements)
     ast_find_symbols(S(node).statements, S(node).symbols);
+
+  symbol_table_first(S(node).symbols, &cur);
+  while (cur)
+    {
+      printf("REMOVE %s at line %i\n", symbol_id(cur), S(node).end_line);
+      symbol_table_next(&cur);
+    }
 }
 
 static void print(NODE *node, FILE *out)
