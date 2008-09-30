@@ -134,9 +134,11 @@ return_stmt
     | RETURN expression ';' { $$ = N(AST_RETURN, $2); }
     ;
 
+/* Removed comma-separated expressions as they aren't required for C--, and
+ * supremely annoying
+ */
 expression
-    : assignment_expression { $$ = N(AST_LIST, $1, NULL); }
-    | assignment_expression ',' expression { $$ = N(AST_LIST, $1, $3); }
+    : assignment_expression
     ;
 
 primary_expression
