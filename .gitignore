@@ -5,3 +5,11 @@ y.tab.h
 c--
 run-test
 ast.dot
+tools/bin
+tools/bison-*
+tools/flex-*
+tools/include
+tools/info
+tools/lib
+tools/man
+tools/share

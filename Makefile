@@ -15,16 +15,10 @@ tools/bin/flex:
 	cd tools/${FLEXVERSION} && ./configure --prefix=${TOOLS} && make && make install
 
 clean:
-	if [ -f c-- ]; then rm c--; fi
+	rm -f c--
 	cd src && make clean
 
 clobber: clean
-	rm -rf tools/${FLEXVERSION}
-	rm -rf tools/${BISONVERSION}
-	rm -rf tools/include
-	rm -rf tools/bin
-	rm -rf tools/usr
-	rm -rf tools/lib
-	rm -rf tools/info
-	rm -rf tools/man
-	rm -rf tools/share
+	rm -rf tools/${FLEXVERSION} tools/${BISONVERSION}
+	rm -rf tools/include tools/bin tools/usr tools/lib
+	rm -rf tools/info tools/man tools/share

@@ -37,38 +37,11 @@ run-test: ${OBJS} ${TEST_OBJS} test.o
 ## Utilities
 
 clean:
-	if [ -f *.o ]; then rm *.o; fi
-	if [ -f c-- ]; then rm c--; fi
-	if [ -f lexer.c ]; then rm lexer.c; fi
-	if [ -f parser.c ]; then rm parser.c; fi
-	if [ -f run-test ]; then rm run-test; fi
-	if [ -f y.tab.h ]; then rm y.tab.h; fi
+	rm -rf *.o c-- lexer.c parser.c run-test y.tab.h
 
 ## File Dependencies
 
-lexer.o: lexer.c y.tab.h parser.h
-lexer_util.o: y.tab.h parser.h
+${AST_OBJS}: ast.h
+lexer.o lexer_util.o: y.tab.h parser.h
 main.o: parser.h
-parser.o: parser.c
 y.tab.h: parser.c
-
-ast_array.o: ast.h
-ast_binary.o: ast.h
-ast_block.o: ast.h
-ast_call.o: ast.h
-ast_constant.o: ast.h
-ast_conditional.o: ast.h
-ast_declare.o: ast.h
-ast_for.o: ast.h
-ast_formal.o: ast.h
-ast_function.o: ast.h
-ast_group.o: ast.h
-ast_identifier.o: ast.h
-ast_list.o: ast.h
-ast_postfix.o: ast.h
-ast_prefix.o: ast.h
-ast_read.o: ast.h
-ast_return.o: ast.h
-ast_string_literal.o: ast.h
-ast_while.o: ast.h
-ast_write.o: ast.h
