@@ -27,10 +27,7 @@ static void find_symbols(NODE *node, void *symbols)
 
   symbol_table_first(S(node).symbols, &cur);
   while (cur)
-    {
-      printf("REMOVE %s at line %i\n", symbol_id(cur), S(node).end_line);
-      symbol_table_next(&cur);
-    }
+    symbol_table_next(&cur);
 }
 
 static void print(NODE *node, FILE *out)
