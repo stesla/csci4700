@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "lexer_util.h"
+#include "util.h"
 #include "y.tab.h"
 
 struct tab {
@@ -18,10 +19,7 @@ static int compare(const void *a, const void *b)
 static void set_text(YYSTYPE *yylval, const char *text)
 {
   if ((yylval->text = strdup(text)) == NULL)
-    {
-      perror("strdup");
-      exit(1);
-    }
+    perror_die("strdup");
 }
 
 TOKEN constant(YYSTYPE *yylval, const char *text)

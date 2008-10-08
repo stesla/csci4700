@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include "ast.h"
 #include "parser.h"
+#include "util.h"
 
 int yywrap( void )
 {
@@ -246,10 +247,7 @@ NODE *semantic_analysis(const char *filename, int lexer_debug, int parser_debug)
   FILE *file;
 
   if ((file = fopen(filename, "r")) == NULL)
-    {
-      perror("file");
-      exit(1);
-    }
+    perror_die("fopen");
 
   yylex_init(&scanner);
   yyset_in(file, scanner);
