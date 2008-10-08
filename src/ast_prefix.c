@@ -18,8 +18,8 @@ static void find_symbols(NODE *node, void *symbols)
 
 static void print(NODE *node, FILE *out)
 {
-  char label[15]; /* AST_PREFIX ++ */
-  snprintf(label, 14, "AST_PREFIX\\n%s", ast_op_str(S(node).op));
+  char label[15];
+  snprintf(label, sizeof(label), "AST_PREFIX\\n%s", ast_op_str(S(node).op));
 
   PRINT_NODE(out, node, label);
 
