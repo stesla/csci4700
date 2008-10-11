@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "ast.h"
+#include "ir.h"
 #include "parser.h"
 #include "symbol.h"
 
@@ -66,7 +67,8 @@ int main(int argc, char **argv)
 
   /* Produce IR */
   ir = ir_create();
-  ir_add_prologue(ir);
+  /* TODO: put stuff in ir */
+  ir_print(stdout, ir);
 
   return 0;
 }
