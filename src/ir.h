@@ -1,0 +1,25 @@
+#ifndef IR_H
+#define IR_H
+
+typedef enum _ir_inst {
+  IR_ADD,
+  IR_AND,
+  IR_CALL,
+  IR_DIVIDE,
+  IR_IF_FALSE,
+  IR_IF_TRUE,
+  IR_LOAD,
+  IR_LOAD_INDIRECT,
+  IR_LOAD_LONG,
+  IR_LOAD_SHORT,
+  IR_MULTIPLY,
+  IR_OR,
+  IR_RETURN,
+  IR_STORE,
+  IR_STORE_INDIRECT,
+  IR_SUBTRACT,
+  IR_SYSCALL,
+  IR_XOR
+} IR_INST;
+
+#endif
