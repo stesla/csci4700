@@ -3,12 +3,12 @@
 #include "util.h"
 #include "sizes.h"
 
-typedef struct _symbol {
+struct _symbol {
   const char *id;
   int is_array;
   int count;
   int size;
-} SYMBOL;
+};
 
 typedef struct _entry ENTRY;
 struct _entry {
@@ -37,20 +37,20 @@ static ENTRY *entry_create(SYMBOL *first, ENTRY *rest)
   return result;
 }
 
-static SYMBOL *symbol_create(const char *id, int is_array, int count, int size)
+static SYMBOL *symbol_create(const char *id)
 {
   SYMBOL *result = my_malloc(sizeof(SYMBOL));
   result->id = id;
-  result->is_array = is_array;
-  result->count = count;
-  result->size = size;
+  result->count = 1;
+  result->size = INTEGER_SIZE;
   return result;
 }
 
-static symbol_table_add_symbol(TABLE *table, const char *id, int is_array, int count, int size)
+static SYMBOL *symbol_table_add_symbol(TABLE *table, const char *id)
 {
-  SYMBOL *symbol = symbol_create(id, FALSE, 1, INTEGER_SIZE);
+  SYMBOL *symbol = symbol_create(id);
   T(table).head = entry_create(symbol, T(table).head);
+  return symbol;
 }
 
 static TABLE *symbol_table_find_global_table(void *table)
@@ -65,9 +65,9 @@ static TABLE *symbol_table_find_global_table(void *table)
 ** Public Functions
 */
 
-const char *symbol_id(void *cursor)
+const char *symbol_id(SYMBOL *symbol)
 {
-  return E(cursor).first->id;
+  return symbol->id;
 }
 
 void *symbol_table_create(void *table)
@@ -77,43 +77,45 @@ void *symbol_table_create(void *table)
   return result;
 }
 
-
-void symbol_table_add_global(void *table, const char *id)
+SYMBOL *symbol_table_add_global(void *table, const char *id)
 {
   TABLE *globals = symbol_table_find_global_table(table);
-
-  if (symbol_table_find(globals, id))
-    return;
-
-  symbol_table_add_symbol(globals, id, FALSE, 1, INTEGER_SIZE);
+  SYMBOL *result = symbol_table_find(table, id);
+  if (result == NULL)
+    result = symbol_table_add_symbol(globals, id);
+  return result;
 }
 
-void symbol_table_add_global_array(void *table, const char *id, size_t count)
+SYMBOL *symbol_table_add_global_array(void *table, const char *id, size_t count)
 {
   TABLE *globals = symbol_table_find_global_table(table);
-
-  if (symbol_table_find(globals, id))
-    return;
-
-  symbol_table_add_symbol(globals, id, TRUE, count, INTEGER_SIZE);
+  SYMBOL *result = symbol_table_find(table, id);
+  if (result == NULL)
+    {
+      result = symbol_table_add_symbol(globals, id);
+      result->is_array = TRUE;
+      result->count = count;
+    }
+  return result;
 }
 
-int symbol_table_add_local(void *table, const char *id)
+SYMBOL *symbol_table_add_local(void *table, const char *id)
 {
-  if (symbol_table_find(table, id))
-    return FALSE;
-
-  symbol_table_add_symbol((TABLE *) table, id, FALSE, 1, INTEGER_SIZE);
-  return TRUE;
+  SYMBOL *result = symbol_table_find(table, id);
+  if (result == NULL)
+    result = symbol_table_add_symbol((TABLE *) table, id);
+  return result;
 }
 
-void symbol_table_add_param(void *table, const char *id, int is_array)
+SYMBOL *symbol_table_add_param(void *table, const char *id, int is_array)
 {
+  SYMBOL *result = symbol_table_add_symbol((TABLE *) table, id);
   /* TODO: Should I be recording a count here? */
-  symbol_table_add_symbol((TABLE *) table, id, is_array, 1, INTEGER_SIZE);
+  result->is_array = is_array;
+  return result;
 }
 
-void *symbol_table_find(void *table, const char *id)
+SYMBOL *symbol_table_find(void *table, const char *id)
 {
   ENTRY *head = T(table).head;
 
@@ -131,14 +133,4 @@ void *symbol_table_find(void *table, const char *id)
     return symbol_table_find(T(table).parent, id);
   else
     return NULL;
-}
-
-void symbol_table_first(void *table, void **cursor)
-{
-  *cursor = T(table).head;
-}
-
-void symbol_table_next(void **cursor)
-{
-  *cursor = E(*cursor).rest;
 }

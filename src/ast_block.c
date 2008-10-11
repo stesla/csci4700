@@ -24,10 +24,6 @@ static void find_symbols(NODE *node, void *symbols)
     ast_find_symbols(S(node).declarations, S(node).symbols);
   if (S(node).statements)
     ast_find_symbols(S(node).statements, S(node).symbols);
-
-  symbol_table_first(S(node).symbols, &cur);
-  while (cur)
-    symbol_table_next(&cur);
 }
 
 static void print(NODE *node, FILE *out)
