@@ -68,7 +68,7 @@ int main(int argc, char **argv)
   /* Produce IR */
   ir = ir_create();
   /* TODO: put stuff in ir */
-  ir_print(stdout, ir);
+  ir_fprint(stdout, ir);
 
   return 0;
 }

@@ -14,24 +14,37 @@ typedef struct _ir_cell {
 } CELL;
 
 typedef struct _ir_quad {
-  IR_INSTRUCTION inst;
+  IR_INST inst;
   CELL arg1;
   CELL arg2;
   CELL result;
 } QUAD;
 
-static void ir_arg(va_list args, CELL *cell)
+/* ir.h: typedef struct _ir IR; */
+struct _ir {
+  QUAD *start;
+  QUAD *point;
+  size_t size;
+};
+
+#define GROW_BY (128 * sizeof(QUAD))
+
+/*
+** Utility Functions
+*/
+
+static void ir_arg(va_list *args, CELL *cell)
 {
-  cell->type = va_arg(args, IR_TYPE);
+  cell->type = va_arg(*args, IR_TYPE);
   switch (cell->type)
     {
     case IR_SYM:
-      cell->val.ptr = va_arg(args, void *);
+      cell->val.ptr = va_arg(*args, void *);
       break;
 
     case IR_CONST:
     case IR_TEMP:
-      cell->val.num = va_arg(args, int);
+      cell->val.num = va_arg(*args, int);
       break;
 
     case IR_NULL:
@@ -87,7 +100,7 @@ static void ir_fprint_quad(FILE *out, QUAD *quad)
   };
   int i;
 
-  fprintf(out, "(%s, ", quad->inst);
+  fprintf(out, "(%s, ", inst[quad->inst]);
   ir_fprint_cell(out, &quad->arg1);
   fprintf(out, ", ");
   ir_fprint_cell(out, &quad->arg2);
@@ -96,21 +109,49 @@ static void ir_fprint_quad(FILE *out, QUAD *quad)
   fprintf(out, ")\n");
 }
 
-static void ir_add_inst(IR_INSTRUCTION inst, CELL arg1, CELL arg2, CELL result) {
-  QUAD quad = {inst, arg1, arg2, result};
-  ir_fprint_quad(stdout, &quad);
+void ir_grow(IR *ir)
+{
+  ir->start = my_realloc(ir->start, GROW_BY);
+  ir->point = ir->start + ir->size;
+  ir->size = ir->size + GROW_BY;
 }
+
+int ir_should_grow(IR *ir)
+{
+  return (ir->start + ir->size) == ir->point;
+}
+
+/*
+** Private Functions
+*/
+
+static void ir_add_inst(IR *ir, QUAD quad)
+{
+  QUAD *current;
+
+  if (ir_should_grow(ir))
+    ir_grow(ir);
+
+  current = ir->point++;
+
+  current->inst = quad.inst;
+  current->arg1 = quad.arg1;
+  current->arg2 = quad.arg2;
+  current->result = quad.result;
+}
+
+/*
+** Public Functions
+*/
 
 IR *ir_create()
 {
-  return NULL;
+  return my_malloc(sizeof(IR));
 }
 
-void ir_add(IR *ir, IR_INSTRUCTION inst, ...)
+void ir_add(IR *ir, IR_INST inst, ...)
 {
-  CELL arg1 = {IR_NULL,0};
-  CELL arg2 = {IR_NULL,0};
-  CELL result = {IR_NULL,0};
+  QUAD quad = {inst, {IR_NULL,0}, {IR_NULL,0}, {IR_NULL,0}};
   va_list args;
 
   va_start(args, inst);
@@ -123,16 +164,16 @@ void ir_add(IR *ir, IR_INSTRUCTION inst, ...)
     case IR_OR:
     case IR_SUBTRACT:
     case IR_XOR:
-      ir_arg(args, &arg1);
-      ir_arg(args, &arg2);
-      ir_arg(args, &result);
+      ir_arg(&args, &quad.arg1);
+      ir_arg(&args, &quad.arg2);
+      ir_arg(&args, &quad.result);
       break;
 
     case IR_ASSIGN:
     case IR_IF_FALSE:
     case IR_IF_TRUE:
-      ir_arg(args, &arg1);
-      ir_arg(args, &result);
+      ir_arg(&args, &quad.arg1);
+      ir_arg(&args, &quad.result);
       break;
 
     case IR_CALL:
@@ -142,15 +183,18 @@ void ir_add(IR *ir, IR_INSTRUCTION inst, ...)
     case IR_READ:
     case IR_RETURN:
     case IR_WRITE:
-      ir_arg(args, &arg1);
+      ir_arg(&args, &quad.arg1);
       break;
     }
   va_end(args);
 
-  ir_add_inst(inst, arg1, arg2, result);
+  ir_add_inst(ir, quad);
 }
 
-void ir_print(FILE *out, IR *ir)
+void ir_fprint(FILE *out, IR *ir)
 {
-  /* TODO */
+  QUAD *current = ir->start;
+
+  while (current < ir->point)
+    ir_fprint_quad(out, current++);
 }

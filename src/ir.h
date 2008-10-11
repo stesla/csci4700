@@ -19,7 +19,7 @@ typedef enum _ir_inst {
   IR_SUBTRACT,
   IR_WRITE,
   IR_XOR
-} IR_INSTRUCTION;
+} IR_INST;
 
 typedef enum _ir_type {
   IR_CONST,
@@ -31,7 +31,7 @@ typedef enum _ir_type {
 typedef struct _ir IR;
 
 IR *ir_create();
-void ir_add(IR *ir, IR_INSTRUCTION inst, ...);
-void ir_print(FILE *out, IR *ir);
+void ir_add(IR *ir, IR_INST inst, ...);
+void ir_fprint(FILE *out, IR *ir);
 
 #endif
