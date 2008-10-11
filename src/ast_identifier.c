@@ -8,18 +8,19 @@
 struct slots {
   const char *identifier;
   int line;
+  SYMBOL *symbol;
 };
 
 size_t ast_identifier_size() { return SLOT_SIZE; }
 
 static void add_symbols(NODE *node, void *symbols)
 {
-  symbol_table_add_global(symbols, S(node).identifier);
+  S(node).symbol = symbol_table_add_global(symbols, S(node).identifier);
 }
 
 static void find_symbols(NODE *node, void *symbols)
 {
-  symbol_table_add_local(symbols, S(node).identifier);
+  S(node).symbol = symbol_table_add_local(symbols, S(node).identifier);
 }
 
 static void print(NODE *node, FILE *out)

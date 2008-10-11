@@ -2,12 +2,14 @@
 #include <stdio.h>
 #include <strings.h>
 #include "ast.h"
+#include "symbol.h"
 #include "util.h"
 
 struct slots {
   NODE *identifier;
   int is_array;
   int line;
+  SYMBOL *symbol;
 };
 
 size_t ast_formal_size() { return SLOT_SIZE; }
@@ -15,7 +17,7 @@ size_t ast_formal_size() { return SLOT_SIZE; }
 static void find_symbols(NODE *node, void *symbols)
 {
   const char *id = ast_to_s(S(node).identifier);
-  symbol_table_add_param(symbols, id, S(node).is_array);
+  S(node).symbol = symbol_table_add_param(symbols, id, S(node).is_array);
 }
 
 static void print(NODE *node, FILE *out)
