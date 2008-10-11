@@ -18,7 +18,8 @@ int main(int argc, char **argv)
   const char *filename;
   int  i, success;
   NODE *ast = NULL;
-  void *symbols = symbol_table_create(NULL);
+  void *symbols;
+  void *ir;
 
   /* CLI flags */
   int lexer_debug = FALSE;
@@ -60,7 +61,12 @@ int main(int argc, char **argv)
     }
 
   /* Fill Symbol Table */
+  symbols = symbol_table_create(NULL);
   ast_find_symbols(ast, symbols);
+
+  /* Produce IR */
+  ir = ir_create();
+  ir_add_prologue(ir);
 
   return 0;
 }

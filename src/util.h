@@ -1,6 +1,8 @@
 #ifndef UTIL_H
 #define UTIL_H
 
+#include <stdlib.h>
+
 #define TRUE 1
 #define FALSE 0
 

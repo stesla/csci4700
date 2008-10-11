@@ -20,6 +20,23 @@ typedef enum _ir_inst {
   IR_SUBTRACT,
   IR_SYSCALL,
   IR_XOR
-} IR_INST;
+} IR_INSTRUCTION;
+
+typedef enum _ir_type {
+  IR_INST,
+  IR_CONST,
+  IR_REG,
+  IR_NULL,
+  IR_SYM,
+  IR_TEMP
+} IR_TYPE;
+
+typedef struct _ir IR;
+
+IR *ir_create();
+
+void ir_add(IR *ir, IR_INSTRUCTION inst, ...);
+
+void ir_add_prologue(IR *ir);
 
 #endif
