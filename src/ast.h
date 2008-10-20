@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "ir.h"
+#include "symbol.h"
 #include "util.h"
 
 /* To add a new node type, add it to the enum (in alphabetical order). You also
@@ -95,6 +96,7 @@ struct _node {
   */
   struct _methods {
     void (*add_symbols)(NODE *, void *);
+    SYMBOL *(*get_symbol)(NODE *);
     int (*get_temp)(NODE *);
     void (*find_symbols)(NODE *, void *);
     void (*generate_ir)(NODE *, IR *);
@@ -142,6 +144,7 @@ const char *ast_op_str(OP_TYPE type);
 
 NODE *ast_create(NODE_TYPE type, ...);
 void ast_add_symbols(NODE *node, void *symbols);
+SYMBOL *ast_get_symbol(NODE *node);
 int ast_get_temp(NODE *node);
 void ast_find_symbols(NODE *node, void *symbols);
 void ast_generate_ir(NODE *node, IR *ir);

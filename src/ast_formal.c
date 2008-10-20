@@ -25,6 +25,11 @@ static void generate_ir(NODE *node, IR *ir)
   /* TODO:IR */
 }
 
+static SYMBOL *get_symbol(NODE *node)
+{
+  return S(node).symbol;
+}
+
 static void print(NODE *node, FILE *out)
 {
   char label[17]; /* AST_FORMAL ARRAY */
@@ -64,4 +69,5 @@ void ast_formal_init(NODE *node, va_list args)
   S(node).line = va_arg(args, int);
 
   SET_METHODS(node);
+  OVERRIDE(node, get_symbol);
 }
