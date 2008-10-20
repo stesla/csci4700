@@ -39,8 +39,14 @@ static void generate_ir(NODE *node, IR *ir)
     {
     case AST_OP_ASSIGN:
       ast_generate_ir(S(node).right, ir);
-      /* TODO: Need get_symbol */
-      /* ir_add(ir, IR_ASSIGN,  */
+      /* In order to make a = b = c work, we need to put our value into both a
+       * temp register and into the actual variable. */
+      ir_add(ir, IR_ASSIGN,
+             IR_TEMP, ast_get_temp(S(node).right),
+             IR_TEMP, S(node).temp);
+      ir_add(ir, IR_ASSIGN,
+             IR_TEMP, ast_get_temp(S(node).right),
+             IR_SYM, ast_get_symbol(S(node).left));
       break;
     case AST_OP_BAND:
       ir_binary_op(node, ir, IR_AND);

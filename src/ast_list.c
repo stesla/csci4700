@@ -44,10 +44,9 @@ static void print(NODE *node, FILE *out)
 
 static void set_temps(NODE *node, int val)
 {
-  /* TODO: Should I be using a different temp for first and rest, I don't
-   * *think* so, but it may need to be that way. */
   ast_set_temps(S(node).first, val);
   if(S(node).rest)
+    /* TODO: I should increment the initial temp value here */
     ast_set_temps(S(node).rest, val);
 }
 

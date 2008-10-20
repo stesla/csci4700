@@ -41,7 +41,9 @@ static void print(NODE *node, FILE *out)
 
 static void set_temps(NODE *node, int val)
 {
-  ast_set_temps(S(node).statements, val);
+  /* This will always be the start of a basic block, so we can reset the temp
+   * counter before assigning temps to the expressions inside the block. */
+  ast_set_temps(S(node).statements, 0);
 }
 
 static const char *to_s(NODE *node)
