@@ -24,6 +24,11 @@ static void find_symbols(NODE *node, void *symbols)
   ast_find_symbols(S(node).inner, symbols);
 }
 
+static void generate_ir(NODE *node, IR *ir)
+{
+  ast_generate_ir(S(node).inner, ir);
+}
+
 static void print(NODE *node, FILE *out)
 {
   PRINT_NODE(out, node, "AST_GROUP");

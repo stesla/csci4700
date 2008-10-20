@@ -20,6 +20,11 @@ static void find_symbols(NODE *node, void *symbols)
   S(node).symbol = symbol_table_add_param(symbols, id, S(node).is_array);
 }
 
+static void generate_ir(NODE *node, IR *ir)
+{
+  /* TODO:IR */
+}
+
 static void print(NODE *node, FILE *out)
 {
   char label[17]; /* AST_FORMAL ARRAY */

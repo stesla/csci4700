@@ -94,6 +94,11 @@ void ast_add_symbols(NODE *node, void *symbols)
   node->methods.add_symbols(node, symbols);
 }
 
+void ast_generate_ir(NODE *node, IR *ir)
+{
+  node->methods.generate_ir(node, ir);
+}
+
 int ast_get_temp(NODE *node)
 {
   return node->methods.get_temp(node);

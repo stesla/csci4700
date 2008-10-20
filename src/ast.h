@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include "ir.h"
 #include "util.h"
 
 /* To add a new node type, add it to the enum (in alphabetical order). You also
@@ -96,6 +97,7 @@ struct _node {
     void (*add_symbols)(NODE *, void *);
     int (*get_temp)(NODE *);
     void (*find_symbols)(NODE *, void *);
+    void (*generate_ir)(NODE *, IR *);
     void (*print)(NODE *, FILE *);
     void (*set_temps)(NODE *, int);
     const char *(*to_s)(NODE *);
@@ -114,6 +116,7 @@ struct _node {
 #define SET_METHODS(node)                           \
   {                                                 \
     SET_METHOD(node, find_symbols, find_symbols);   \
+    SET_METHOD(node, generate_ir, generate_ir);     \
     SET_METHOD(node, print, print);                 \
     SET_METHOD(node, set_temps, set_temps);         \
     SET_METHOD(node, to_s, to_s);                   \
@@ -141,6 +144,7 @@ NODE *ast_create(NODE_TYPE type, ...);
 void ast_add_symbols(NODE *node, void *symbols);
 int ast_get_temp(NODE *node);
 void ast_find_symbols(NODE *node, void *symbols);
+void ast_generate_ir(NODE *node, IR *ir);
 void ast_print(NODE *node, FILE *out);
 void ast_set_temps(NODE *node, int val);
 const char *ast_to_s(NODE *node);

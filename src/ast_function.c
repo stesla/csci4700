@@ -26,6 +26,12 @@ static void find_symbols(NODE *node, void *symbols)
   ast_find_symbols(S(node).body, S(node).symbols);
 }
 
+static void generate_ir(NODE *node, IR *ir)
+{
+  /* TODO:IR */
+  ast_generate_ir(S(node).body, ir);
+}
+
 static void print(NODE *node, FILE *out)
 {
   PRINT_NODE(out, node, "AST_FUNCTION");

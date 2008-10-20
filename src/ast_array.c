@@ -21,6 +21,11 @@ static void add_symbols(NODE *node, void *symbols)
   S(node).symbol = symbol_table_add_global_array(symbols, id, count);
 }
 
+static void generate_ir(NODE *node, IR *ir)
+{
+  /* TODO:IR */
+}
+
 static void find_symbols(NODE *node, void *symbols)
 {
   ast_find_symbols(S(node).count, symbols);

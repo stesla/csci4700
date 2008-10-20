@@ -15,6 +15,11 @@ static void find_symbols(NODE *node, void *symbols)
   /* TODO */
 }
 
+static void generate_ir(NODE *node, IR *ir)
+{
+  /* TODO:IR */
+}
+
 static void print(NODE *node, FILE *out)
 {
   PRINT_NODE(out, node, "AST_READ");

@@ -16,6 +16,11 @@ static void find_symbols(NODE *node, void *symbols)
   ast_add_symbols(S(node).list, symbols);
 }
 
+static void generate_ir(NODE *node, IR *ir)
+{
+  /* TODO:IR */
+}
+
 static void print(NODE *node, FILE *out)
 {
   PRINT_NODE(out, node, "AST_DECLARE");

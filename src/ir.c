@@ -89,6 +89,7 @@ static void ir_fprint_quad(FILE *out, QUAD *quad)
     "IF-TRUE",
     "JUMP",
     "LABEL",
+    "MODULO",
     "MULTIPLY",
     "OR",
     "PARAM",

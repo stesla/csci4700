@@ -29,6 +29,11 @@ static void find_symbols(NODE *node, void *symbols)
   S(node).symbol = symbol_table_add_local(symbols, S(node).identifier);
 }
 
+static void generate_ir(NODE *node, IR *ir)
+{
+  ir_add(ir, IR_ASSIGN, IR_SYM, S(node).symbol, IR_TEMP, S(node).temp);
+}
+
 static void print(NODE *node, FILE *out)
 {
   size_t length = strlen("AST_IDENTIFIER") + strlen(S(node).identifier) + 3;

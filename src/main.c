@@ -70,7 +70,7 @@ int main(int argc, char **argv)
 
   /* Produce IR */
   ir = ir_create();
-  /* TODO: put stuff in ir */
+  ast_generate_ir(ast, ir);
   ir_fprint(stdout, ir);
 
   return 0;

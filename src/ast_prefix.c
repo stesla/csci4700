@@ -17,6 +17,31 @@ static int get_temp(NODE *node)
   return S(node).temp;
 }
 
+static void generate_ir(NODE *node, IR *ir)
+{
+  /* TODO: need get_symbol method for these */
+  ast_generate_ir(S(node).operand, ir);
+  switch(S(node).op)
+    {
+    case AST_OP_DEC:
+      break;
+    case AST_OP_DEREF:
+      break;
+    case AST_OP_INC:
+      break;
+    case AST_OP_MINUS:
+      ir_add(ir, IR_SUBTRACT,
+             IR_CONST, 0,
+             IR_TEMP, ast_get_temp(S(node).operand),
+             IR_TEMP, S(node).temp);
+      break;
+    case AST_OP_REF:
+      break;
+    default:
+      ;
+    }
+}
+
 static void find_symbols(NODE *node, void *symbols)
 {
   ast_find_symbols(S(node).operand, symbols);

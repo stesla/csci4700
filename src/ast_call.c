@@ -16,6 +16,11 @@ static void find_symbols(NODE *node, void *symbols)
   ast_find_symbols(S(node).args, symbols);
 }
 
+static void generate_ir(NODE *node, IR *ir)
+{
+  /* TODO:IR */
+}
+
 static void print(NODE *node, FILE *out)
 {
   PRINT_NODE(out, node, "AST_CALL");
@@ -25,7 +30,6 @@ static void print(NODE *node, FILE *out)
 
 static void set_temps(NODE *node, int val)
 {
-
 }
 
 static const char *to_s(NODE *node)

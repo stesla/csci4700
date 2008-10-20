@@ -27,6 +27,13 @@ static void find_symbols(NODE *node, void *symbols)
     ast_find_symbols(S(node).rest, symbols);
 }
 
+static void generate_ir(NODE *node, IR *ir)
+{
+  ast_generate_ir(S(node).first, ir);
+  if(S(node).rest)
+    ast_generate_ir(S(node).rest, ir);
+}
+
 static void print(NODE *node, FILE *out)
 {
   PRINT_NODE(out, node, "AST_LIST");

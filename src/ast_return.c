@@ -15,6 +15,12 @@ static void find_symbols(NODE *node, void *symbols)
   ast_find_symbols(S(node).value, symbols);
 }
 
+static void generate_ir(NODE *node, IR *ir)
+{
+  ast_generate_ir(S(node).value, ir);
+  ir_add(ir, IR_RETURN, IR_TEMP, ast_get_temp(S(node).value));
+}
+
 static void print(NODE *node, FILE *out)
 {
   PRINT_NODE(out, node, "AST_RETURN");

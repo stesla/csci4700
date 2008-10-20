@@ -12,6 +12,11 @@ static void find_symbols(NODE *node, void *symbols)
 {
 }
 
+static void generate_ir(NODE *node, IR *ir)
+{
+  /* TODO:IR */
+}
+
 static void print(NODE *node, FILE *out)
 {
   size_t length = strlen("AST_STRING_LITERAL") + strlen(S(node).value) + 7;

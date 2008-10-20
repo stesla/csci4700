@@ -11,6 +11,7 @@ typedef enum _ir_inst {
   IR_IF_TRUE,
   IR_JUMP,
   IR_LABEL,
+  IR_MODULO,
   IR_MULTIPLY,
   IR_OR,
   IR_PARAM,
