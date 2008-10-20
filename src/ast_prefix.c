@@ -12,6 +12,11 @@ struct slots {
 
 size_t ast_prefix_size() { return SLOT_SIZE; }
 
+static int get_temp(NODE *node)
+{
+  return S(node).temp;
+}
+
 static void find_symbols(NODE *node, void *symbols)
 {
   ast_find_symbols(S(node).operand, symbols);
@@ -49,4 +54,5 @@ void ast_prefix_init(NODE *node, va_list args)
   S(node).op = va_arg(args, OP_TYPE);
 
   SET_METHODS(node);
+  OVERRIDE(node, get_temp);
 }

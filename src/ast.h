@@ -94,6 +94,7 @@ struct _node {
   */
   struct _methods {
     void (*add_symbols)(NODE *, void *);
+    int (*get_temp)(NODE *);
     void (*find_symbols)(NODE *, void *);
     void (*print)(NODE *, FILE *);
     void (*set_temps)(NODE *, int);
@@ -138,6 +139,7 @@ const char *ast_op_str(OP_TYPE type);
 
 NODE *ast_create(NODE_TYPE type, ...);
 void ast_add_symbols(NODE *node, void *symbols);
+int ast_get_temp(NODE *node);
 void ast_find_symbols(NODE *node, void *symbols);
 void ast_print(NODE *node, FILE *out);
 void ast_set_temps(NODE *node, int val);

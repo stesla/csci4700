@@ -14,6 +14,11 @@ struct slots {
 
 size_t ast_identifier_size() { return SLOT_SIZE; }
 
+static int get_temp(NODE *node)
+{
+  return S(node).temp;
+}
+
 static void add_symbols(NODE *node, void *symbols)
 {
   S(node).symbol = symbol_table_add_global(symbols, S(node).identifier);
@@ -52,4 +57,5 @@ void ast_identifier_init(NODE *node, va_list args)
 
   SET_METHODS(node);
   OVERRIDE(node, add_symbols);
+  OVERRIDE(node, get_temp);
 }

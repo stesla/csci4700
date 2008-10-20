@@ -37,6 +37,11 @@ static void ast_default_add_symbols(NODE *node, void *symbols)
 {
 }
 
+static int ast_default_get_temp(NODE *node)
+{
+  return -1;
+}
+
 struct constructor {
   size_t (*size)();
   void (*init)(NODE *node, va_list args);
@@ -74,6 +79,7 @@ NODE *ast_create(NODE_TYPE type, ...)
 
   result->slots = my_malloc(size);
 
+  SET_METHOD(result, get_temp, ast_default_get_temp);
   SET_METHOD(result, add_symbols, ast_default_add_symbols);
 
   va_start(args, type);
@@ -86,6 +92,11 @@ NODE *ast_create(NODE_TYPE type, ...)
 void ast_add_symbols(NODE *node, void *symbols)
 {
   node->methods.add_symbols(node, symbols);
+}
+
+int ast_get_temp(NODE *node)
+{
+  return node->methods.get_temp(node);
 }
 
 void ast_find_symbols(NODE *node, void *symbols)

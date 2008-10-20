@@ -6,9 +6,15 @@ struct slots {
   OP_TYPE op;
   NODE *left;
   NODE *right;
+  int temp;
 };
 
 size_t ast_binary_size() { return SLOT_SIZE; }
+
+static int get_temp(NODE *node)
+{
+  return S(node).temp;
+}
 
 static void find_symbols(NODE *node, void *symbols)
 {
@@ -28,6 +34,7 @@ static void print(NODE *node, FILE *out)
 
 static void set_temps(NODE *node, int val)
 {
+  S(node).temp = val;
   ast_set_temps(S(node).left, val);
   ast_set_temps(S(node).right, val + 1);
 }
@@ -50,4 +57,5 @@ void ast_binary_init(NODE *node, va_list args)
   S(node).right = va_arg(args, NODE *);
 
   SET_METHODS(node);
+  OVERRIDE(node, get_temp);
 }

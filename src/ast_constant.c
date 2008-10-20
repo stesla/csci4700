@@ -11,6 +11,11 @@ struct slots {
 
 size_t ast_constant_size() { return SLOT_SIZE; }
 
+static int get_temp(NODE *node)
+{
+  return S(node).temp;
+}
+
 static void find_symbols(NODE *node, void *symbols)
 {
 }
@@ -43,4 +48,5 @@ void ast_constant_init(NODE *node, va_list args)
   free(text);
 
   SET_METHODS(node);
+  OVERRIDE(node, get_temp);
 }

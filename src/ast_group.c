@@ -14,6 +14,11 @@ struct slots {
 
 size_t ast_group_size() { return SLOT_SIZE; }
 
+static int get_temp(NODE *node)
+{
+  return ast_get_temp(S(node).inner);
+}
+
 static void find_symbols(NODE *node, void *symbols)
 {
   ast_find_symbols(S(node).inner, symbols);
@@ -44,4 +49,5 @@ void ast_group_init(NODE *node, va_list args)
   S(node).inner = va_arg(args, NODE *);
 
   SET_METHODS(node);
+  OVERRIDE(node, get_temp);
 }
