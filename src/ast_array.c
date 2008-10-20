@@ -33,6 +33,12 @@ static void print(NODE *node, FILE *out)
   PRINT_EDGE(out, node, S(node).count);
 }
 
+static void set_temps(NODE *node, int val)
+{
+  ast_set_temps(S(node).identifier, val);
+  ast_set_temps(S(node).count, val + 1);
+}
+
 static const char *to_s(NODE *node)
 {
   const char *identifier = ast_to_s(S(node).identifier);

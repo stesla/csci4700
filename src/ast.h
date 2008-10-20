@@ -96,6 +96,7 @@ struct _node {
     void (*add_symbols)(NODE *, void *);
     void (*find_symbols)(NODE *, void *);
     void (*print)(NODE *, FILE *);
+    void (*set_temps)(NODE *, int);
     const char *(*to_s)(NODE *);
   } methods;
 
@@ -111,9 +112,10 @@ struct _node {
 #define SET_METHOD(node, method, func) { (node)->methods.method = (func); }
 #define SET_METHODS(node)                           \
   {                                                 \
-    SET_METHOD(node, print, print);                 \
-    SET_METHOD(node, to_s, to_s);                   \
     SET_METHOD(node, find_symbols, find_symbols);   \
+    SET_METHOD(node, print, print);                 \
+    SET_METHOD(node, set_temps, set_temps);         \
+    SET_METHOD(node, to_s, to_s);                   \
   }
 #define SLOT_SIZE sizeof(struct slots)
 
@@ -138,6 +140,7 @@ NODE *ast_create(NODE_TYPE type, ...);
 void ast_add_symbols(NODE *node, void *symbols);
 void ast_find_symbols(NODE *node, void *symbols);
 void ast_print(NODE *node, FILE *out);
+void ast_set_temps(NODE *node, int val);
 const char *ast_to_s(NODE *node);
 
 #endif

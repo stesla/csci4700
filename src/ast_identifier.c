@@ -9,6 +9,7 @@ struct slots {
   const char *identifier;
   int line;
   SYMBOL *symbol;
+  int temp;
 };
 
 size_t ast_identifier_size() { return SLOT_SIZE; }
@@ -32,6 +33,11 @@ static void print(NODE *node, FILE *out)
   PRINT_NODE(out, node, label);
 
   free(label);
+}
+
+static void set_temps(NODE *node, int val)
+{
+  S(node).temp = val;
 }
 
 static const char *to_s(NODE *node)

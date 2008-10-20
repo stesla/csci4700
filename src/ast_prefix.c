@@ -7,6 +7,7 @@
 struct slots {
   NODE *operand;
   OP_TYPE op;
+  int temp;
 };
 
 size_t ast_prefix_size() { return SLOT_SIZE; }
@@ -24,6 +25,12 @@ static void print(NODE *node, FILE *out)
   PRINT_NODE(out, node, label);
 
   PRINT_EDGE(out, node, S(node).operand);
+}
+
+static void set_temps(NODE *node, int val)
+{
+  S(node).temp = val;
+  ast_set_temps(S(node).operand, val);
 }
 
 static const char *to_s(NODE *node)

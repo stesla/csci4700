@@ -6,6 +6,7 @@
 
 struct slots {
   int value;
+  int temp;
 };
 
 size_t ast_constant_size() { return SLOT_SIZE; }
@@ -19,6 +20,11 @@ static void print(NODE *node, FILE *out)
   char label[25]; /* AST_CONSTANT 1234567890\0 */
   snprintf(label, 24, "AST_CONSTANT\\n%d", S(node).value);
   PRINT_NODE(out, node, label);
+}
+
+static void set_temps(NODE *node, int val)
+{
+  S(node).temp = val;
 }
 
 #define MAX_DIGITS 11 /* 10 digits in a 32-bit number + 1 for trailing \0 */

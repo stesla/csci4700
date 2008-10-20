@@ -22,6 +22,10 @@ static void print(NODE *node, FILE *out)
   free(label);
 }
 
+static void set_temps(NODE *node, int val)
+{
+}
+
 static const char *to_s(NODE *node)
 {
   return strdup(S(node).value);

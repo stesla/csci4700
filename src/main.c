@@ -65,6 +65,9 @@ int main(int argc, char **argv)
   symbols = symbol_table_create(NULL);
   ast_find_symbols(ast, symbols);
 
+  /* Set Temp Variable Values */
+  ast_set_temps(ast, 0);
+
   /* Produce IR */
   ir = ir_create();
   /* TODO: put stuff in ir */

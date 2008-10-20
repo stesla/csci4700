@@ -30,6 +30,13 @@ static void print(NODE *node, FILE *out)
     PRINT_EDGE(out, node, S(node).else_branch);
 }
 
+static void set_temps(NODE *node, int val)
+{
+  ast_set_temps(S(node).condition, val);
+  ast_set_temps(S(node).if_branch, val);
+  ast_set_temps(S(node).else_branch, val);
+}
+
 static const char *to_s(NODE *node)
 {
   char *result;

@@ -35,6 +35,15 @@ static void print(NODE *node, FILE *out)
   PRINT_EDGE(out, node, S(node).rest);
 }
 
+static void set_temps(NODE *node, int val)
+{
+  /* TODO: Should I be using a different temp for first and rest, I don't
+   * *think* so, but it may need to be that way. */
+  ast_set_temps(S(node).first, val);
+  if(S(node).rest)
+    ast_set_temps(S(node).rest, val);
+}
+
 static const char *to_s(NODE *node)
 {
   char *result;
