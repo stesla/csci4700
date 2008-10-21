@@ -17,17 +17,42 @@ static int get_temp(NODE *node)
   return S(node).temp;
 }
 
+static void preop(NODE *node, IR *ir, IR_INST inst)
+{
+  SYMBOL *symbol;
+
+  ir_add(ir, inst,
+         IR_TEMP, ast_get_temp(S(node).operand),
+         IR_CONST, 1,
+         IR_TEMP, S(node).temp);
+  /* Only AST_IDENTIFIER or AST_FORMAL nodes will return a symbol here, but
+   * it's legal for operand to be something else. The safe thing to do is
+   * return the altered value, but throw it away. */
+  symbol = ast_get_symbol(S(node).operand);
+  if (symbol)
+    {
+      ir_add(ir, IR_ASSIGN,
+             IR_TEMP, S(node).temp,
+             IR_SYM, symbol);
+    }
+}
+
 static void generate_ir(NODE *node, IR *ir)
 {
-  /* TODO: need get_symbol method for these */
+  int label_a, label_b;
+
+  /* TODO: Need to implement REF and DEREF */
   ast_generate_ir(S(node).operand, ir);
   switch(S(node).op)
     {
     case AST_OP_DEC:
+      preop(node, ir, IR_SUBTRACT);
       break;
     case AST_OP_DEREF:
+      /* TODO: Leaving this out on purpose */
       break;
     case AST_OP_INC:
+      preop(node, ir, IR_ADD);
       break;
     case AST_OP_MINUS:
       ir_add(ir, IR_SUBTRACT,
@@ -35,7 +60,30 @@ static void generate_ir(NODE *node, IR *ir)
              IR_TEMP, ast_get_temp(S(node).operand),
              IR_TEMP, S(node).temp);
       break;
+    case AST_OP_NOT:
+      /* IF operand == 0 THEN JUMP A
+         result = 0
+         JUMP B
+         A: result = 1
+         B: */
+      label_a = ir_make_label();
+      label_b = ir_make_label();
+      ir_add(ir, IR_IF_EQ,
+             IR_TEMP, ast_get_temp(S(node).operand),
+             IR_CONST, 0,
+             IR_CONST, label_a);
+      ir_add(ir, IR_ASSIGN,
+             IR_CONST, 0,
+             IR_TEMP, S(node).temp);
+      ir_add(ir, IR_JUMP, IR_CONST, label_b);
+      ir_add(ir, IR_LABEL, IR_CONST, label_a);
+      ir_add(ir, IR_ASSIGN,
+             IR_CONST, 1,
+             IR_TEMP, S(node).temp);
+      ir_add(ir, IR_LABEL, IR_CONST, label_b);
+      break;
     case AST_OP_REF:
+      /* TODO: Leaving this out on purpose */
       break;
     default:
       ;
