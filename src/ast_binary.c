@@ -34,11 +34,6 @@ static void ir_binary_op(NODE *node, IR *ir, IR_INST inst)
 
 static void ir_rel_op(NODE *node, IR *ir, IR_INST inst)
 {
-  /* IF arg1 OP arg2 THEN JUMP A
-     result = 0
-     JUMP B
-     A: result = 1
-     B: */
   int label_a, label_b;
   ast_generate_ir(S(node).left, ir);
   ast_generate_ir(S(node).right, ir);
@@ -59,9 +54,23 @@ static void ir_rel_op(NODE *node, IR *ir, IR_INST inst)
   ir_add(ir, IR_LABEL, IR_CONST, label_b);
 }
 
+static void ir_short_op(NODE *node, IR *ir, IR_INST inst, int v1, int v2)
+{
+  int label_a = ir_make_label();
+  int label_b = ir_make_label();
+  ast_generate_ir(S(node).left, ir);
+  ir_add(ir, inst, IR_TEMP, ast_get_temp(S(node).left), IR_CONST, label_a);
+  ast_generate_ir(S(node).right, ir);
+  ir_add(ir, inst, IR_TEMP, ast_get_temp(S(node).right), IR_CONST, label_a);
+  ir_add(ir, IR_ASSIGN, IR_CONST, v1, IR_TEMP, S(node).temp);
+  ir_add(ir, IR_JUMP, IR_CONST, label_b);
+  ir_add(ir, IR_LABEL, IR_CONST, label_a);
+  ir_add(ir, IR_ASSIGN, IR_CONST, v2, IR_TEMP, S(node).temp);
+  ir_add(ir, IR_LABEL, IR_CONST, label_b);
+}
+
 static void generate_ir(NODE *node, IR *ir)
 {
-  /* TODO: Need to implement logic operators, short circuits, and assignment */
   switch (S(node).op)
     {
     case AST_OP_ASSIGN:
@@ -97,13 +106,13 @@ static void generate_ir(NODE *node, IR *ir)
       ir_rel_op(node, ir, IR_IF_GT);
       break;
     case AST_OP_LAND:
-      /* TODO: Short Circuit */
+      ir_short_op(node, ir, IR_IF_FALSE, 1, 0);
       break;
     case AST_OP_LE:
       ir_rel_op(node, ir, IR_IF_LE);
       break;
     case AST_OP_LOR:
-      /* TODO: Short Circuit */
+      ir_short_op(node, ir, IR_IF_TRUE, 0, 1);
       break;
     case AST_OP_LT:
       ir_rel_op(node, ir, IR_IF_LT);
