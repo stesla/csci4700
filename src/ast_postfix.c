@@ -17,14 +17,40 @@ static int get_temp(NODE *node)
   return S(node).temp;
 }
 
+static void postop(NODE *node, IR *ir, IR_INST inst)
+{
+  SYMBOL *symbol;
+
+  ir_add(ir, IR_ASSIGN,
+         IR_TEMP, ast_get_temp(S(node).operand),
+         IR_TEMP, S(node).temp);
+  /* Only AST_IDENTIFIER or AST_FORMAL nodes will return a symbol here, but
+   * it's legal for operand to be something else. The safe thing to do is to
+   * just bail. */
+  symbol = ast_get_symbol(S(node).operand);
+  if (symbol)
+    {
+      ir_add(ir, inst,
+             IR_TEMP, ast_get_temp(S(node).operand),
+             IR_CONST, 1,
+             IR_TEMP, ast_get_temp(S(node).operand));
+      ir_add(ir, IR_ASSIGN,
+             IR_TEMP, ast_get_temp(S(node).operand),
+             IR_SYM, symbol);
+    }
+}
+
 static void generate_ir(NODE *node, IR *ir)
 {
-  /* TODO: need get_symbol method for these */
   ast_generate_ir(S(node).operand, ir);
   switch(S(node).op)
     {
     case AST_OP_DEC:
+      postop(node, ir, IR_SUBTRACT);
+      break;
     case AST_OP_INC:
+      postop(node, ir, IR_ADD);
+      break;
     default:
       ;
     }
@@ -48,7 +74,10 @@ static void print(NODE *node, FILE *out)
 static void set_temps(NODE *node, int val)
 {
   S(node).temp = val;
-  ast_set_temps(S(node).operand, val);
+  /* We don't *have* to have a separate temp here, but it's convenient when
+   * we're generating code to have a different temp to use for the operation so
+   * we can just stash the original value in our own temp. */
+  ast_set_temps(S(node).operand, val + 1);
 }
 
 static const char *to_s(NODE *node)
