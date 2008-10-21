@@ -85,8 +85,14 @@ static void ir_fprint_quad(FILE *out, QUAD *quad)
     "ASSIGN",
     "CALL",
     "DIVIDE",
-    "IF-FALSE",
-    "IF-TRUE",
+    "IR-IF-EQ",
+    "IR-IF-FALSE",
+    "IR-IF-GE",
+    "IR-IF-GT",
+    "IR-IF-LE",
+    "IR-IF-LT",
+    "IR-IF-NE",
+    "IR-IF-TRUE",
     "JUMP",
     "LABEL",
     "MODULO",
@@ -161,6 +167,12 @@ void ir_add(IR *ir, IR_INST inst, ...)
     case IR_ADD:
     case IR_AND:
     case IR_DIVIDE:
+    case IR_IF_EQ:
+    case IR_IF_GE:
+    case IR_IF_GT:
+    case IR_IF_LE:
+    case IR_IF_LT:
+    case IR_IF_NE:
     case IR_MULTIPLY:
     case IR_OR:
     case IR_SUBTRACT:
