@@ -110,14 +110,14 @@ static void ir_fprint_quad(FILE *out, QUAD *quad)
   fprintf(out, ")\n");
 }
 
-void ir_grow(IR *ir)
+static void ir_grow(IR *ir)
 {
   ir->start = my_realloc(ir->start, GROW_BY);
   ir->point = ir->start + ir->size;
   ir->size = ir->size + GROW_BY;
 }
 
-int ir_should_grow(IR *ir)
+static int ir_should_grow(IR *ir)
 {
   return (ir->start + ir->size) == ir->point;
 }
@@ -198,4 +198,10 @@ void ir_fprint(FILE *out, IR *ir)
 
   while (current < ir->point)
     ir_fprint_quad(out, current++);
+}
+
+int ir_make_label()
+{
+  static ir_label_ctr = 0;
+  return ir_label_ctr++;
 }
