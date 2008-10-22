@@ -9,15 +9,9 @@ struct slots {
   const char *identifier;
   int line;
   SYMBOL *symbol;
-  int temp;
 };
 
 size_t ast_identifier_size() { return SLOT_SIZE; }
-
-static int get_temp(NODE *node)
-{
-  return S(node).temp;
-}
 
 static void add_symbols(NODE *node, void *symbols)
 {
@@ -31,7 +25,6 @@ static void find_symbols(NODE *node, void *symbols)
 
 static void generate_ir(NODE *node, IR *ir)
 {
-  ir_add(ir, IR_ASSIGN, IR_SYM, S(node).symbol, IR_TEMP, S(node).temp);
 }
 
 static SYMBOL *get_symbol(NODE *node)
@@ -63,5 +56,4 @@ void ast_identifier_init(NODE *node, va_list args)
   SET_METHODS(node);
   OVERRIDE(node, add_symbols);
   OVERRIDE(node, get_symbol);
-  OVERRIDE(node, get_temp);
 }

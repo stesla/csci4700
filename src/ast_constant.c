@@ -6,15 +6,9 @@
 
 struct slots {
   int value;
-  int temp;
 };
 
 size_t ast_constant_size() { return SLOT_SIZE; }
-
-static int get_temp(NODE *node)
-{
-  return S(node).temp;
-}
 
 static void find_symbols(NODE *node, void *symbols)
 {
@@ -22,7 +16,6 @@ static void find_symbols(NODE *node, void *symbols)
 
 static void generate_ir(NODE *node, IR *ir)
 {
-  ir_add(ir, IR_ASSIGN, IR_CONST, S(node).value, IR_TEMP, S(node).temp);
 }
 
 static void print(NODE *node, FILE *out)
@@ -48,5 +41,4 @@ void ast_constant_init(NODE *node, va_list args)
   free(text);
 
   SET_METHODS(node);
-  OVERRIDE(node, get_temp);
 }
