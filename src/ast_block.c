@@ -28,6 +28,7 @@ static void find_symbols(NODE *node, void *symbols)
 
 static void generate_ir(NODE *node, IR *ir)
 {
+  ir_reset_temp();
   /* TODO: generate_activation_record(node, ir); */
   ast_generate_ir(S(node).statements, ir);
 }

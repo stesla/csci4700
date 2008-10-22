@@ -41,6 +41,8 @@ static void generate_ir(NODE *node, IR *ir)
 {
   int label_a, label_b;
 
+  S(node).temp = ir_make_temp();
+
   /* TODO: Need to implement REF and DEREF */
   ast_generate_ir(S(node).operand, ir);
   switch(S(node).op)

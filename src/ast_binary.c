@@ -71,6 +71,7 @@ static void ir_short_op(NODE *node, IR *ir, IR_INST inst, int v1, int v2)
 
 static void generate_ir(NODE *node, IR *ir)
 {
+  S(node).temp = ir_make_temp();
   switch (S(node).op)
     {
     case AST_OP_ASSIGN:

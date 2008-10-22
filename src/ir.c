@@ -217,3 +217,26 @@ int ir_make_label()
   static ir_label_ctr = 0;
   return ir_label_ctr++;
 }
+
+static int *ir_init_temp()
+{
+  static int ir_temp_ctr = 0;
+  return &ir_temp_ctr;
+}
+
+int ir_make_temp()
+{
+  static int *ctr = NULL;
+  if (ctr == NULL)
+    ctr = ir_init_temp();
+  return (*ctr)++;
+}
+
+void ir_reset_temp()
+{
+  static int *ctr = NULL;
+  if (ctr == NULL)
+    ctr = ir_init_temp();
+  *ctr = 0;
+}
+

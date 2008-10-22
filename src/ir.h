@@ -40,6 +40,8 @@ typedef struct _ir IR;
 IR *ir_create();
 void ir_add(IR *ir, IR_INST inst, ...);
 void ir_fprint(FILE *out, IR *ir);
-int ir_new_label();
+int ir_make_label();
+int ir_make_temp();
+void ir_reset_temp();
 
 #endif
