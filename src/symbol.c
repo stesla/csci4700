@@ -6,8 +6,10 @@
 struct _symbol {
   const char *id;
   int is_array;
+  int is_global;
   int count;
   int size;
+  int address; /* IF is_global THEN label number ELSE offset */
 };
 
 typedef struct _entry ENTRY;
@@ -65,9 +67,19 @@ static TABLE *symbol_table_find_global_table(void *table)
 ** Public Functions
 */
 
+int symbol_address(SYMBOL *symbol)
+{
+  return symbol->address;
+}
+
 const char *symbol_id(SYMBOL *symbol)
 {
   return symbol->id;
+}
+
+int symbol_is_global(SYMBOL *symbol)
+{
+  return symbol->is_global;
 }
 
 void *symbol_table_create(void *table)
@@ -82,7 +94,11 @@ SYMBOL *symbol_table_add_global(void *table, const char *id)
   TABLE *globals = symbol_table_find_global_table(table);
   SYMBOL *result = symbol_table_find(table, id);
   if (result == NULL)
-    result = symbol_table_add_symbol(globals, id);
+    {
+      result = symbol_table_add_symbol(globals, id);
+      result->is_global = TRUE;
+      result->address = ir_make_label();
+    }
   return result;
 }
 
@@ -93,8 +109,9 @@ SYMBOL *symbol_table_add_global_array(void *table, const char *id, size_t count)
   if (result == NULL)
     {
       result = symbol_table_add_symbol(globals, id);
-      result->is_array = TRUE;
+      result->is_array = result->is_global = TRUE;
       result->count = count;
+      result->address = ir_make_label();
     }
   return result;
 }
@@ -103,7 +120,11 @@ SYMBOL *symbol_table_add_local(void *table, const char *id)
 {
   SYMBOL *result = symbol_table_find(table, id);
   if (result == NULL)
-    result = symbol_table_add_symbol((TABLE *) table, id);
+    {
+      size_t size = symbol_table_size(table);
+      result = symbol_table_add_symbol((TABLE *) table, id);
+      result->address = size;
+    }
   return result;
 }
 
@@ -133,4 +154,13 @@ SYMBOL *symbol_table_find(void *table, const char *id)
     return symbol_table_find(T(table).parent, id);
   else
     return NULL;
+}
+
+size_t symbol_table_size(void *table)
+{
+  /* The size of the table should be the address of the most recent symbol in
+   * the table plus its total size. */
+  TABLE *tab = (TABLE *) table;
+  SYMBOL *sym = tab->head ? tab->head->first : NULL;
+  return sym ? sym->address + sym->count * sym->size : 0;
 }
