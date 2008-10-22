@@ -42,14 +42,6 @@ static void print(NODE *node, FILE *out)
   PRINT_EDGE(out, node, S(node).rest);
 }
 
-static void set_temps(NODE *node, int val)
-{
-  ast_set_temps(S(node).first, val);
-  if(S(node).rest)
-    /* TODO: I should increment the initial temp value here */
-    ast_set_temps(S(node).rest, val);
-}
-
 static const char *to_s(NODE *node)
 {
   char *result;

@@ -101,7 +101,6 @@ struct _node {
     void (*find_symbols)(NODE *, void *);
     void (*generate_ir)(NODE *, IR *);
     void (*print)(NODE *, FILE *);
-    void (*set_temps)(NODE *, int);
     const char *(*to_s)(NODE *);
   } methods;
 
@@ -120,7 +119,6 @@ struct _node {
     SET_METHOD(node, find_symbols, find_symbols);   \
     SET_METHOD(node, generate_ir, generate_ir);     \
     SET_METHOD(node, print, print);                 \
-    SET_METHOD(node, set_temps, set_temps);         \
     SET_METHOD(node, to_s, to_s);                   \
   }
 #define SLOT_SIZE sizeof(struct slots)
@@ -149,7 +147,6 @@ int ast_get_temp(NODE *node);
 void ast_find_symbols(NODE *node, void *symbols);
 void ast_generate_ir(NODE *node, IR *ir);
 void ast_print(NODE *node, FILE *out);
-void ast_set_temps(NODE *node, int val);
 const char *ast_to_s(NODE *node);
 
 #endif

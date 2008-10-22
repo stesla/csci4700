@@ -189,11 +189,6 @@ void ast_print(NODE *node, FILE *out)
   fprintf(out, "}\n");
 }
 
-void ast_set_temps(NODE *node, int val)
-{
-  node->methods.set_temps(node, val);
-}
-
 const char *ast_to_s(NODE *node)
 {
   if (!node)

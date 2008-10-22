@@ -50,11 +50,6 @@ static void print(NODE *node, FILE *out)
   free(label);
 }
 
-static void set_temps(NODE *node, int val)
-{
-  S(node).temp = val;
-}
-
 static const char *to_s(NODE *node)
 {
   return S(node).identifier;

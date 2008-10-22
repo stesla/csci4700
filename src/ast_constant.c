@@ -32,11 +32,6 @@ static void print(NODE *node, FILE *out)
   PRINT_NODE(out, node, label);
 }
 
-static void set_temps(NODE *node, int val)
-{
-  S(node).temp = val;
-}
-
 #define MAX_DIGITS 11 /* 10 digits in a 32-bit number + 1 for trailing \0 */
 static const char *to_s(NODE *node)
 {

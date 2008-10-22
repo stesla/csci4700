@@ -147,13 +147,6 @@ static void print(NODE *node, FILE *out)
   PRINT_EDGE(out, node, S(node).right);
 }
 
-static void set_temps(NODE *node, int val)
-{
-  S(node).temp = val;
-  ast_set_temps(S(node).left, val);
-  ast_set_temps(S(node).right, val + 1);
-}
-
 static const char *to_s(NODE *node)
 {
   const char *left = ast_to_s(S(node).left);

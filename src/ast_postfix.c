@@ -71,15 +71,6 @@ static void print(NODE *node, FILE *out)
   PRINT_EDGE(out, node, S(node).operand);
 }
 
-static void set_temps(NODE *node, int val)
-{
-  S(node).temp = val;
-  /* We don't *have* to have a separate temp here, but it's convenient when
-   * we're generating code to have a different temp to use for the operation so
-   * we can just stash the original value in our own temp. */
-  ast_set_temps(S(node).operand, val + 1);
-}
-
 static const char *to_s(NODE *node)
 {
   const char *operand = ast_to_s(S(node).operand);

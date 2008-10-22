@@ -27,10 +27,6 @@ static void print(NODE *node, FILE *out)
   PRINT_EDGE(out, node, S(node).list);
 }
 
-static void set_temps(NODE *node, int val)
-{
-}
-
 static const char *to_s(NODE *node)
 {
   return ast_to_s(S(node).list);

@@ -30,12 +30,6 @@ static void print(NODE *node, FILE *out)
   PRINT_EDGE(out, node, S(node).body);
 }
 
-static void set_temps(NODE *node, int val)
-{
-  ast_set_temps(S(node).condition, val);
-  ast_set_temps(S(node).body, val);
-}
-
 static const char *to_s(NODE *node)
 {
   return strdup("WHILE");

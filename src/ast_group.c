@@ -35,11 +35,6 @@ static void print(NODE *node, FILE *out)
   PRINT_EDGE(out, node, S(node).inner);
 }
 
-static void set_temps(NODE *node, int val)
-{
-  ast_set_temps(S(node).inner, val);
-}
-
 static const char *to_s(NODE *node)
 {
   const char *group = ast_to_s(S(node).inner);
