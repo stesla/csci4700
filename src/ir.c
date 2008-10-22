@@ -99,6 +99,8 @@ static void ir_fprint_quad(FILE *out, QUAD *quad)
     "MULTIPLY",
     "OR",
     "PARAM",
+    "POP",
+    "PUSH",
     "READ",
     "RETURN",
     "SUBTRACT",
@@ -193,6 +195,8 @@ void ir_add(IR *ir, IR_INST inst, ...)
     case IR_JUMP:
     case IR_LABEL:
     case IR_PARAM:
+    case IR_POP:
+    case IR_PUSH:
     case IR_READ:
     case IR_RETURN:
     case IR_WRITE:
