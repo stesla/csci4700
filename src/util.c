@@ -2,10 +2,11 @@
 #include <strings.h>
 #include "util.h"
 
-void perror_die(const char *msg)
+void ext(const char *filename, const char *newext, char *out, size_t size)
 {
-  perror(msg);
-  exit(1);
+  strncpy(out, filename, size);
+  *(strrchr(out, '.')) = 0;
+  strncat(out, newext, size);
 }
 
 void *my_malloc(size_t size)
@@ -23,4 +24,11 @@ void *my_realloc(void *ptr, size_t size)
   if ((result = realloc(ptr, size)) == NULL)
     perror_die("malloc");
   return result;
+}
+
+
+void perror_die(const char *msg)
+{
+  perror(msg);
+  exit(1);
 }

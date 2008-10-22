@@ -7,8 +7,9 @@
 
 int usage( void )
 {
-  printf("usage: whatever <file> [-l] [-y]\n");
-  printf("-a -- Produce a GraphViz representation of the AST in the file ast.dot.\n");
+  printf("usage: whatever <file> [options]\n");
+  printf("-a -- Produce a GraphViz visualization of the AST.\n");
+  printf("-i -- Output the intermediate representation.\n");
   printf("-l -- Enable lexer debugging.\n");
   printf("-y -- Enable parser debugging.\n");
   return( 1 );
@@ -17,6 +18,7 @@ int usage( void )
 int main(int argc, char **argv)
 {
   const char *filename;
+  char out_file_name[FILENAME_MAX];
   int  i, success;
   NODE *ast = NULL;
   void *symbols;
@@ -25,6 +27,7 @@ int main(int argc, char **argv)
   /* CLI flags */
   int lexer_debug = FALSE;
   int output_ast = FALSE;
+  int output_ir = FALSE;
   int parser_debug = FALSE;
 
   if ( argc < 2 )
@@ -36,6 +39,9 @@ int main(int argc, char **argv)
           {
           case 'a':
             output_ast = !output_ast;
+            break;
+          case 'i':
+            output_ir = !output_ir;
             break;
           case 'l':
             lexer_debug = !lexer_debug;
@@ -56,7 +62,9 @@ int main(int argc, char **argv)
   /* Output AST */
   if (output_ast)
     {
-      FILE *ast_file = fopen("ast.dot", "w");
+      FILE *ast_file;
+      ext(filename, ".dot", out_file_name, sizeof(out_file_name));
+      ast_file = fopen(out_file_name, "w");
       ast_print(ast, ast_file);
       fclose(ast_file);
     }
@@ -65,10 +73,17 @@ int main(int argc, char **argv)
   symbols = symbol_table_create(NULL);
   ast_find_symbols(ast, symbols);
 
-  /* Produce IR */
+  /* Generate IR */
   ir = ir_create();
   ast_generate_ir(ast, ir);
-  ir_fprint(stdout, ir);
+  if (output_ir)
+    {
+      FILE *ir_file;
+      ext(filename, ".ir", out_file_name, sizeof(out_file_name));
+      ir_file = fopen(out_file_name, "w");
+      ir_fprint(ir_file, ir);
+      fclose(ir_file);
+    }
 
   return 0;
 }
