@@ -29,6 +29,16 @@ static void generate_ir(NODE *node, IR *ir)
   ast_generate_ir(S(node).inner, ir);
 }
 
+static IR_TYPE ir_type(NODE *node)
+{
+  return ast_ir_type(S(node).inner);
+}
+
+static void *ir_value(NODE *node)
+{
+  return ast_ir_value(S(node).inner);
+}
+
 static void print(NODE *node, FILE *out)
 {
   PRINT_NODE(out, node, "AST_GROUP");
@@ -50,4 +60,6 @@ void ast_group_init(NODE *node, va_list args)
 
   SET_METHODS(node);
   OVERRIDE(node, get_temp);
+  OVERRIDE(node, ir_type);
+  OVERRIDE(node, ir_value);
 }

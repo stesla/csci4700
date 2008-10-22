@@ -27,31 +27,33 @@ static void ir_binary_op(NODE *node, IR *ir, IR_INST inst)
   ast_generate_ir(S(node).left, ir);
   ast_generate_ir(S(node).right, ir);
   ir_add(ir, inst,
-         IR_TEMP, ast_get_temp(S(node).left),
-         IR_TEMP, ast_get_temp(S(node).right),
-         IR_TEMP, S(node).temp);
+         ast_ir_type(S(node).left), ast_ir_value(S(node).left),
+         ast_ir_type(S(node).right), ast_ir_value(S(node).right),
+         ast_ir_type(node), ast_ir_value(node));
 }
 
 static void ir_rel_op(NODE *node, IR *ir, IR_INST inst)
 {
   int label_a, label_b;
+  int one = 1;
+  int zero = 0;
   ast_generate_ir(S(node).left, ir);
   ast_generate_ir(S(node).right, ir);
   label_a = ir_make_label();
   label_b = ir_make_label();
   ir_add(ir, inst,
-         IR_TEMP, ast_get_temp(S(node).left),
-         IR_TEMP, ast_get_temp(S(node).right),
-         IR_CONST, label_a);
+         ast_ir_type(S(node).left), ast_ir_value(S(node).left),
+         ast_ir_type(S(node).right), ast_ir_value(S(node).right),
+         IR_CONST, &label_a);
   ir_add(ir, IR_ASSIGN,
-         IR_CONST, 0,
-         IR_TEMP, S(node).temp);
-  ir_add(ir, IR_JUMP, IR_CONST, label_b);
-  ir_add(ir, IR_LABEL, IR_CONST, label_a);
+         IR_CONST, &zero,
+         ast_ir_type(node), ast_ir_value(node));
+  ir_add(ir, IR_JUMP, IR_CONST, &label_b);
+  ir_add(ir, IR_LABEL, IR_CONST, &label_a);
   ir_add(ir, IR_ASSIGN,
-         IR_CONST, 1,
-         IR_TEMP, S(node).temp);
-  ir_add(ir, IR_LABEL, IR_CONST, label_b);
+         IR_CONST, &one,
+         ast_ir_type(node), ast_ir_value(node));
+  ir_add(ir, IR_LABEL, IR_CONST, &label_b);
 }
 
 static void ir_short_op(NODE *node, IR *ir, IR_INST inst, int v1, int v2)
@@ -59,14 +61,18 @@ static void ir_short_op(NODE *node, IR *ir, IR_INST inst, int v1, int v2)
   int label_a = ir_make_label();
   int label_b = ir_make_label();
   ast_generate_ir(S(node).left, ir);
-  ir_add(ir, inst, IR_TEMP, ast_get_temp(S(node).left), IR_CONST, label_a);
+  ir_add(ir, inst,
+         ast_ir_type(S(node).left), ast_ir_value(S(node).left),
+         IR_CONST, &label_a);
   ast_generate_ir(S(node).right, ir);
-  ir_add(ir, inst, IR_TEMP, ast_get_temp(S(node).right), IR_CONST, label_a);
-  ir_add(ir, IR_ASSIGN, IR_CONST, v1, IR_TEMP, S(node).temp);
-  ir_add(ir, IR_JUMP, IR_CONST, label_b);
-  ir_add(ir, IR_LABEL, IR_CONST, label_a);
-  ir_add(ir, IR_ASSIGN, IR_CONST, v2, IR_TEMP, S(node).temp);
-  ir_add(ir, IR_LABEL, IR_CONST, label_b);
+  ir_add(ir, inst,
+         ast_ir_type(S(node).right), ast_ir_value(S(node).right),
+         IR_CONST, &label_a);
+  ir_add(ir, IR_ASSIGN, IR_CONST, &v1, ast_ir_type(node), ast_ir_value(node));
+  ir_add(ir, IR_JUMP, IR_CONST, &label_b);
+  ir_add(ir, IR_LABEL, IR_CONST, &label_a);
+  ir_add(ir, IR_ASSIGN, IR_CONST, &v2, ast_ir_type(node), ast_ir_value(node));
+  ir_add(ir, IR_LABEL, IR_CONST, &label_b);
 }
 
 static void generate_ir(NODE *node, IR *ir)
@@ -79,10 +85,10 @@ static void generate_ir(NODE *node, IR *ir)
       /* In order to make a = b = c work, we need to put our value into both a
        * temp register and into the actual variable. */
       ir_add(ir, IR_ASSIGN,
-             IR_TEMP, ast_get_temp(S(node).right),
-             IR_TEMP, S(node).temp);
+             ast_ir_type(S(node).right), ast_ir_value(S(node).right),
+             ast_ir_type(node), ast_ir_value(node));
       ir_add(ir, IR_ASSIGN,
-             IR_TEMP, ast_get_temp(S(node).right),
+             ast_ir_type(node), ast_ir_value(node),
              IR_SYM, ast_get_symbol(S(node).left));
       break;
     case AST_OP_BAND:
@@ -138,6 +144,16 @@ static void generate_ir(NODE *node, IR *ir)
     }
 }
 
+static IR_TYPE ir_type(NODE *node)
+{
+  return IR_TEMP;
+}
+
+static void *ir_value(NODE *node)
+{
+  return &(S(node).temp);
+}
+
 static void print(NODE *node, FILE *out)
 {
   char label[15]; /* AST_BINARY ++ */
@@ -167,4 +183,6 @@ void ast_binary_init(NODE *node, va_list args)
 
   SET_METHODS(node);
   OVERRIDE(node, get_temp);
+  OVERRIDE(node, ir_type);
+  OVERRIDE(node, ir_value);
 }

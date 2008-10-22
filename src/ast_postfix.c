@@ -20,10 +20,11 @@ static int get_temp(NODE *node)
 static void postop(NODE *node, IR *ir, IR_INST inst)
 {
   SYMBOL *symbol;
+  int one = 1;
 
   ir_add(ir, IR_ASSIGN,
-         IR_TEMP, ast_get_temp(S(node).operand),
-         IR_TEMP, S(node).temp);
+         ast_ir_type(S(node).operand), ast_ir_value(S(node).operand),
+         ast_ir_type(node), ast_ir_value(node));
   /* Only AST_IDENTIFIER or AST_FORMAL nodes will return a symbol here, but
    * it's legal for operand to be something else. The safe thing to do is to
    * just bail. */
@@ -31,11 +32,8 @@ static void postop(NODE *node, IR *ir, IR_INST inst)
   if (symbol)
     {
       ir_add(ir, inst,
-             IR_TEMP, ast_get_temp(S(node).operand),
-             IR_CONST, 1,
-             IR_TEMP, ast_get_temp(S(node).operand));
-      ir_add(ir, IR_ASSIGN,
-             IR_TEMP, ast_get_temp(S(node).operand),
+             IR_CONST, &one,
+             ast_ir_type(node), ast_ir_value(node),
              IR_SYM, symbol);
     }
 }
@@ -60,6 +58,16 @@ static void generate_ir(NODE *node, IR *ir)
 static void find_symbols(NODE *node, void *symbols)
 {
   ast_find_symbols(S(node).operand, symbols);
+}
+
+static IR_TYPE ir_type(NODE *node)
+{
+  return IR_TEMP;
+}
+
+static void *ir_value(NODE *node)
+{
+  return &(S(node).temp);
 }
 
 static void print(NODE *node, FILE *out)
@@ -89,4 +97,6 @@ void ast_postfix_init(NODE *node, va_list args)
 
   SET_METHODS(node);
   OVERRIDE(node, get_temp);
+  OVERRIDE(node, ir_type);
+  OVERRIDE(node, ir_value);
 }

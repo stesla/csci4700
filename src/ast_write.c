@@ -18,7 +18,8 @@ static void find_symbols(NODE *node, void *symbols)
 static void generate_ir(NODE *node, IR *ir)
 {
   ast_generate_ir(S(node).value, ir);
-  ir_add(ir, IR_WRITE, IR_TEMP, ast_get_temp(S(node).value));
+  ir_add(ir, IR_WRITE,
+         ast_ir_type(S(node).value), ast_ir_value(S(node).value));
 }
 
 static void print(NODE *node, FILE *out)

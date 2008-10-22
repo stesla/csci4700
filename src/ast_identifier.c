@@ -32,6 +32,16 @@ static SYMBOL *get_symbol(NODE *node)
   return S(node).symbol;
 }
 
+static IR_TYPE ir_type(NODE *node)
+{
+  return IR_SYM;
+}
+
+static void *ir_value(NODE *node)
+{
+  return S(node).symbol;
+}
+
 static void print(NODE *node, FILE *out)
 {
   size_t length = strlen("AST_IDENTIFIER") + strlen(S(node).identifier) + 3;
@@ -56,4 +66,6 @@ void ast_identifier_init(NODE *node, va_list args)
   SET_METHODS(node);
   OVERRIDE(node, add_symbols);
   OVERRIDE(node, get_symbol);
+  OVERRIDE(node, ir_type);
+  OVERRIDE(node, ir_value);
 }

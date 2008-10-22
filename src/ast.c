@@ -37,6 +37,16 @@ static void ast_default_add_symbols(NODE *node, void *symbols)
 {
 }
 
+static IR_TYPE ast_default_ir_type(NODE *node)
+{
+  return -1;
+}
+
+void *ast_default_ir_value(NODE *node)
+{
+  return NULL;
+}
+
 static SYMBOL *ast_default_get_symbol(NODE *node)
 {
   return NULL;
@@ -87,6 +97,8 @@ NODE *ast_create(NODE_TYPE type, ...)
   SET_METHOD(result, get_symbol, ast_default_get_symbol);
   SET_METHOD(result, get_temp, ast_default_get_temp);
   SET_METHOD(result, add_symbols, ast_default_add_symbols);
+  SET_METHOD(result, ir_type, ast_default_ir_type);
+  SET_METHOD(result, ir_value, ast_default_ir_value);
 
   va_start(args, type);
   constructor[type].init(result, args);
@@ -118,6 +130,16 @@ int ast_get_temp(NODE *node)
 void ast_find_symbols(NODE *node, void *symbols)
 {
   node->methods.find_symbols(node, symbols);
+}
+
+IR_TYPE ast_ir_type(NODE *node)
+{
+  return node->methods.ir_type(node);
+}
+
+void *ast_ir_value(NODE *node)
+{
+  return node->methods.ir_value(node);
 }
 
 const char *ast_node_type_str(NODE_TYPE type)

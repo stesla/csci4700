@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <strings.h>
 #include "ast.h"
+#include "ir.h"
 #include "util.h"
 
 struct slots {
@@ -16,6 +17,17 @@ static void find_symbols(NODE *node, void *symbols)
 
 static void generate_ir(NODE *node, IR *ir)
 {
+}
+
+static IR_TYPE ir_type(NODE *node)
+{
+  return IR_CONST;
+}
+
+static void *ir_value(NODE *node)
+{
+  void *result = &(S(node).value);
+  return result;
 }
 
 static void print(NODE *node, FILE *out)
@@ -41,4 +53,6 @@ void ast_constant_init(NODE *node, va_list args)
   free(text);
 
   SET_METHODS(node);
+  OVERRIDE(node, ir_type);
+  OVERRIDE(node, ir_value);
 }

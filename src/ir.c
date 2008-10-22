@@ -35,6 +35,8 @@ struct _ir {
 
 static void ir_arg(va_list *args, CELL *cell)
 {
+  int *intp;
+
   cell->type = va_arg(*args, IR_TYPE);
   switch (cell->type)
     {
@@ -44,7 +46,8 @@ static void ir_arg(va_list *args, CELL *cell)
 
     case IR_CONST:
     case IR_TEMP:
-      cell->val.num = va_arg(*args, int);
+      intp = va_arg(*args, int *);
+      cell->val.num = *intp;
       break;
 
     case IR_NULL:

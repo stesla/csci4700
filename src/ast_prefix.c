@@ -20,26 +20,25 @@ static int get_temp(NODE *node)
 static void preop(NODE *node, IR *ir, IR_INST inst)
 {
   SYMBOL *symbol;
+  int one = 1;
 
   ir_add(ir, inst,
-         IR_TEMP, ast_get_temp(S(node).operand),
-         IR_CONST, 1,
-         IR_TEMP, S(node).temp);
+         IR_CONST, &one,
+         ast_ir_type(S(node).operand), ast_ir_value(S(node).operand),
+         ast_ir_type(node), ast_ir_value(node));
   /* Only AST_IDENTIFIER or AST_FORMAL nodes will return a symbol here, but
    * it's legal for operand to be something else. The safe thing to do is
    * return the altered value, but throw it away. */
   symbol = ast_get_symbol(S(node).operand);
   if (symbol)
-    {
-      ir_add(ir, IR_ASSIGN,
-             IR_TEMP, S(node).temp,
-             IR_SYM, symbol);
-    }
+    ir_add(ir, IR_ASSIGN, ast_ir_type(node), ast_ir_value(node), IR_SYM, symbol);
 }
 
 static void generate_ir(NODE *node, IR *ir)
 {
   int label_a, label_b;
+  int one = 1;
+  int zero = 0;
 
   S(node).temp = ir_make_temp();
 
@@ -58,9 +57,9 @@ static void generate_ir(NODE *node, IR *ir)
       break;
     case AST_OP_MINUS:
       ir_add(ir, IR_SUBTRACT,
-             IR_CONST, 0,
-             IR_TEMP, ast_get_temp(S(node).operand),
-             IR_TEMP, S(node).temp);
+             IR_CONST, &zero,
+             ast_ir_type(S(node).operand), ast_ir_value(S(node).operand),
+             ast_ir_type(node), ast_ir_value(node));
       break;
     case AST_OP_NOT:
       /* IF operand == 0 THEN JUMP A
@@ -71,18 +70,18 @@ static void generate_ir(NODE *node, IR *ir)
       label_a = ir_make_label();
       label_b = ir_make_label();
       ir_add(ir, IR_IF_EQ,
-             IR_TEMP, ast_get_temp(S(node).operand),
-             IR_CONST, 0,
-             IR_CONST, label_a);
+             ast_ir_type(S(node).operand), ast_ir_value(S(node).operand),
+             IR_CONST, &zero,
+             IR_CONST, &label_a);
       ir_add(ir, IR_ASSIGN,
-             IR_CONST, 0,
-             IR_TEMP, S(node).temp);
-      ir_add(ir, IR_JUMP, IR_CONST, label_b);
-      ir_add(ir, IR_LABEL, IR_CONST, label_a);
+             IR_CONST, &zero,
+             ast_ir_type(node), ast_ir_value(node));
+      ir_add(ir, IR_JUMP, IR_CONST, &label_b);
+      ir_add(ir, IR_LABEL, IR_CONST, &label_a);
       ir_add(ir, IR_ASSIGN,
-             IR_CONST, 1,
-             IR_TEMP, S(node).temp);
-      ir_add(ir, IR_LABEL, IR_CONST, label_b);
+             IR_CONST, &one,
+             ast_ir_type(node), ast_ir_value(node));
+      ir_add(ir, IR_LABEL, IR_CONST, &label_b);
       break;
     case AST_OP_REF:
       /* TODO: Leaving this out on purpose */
@@ -95,6 +94,17 @@ static void generate_ir(NODE *node, IR *ir)
 static void find_symbols(NODE *node, void *symbols)
 {
   ast_find_symbols(S(node).operand, symbols);
+}
+
+static IR_TYPE ir_type(NODE *node)
+{
+  return IR_TEMP;
+}
+
+static void *ir_value(NODE *node)
+{
+  void *result = &(S(node).temp);
+  return result;
 }
 
 static void print(NODE *node, FILE *out)
@@ -124,4 +134,6 @@ void ast_prefix_init(NODE *node, va_list args)
 
   SET_METHODS(node);
   OVERRIDE(node, get_temp);
+  OVERRIDE(node, ir_type);
+  OVERRIDE(node, ir_value);
 }
