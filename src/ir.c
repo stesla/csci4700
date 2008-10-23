@@ -1,6 +1,7 @@
 #include <stdarg.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include "ir.h"
 #include "sizes.h"
 #include "symbol.h"
@@ -27,7 +28,8 @@ struct _ir {
   size_t size;
 };
 
-#define GROW_BY (128 * sizeof(IR_QUAD))
+#define GROW_BY 128
+#define GROW_BYTES (GROW_BY * sizeof(IR_QUAD))
 
 /*
 ** Utility Functions
@@ -95,8 +97,9 @@ void ir_fprint_quad(FILE *out, IR_QUAD *quad)
 
 static void ir_grow(IR *ir)
 {
-  ir->start = my_realloc(ir->start, GROW_BY);
+  ir->start = my_realloc(ir->start, (ir->size + GROW_BY) * sizeof(IR_QUAD));
   ir->point = ir->start + ir->size;
+  memset(ir->point, 0, GROW_BYTES);
   ir->size = ir->size + GROW_BY;
 }
 
