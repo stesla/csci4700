@@ -48,8 +48,16 @@ static const char *to_s(NODE *node)
 void ast_constant_init(NODE *node, va_list args)
 {
   char *text = va_arg(args, char *);
+  int base;
 
-  S(node).value = atoi(text);
+  if (strnstr(text, "0x", 2) == text) /* hex */
+    base = 16;
+  else if (text[0] == '0') /* octal */
+    base = 8;
+  else
+    base = 10;
+  S(node).value = strtol(text, NULL, base);
+
   free(text);
 
   SET_METHODS(node);
