@@ -48,10 +48,12 @@ IR *ir_create();
 void ir_add(IR *ir, IR_INST inst, ...);
 void ir_each(IR *ir, IR_CALLBACK callback, void *data);
 void ir_fprint(FILE *out, IR *ir);
+void ir_fprint_quad(FILE *out, IR_QUAD *quad);
 int ir_make_label();
 int ir_make_temp(IR *ir);
 void ir_reset_temp(size_t ar_size);
 
+const char *ir_inst_str(IR_INST inst);
 IR_INST ir_quad_inst(IR_QUAD *quad);
 IR_CELL *ir_quad_arg1(IR_QUAD *quad);
 IR_CELL *ir_quad_arg2(IR_QUAD *quad);

@@ -80,41 +80,11 @@ static void ir_fprint_cell(FILE *out, IR_CELL *cell)
     }
 }
 
-static void ir_fprint_quad(FILE *out, IR_QUAD *quad)
+void ir_fprint_quad(FILE *out, IR_QUAD *quad)
 {
-  static const char *inst[] = {
-    "ADD",
-    "AND",
-    "ASSIGN",
-    "CALL",
-    "DIVIDE",
-    "ENTER",
-    "IF_EQ",
-    "IF_FALSE",
-    "IF_GE",
-    "IF_GT",
-    "IF_LE",
-    "IF_LT",
-    "IF_NE",
-    "IF_TRUE",
-    "JUMP",
-    "LABEL",
-    "LEAVE",
-    "MODULO",
-    "MULTIPLY",
-    "OR",
-    "PARAM",
-    "POP",
-    "PUSH",
-    "READ",
-    "RETURN",
-    "SUBTRACT",
-    "WRITE",
-    "XOR"
-  };
   int i;
 
-  fprintf(out, "(%s, ", inst[quad->inst]);
+  fprintf(out, "(%s, ", ir_inst_str(quad->inst));
   ir_fprint_cell(out, &quad->arg1);
   fprintf(out, ", ");
   ir_fprint_cell(out, &quad->arg2);
@@ -232,6 +202,41 @@ static void ir_fprint_callback(IR_QUAD *quad, void *data)
 void ir_fprint(FILE *out, IR *ir)
 {
   ir_each(ir, ir_fprint_callback, (void *) out);
+}
+
+const char *ir_inst_str(IR_INST inst)
+{
+  static const char *strs[] = {
+    "ADD",
+    "AND",
+    "ASSIGN",
+    "CALL",
+    "DIVIDE",
+    "ENTER",
+    "IF_EQ",
+    "IF_FALSE",
+    "IF_GE",
+    "IF_GT",
+    "IF_LE",
+    "IF_LT",
+    "IF_NE",
+    "IF_TRUE",
+    "JUMP",
+    "LABEL",
+    "LEAVE",
+    "MODULO",
+    "MULTIPLY",
+    "OR",
+    "PARAM",
+    "POP",
+    "PUSH",
+    "READ",
+    "RETURN",
+    "SUBTRACT",
+    "WRITE",
+    "XOR"
+  };
+  return strs[inst];
 }
 
 int ir_make_label()
