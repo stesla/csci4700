@@ -32,8 +32,8 @@ static void postop(NODE *node, IR *ir, IR_INST inst)
   if (symbol)
     {
       ir_add(ir, inst,
-             IR_CONST, &one,
              ast_ir_type(node), ast_ir_value(node),
+             IR_CONST, &one,
              IR_SYM, symbol);
     }
 }

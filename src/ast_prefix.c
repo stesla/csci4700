@@ -23,8 +23,8 @@ static void preop(NODE *node, IR *ir, IR_INST inst)
   int one = 1;
 
   ir_add(ir, inst,
-         IR_CONST, &one,
          ast_ir_type(S(node).operand), ast_ir_value(S(node).operand),
+         IR_CONST, &one,
          ast_ir_type(node), ast_ir_value(node));
   /* Only AST_IDENTIFIER or AST_FORMAL nodes will return a symbol here, but
    * it's legal for operand to be something else. The safe thing to do is
