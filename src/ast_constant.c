@@ -26,8 +26,7 @@ static IR_TYPE ir_type(NODE *node)
 
 static void *ir_value(NODE *node)
 {
-  void *result = &(S(node).value);
-  return result;
+  return &(S(node).value);;
 }
 
 static void print(NODE *node, FILE *out)
