@@ -6,35 +6,34 @@
 #include "symbol.h"
 #include "util.h"
 
-typedef struct _ir_cell {
+struct _ir_cell {
   IR_TYPE type;
   union {
     void *ptr;
     int num;
   } val;
-} CELL;
+};
 
-typedef struct _ir_quad {
+struct _ir_quad {
   IR_INST inst;
-  CELL arg1;
-  CELL arg2;
-  CELL result;
-} QUAD;
+  IR_CELL arg1;
+  IR_CELL arg2;
+  IR_CELL result;
+};
 
-/* ir.h: typedef struct _ir IR; */
 struct _ir {
-  QUAD *start;
-  QUAD *point;
+  IR_QUAD *start;
+  IR_QUAD *point;
   size_t size;
 };
 
-#define GROW_BY (128 * sizeof(QUAD))
+#define GROW_BY (128 * sizeof(IR_QUAD))
 
 /*
 ** Utility Functions
 */
 
-static void ir_arg(va_list *args, CELL *cell)
+static void ir_arg(va_list *args, IR_CELL *cell)
 {
   int *intp;
 
@@ -56,7 +55,7 @@ static void ir_arg(va_list *args, CELL *cell)
     }
 }
 
-static void ir_fprint_cell(FILE *out, CELL *cell)
+static void ir_fprint_cell(FILE *out, IR_CELL *cell)
 {
   const char *id;
 
@@ -81,7 +80,7 @@ static void ir_fprint_cell(FILE *out, CELL *cell)
     }
 }
 
-static void ir_fprint_quad(FILE *out, QUAD *quad)
+static void ir_fprint_quad(FILE *out, IR_QUAD *quad)
 {
   static const char *inst[] = {
     "ADD",
@@ -140,9 +139,9 @@ static int ir_should_grow(IR *ir)
 ** Private Functions
 */
 
-static void ir_add_inst(IR *ir, QUAD quad)
+static void ir_add_inst(IR *ir, IR_QUAD quad)
 {
-  QUAD *current;
+  IR_QUAD *current;
 
   if (ir_should_grow(ir))
     ir_grow(ir);
@@ -166,7 +165,7 @@ IR *ir_create()
 
 void ir_add(IR *ir, IR_INST inst, ...)
 {
-  QUAD quad = {inst, {IR_NULL,0}, {IR_NULL,0}, {IR_NULL,0}};
+  IR_QUAD quad = {inst, {IR_NULL,0}, {IR_NULL,0}, {IR_NULL,0}};
   va_list args;
 
   va_start(args, inst);
@@ -220,7 +219,7 @@ void ir_add(IR *ir, IR_INST inst, ...)
 
 void ir_fprint(FILE *out, IR *ir)
 {
-  QUAD *current = ir->start;
+  IR_QUAD *current = ir->start;
 
   while (current < ir->point)
     ir_fprint_quad(out, current++);

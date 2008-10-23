@@ -40,6 +40,8 @@ typedef enum _ir_type {
 } IR_TYPE;
 
 typedef struct _ir IR;
+typedef struct _ir_quad IR_QUAD;
+typedef struct _ir_cell IR_CELL;
 
 IR *ir_create();
 void ir_add(IR *ir, IR_INST inst, ...);
