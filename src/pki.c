@@ -252,6 +252,18 @@ static void pki_if_true(FILE *out, IR_QUAD *quad)
   fprintf(out, "\tJUMP NE,L%i\n", label);
 }
 
+static void pki_modulo(FILE *out, IR_QUAD *quad)
+{
+  int arg1 = pki_reg(out, ir_quad_arg1(quad), TRUE);
+  int arg2 = pki_reg(out, ir_quad_arg2(quad), TRUE);
+  int result = pki_reg(out, ir_quad_result(quad), FALSE);
+  int temp = pki_get_reg();
+  pki_reg_op1(out, "DIV", temp, arg1, arg2);
+  pki_reg_op1(out, "MUL", temp, temp, arg2);
+  pki_reg_op1(out, "SUB", result, arg1, temp);
+  pki_store_result(out, result, ir_quad_result(quad));
+}
+
 static void pki_generate_callback(IR_QUAD *quad, void *data)
 {
   FILE *out = (FILE *) data;
@@ -312,7 +324,7 @@ static void pki_generate_callback(IR_QUAD *quad, void *data)
       pki_leave(out);
       break;
     case IR_MODULO:
-      /* TODO */
+      pki_modulo(out, quad);
       break;
     case IR_MULTIPLY:
       pki_reg_op(out, "MUL", quad);

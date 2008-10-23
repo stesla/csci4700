@@ -153,6 +153,7 @@ void ir_add(IR *ir, IR_INST inst, ...)
     case IR_IF_LE:
     case IR_IF_LT:
     case IR_IF_NE:
+    case IR_MODULO:
     case IR_MULTIPLY:
     case IR_OR:
     case IR_SUBTRACT:
