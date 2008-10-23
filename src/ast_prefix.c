@@ -40,7 +40,7 @@ static void generate_ir(NODE *node, IR *ir)
   int one = 1;
   int zero = 0;
 
-  S(node).temp = ir_make_temp();
+  S(node).temp = ir_make_temp(ir);
 
   /* TODO: Need to implement REF and DEREF */
   ast_generate_ir(S(node).operand, ir);

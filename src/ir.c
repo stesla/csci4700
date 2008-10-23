@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "ir.h"
+#include "sizes.h"
 #include "symbol.h"
 #include "util.h"
 
@@ -88,6 +89,7 @@ static void ir_fprint_quad(FILE *out, QUAD *quad)
     "ASSIGN",
     "CALL",
     "DIVIDE",
+    "ENTER",
     "IF_EQ",
     "IF_FALSE",
     "IF_GE",
@@ -98,6 +100,7 @@ static void ir_fprint_quad(FILE *out, QUAD *quad)
     "IF_TRUE",
     "JUMP",
     "LABEL",
+    "LEAVE",
     "MODULO",
     "MULTIPLY",
     "OR",
@@ -205,6 +208,10 @@ void ir_add(IR *ir, IR_INST inst, ...)
     case IR_WRITE:
       ir_arg(&args, &quad.arg1);
       break;
+
+    case IR_ENTER:
+    case IR_LEAVE:
+      break;
     }
   va_end(args);
 
@@ -231,19 +238,20 @@ static int *ir_init_temp()
   return &ir_temp_ctr;
 }
 
-int ir_make_temp()
+int ir_make_temp(IR *ir)
+{
+  static int *ctr = NULL;
+  size_t size = INTEGER_SIZE;
+  if (ctr == NULL)
+    ctr = ir_init_temp();
+  ir_add(ir, IR_PUSH, IR_CONST, &size);
+  return (*ctr) += INTEGER_SIZE;
+}
+
+void ir_reset_temp(size_t ar_size)
 {
   static int *ctr = NULL;
   if (ctr == NULL)
     ctr = ir_init_temp();
-  return (*ctr)++;
+  *ctr = ar_size;
 }
-
-void ir_reset_temp()
-{
-  static int *ctr = NULL;
-  if (ctr == NULL)
-    ctr = ir_init_temp();
-  *ctr = 0;
-}
-

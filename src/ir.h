@@ -7,6 +7,7 @@ typedef enum _ir_inst {
   IR_ASSIGN,
   IR_CALL,
   IR_DIVIDE,
+  IR_ENTER,
   IR_IF_EQ,
   IR_IF_FALSE,
   IR_IF_GE,
@@ -17,6 +18,7 @@ typedef enum _ir_inst {
   IR_IF_TRUE,
   IR_JUMP,
   IR_LABEL,
+  IR_LEAVE,
   IR_MODULO,
   IR_MULTIPLY,
   IR_OR,
@@ -43,7 +45,7 @@ IR *ir_create();
 void ir_add(IR *ir, IR_INST inst, ...);
 void ir_fprint(FILE *out, IR *ir);
 int ir_make_label();
-int ir_make_temp();
-void ir_reset_temp();
+int ir_make_temp(IR *ir);
+void ir_reset_temp(size_t ar_size);
 
 #endif

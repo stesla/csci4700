@@ -41,7 +41,7 @@ static void postop(NODE *node, IR *ir, IR_INST inst)
 static void generate_ir(NODE *node, IR *ir)
 {
   ast_generate_ir(S(node).operand, ir);
-  S(node).temp = ir_make_temp();
+  S(node).temp = ir_make_temp(ir);
   switch(S(node).op)
     {
     case AST_OP_DEC:

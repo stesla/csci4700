@@ -28,11 +28,12 @@ static void find_symbols(NODE *node, void *symbols)
 
 static void generate_ir(NODE *node, IR *ir)
 {
-  size_t activation_record_size = symbol_table_size(S(node).symbols);
-  ir_reset_temp();
-  ir_add(ir, IR_PUSH, IR_CONST, &activation_record_size);
+  size_t ar_size = symbol_table_size(S(node).symbols);
+  ir_reset_temp(ar_size);
+  ir_add(ir, IR_ENTER);
+  ir_add(ir, IR_PUSH, IR_CONST, &ar_size);
   ast_generate_ir(S(node).statements, ir);
-  ir_add(ir, IR_POP, IR_CONST, &activation_record_size);
+  ir_add(ir, IR_LEAVE);
 }
 
 static void print(NODE *node, FILE *out)
