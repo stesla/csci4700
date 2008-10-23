@@ -263,3 +263,39 @@ void ir_reset_temp(size_t ar_size)
     ctr = ir_init_temp();
   *ctr = ar_size;
 }
+
+IR_INST ir_quad_inst(IR_QUAD *quad)
+{
+  return quad->inst;
+}
+
+IR_CELL *ir_quad_arg1(IR_QUAD *quad)
+{
+  return &(quad->arg1);
+}
+
+IR_CELL *ir_quad_arg2(IR_QUAD *quad)
+{
+  return &(quad->arg2);
+}
+
+IR_CELL *ir_quad_result(IR_QUAD *quad)
+{
+  return &(quad->result);
+}
+
+IR_TYPE ir_cell_type(IR_CELL *cell)
+{
+  return cell->type;
+}
+
+void *ir_cell_ptr(IR_CELL *cell)
+{
+  return cell->val.ptr;
+}
+
+int ir_cell_num(IR_CELL *cell)
+{
+  return cell->val.num;
+}
+

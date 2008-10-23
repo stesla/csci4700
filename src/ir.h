@@ -52,4 +52,12 @@ int ir_make_label();
 int ir_make_temp(IR *ir);
 void ir_reset_temp(size_t ar_size);
 
+IR_INST ir_quad_inst(IR_QUAD *quad);
+IR_CELL *ir_quad_arg1(IR_QUAD *quad);
+IR_CELL *ir_quad_arg2(IR_QUAD *quad);
+IR_CELL *ir_quad_result(IR_QUAD *quad);
+IR_TYPE ir_cell_type(IR_CELL *cell);
+void *ir_cell_ptr(IR_CELL *cell);
+int ir_cell_num(IR_CELL *cell);
+
 #endif
