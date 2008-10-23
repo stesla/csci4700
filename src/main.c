@@ -3,6 +3,7 @@
 #include "ast.h"
 #include "ir.h"
 #include "parser.h"
+#include "pki.h"
 #include "symbol.h"
 
 int usage( void )
@@ -18,6 +19,7 @@ int usage( void )
 int main(int argc, char **argv)
 {
   const char *filename;
+  FILE *out_file;
   char out_file_name[FILENAME_MAX];
   int  i, success;
   NODE *ast = NULL;
@@ -62,11 +64,11 @@ int main(int argc, char **argv)
   /* Output AST */
   if (output_ast)
     {
-      FILE *ast_file;
+      FILE *out_file;
       ext(filename, ".dot", out_file_name, sizeof(out_file_name));
-      ast_file = fopen(out_file_name, "w");
-      ast_print(ast, ast_file);
-      fclose(ast_file);
+      out_file = fopen(out_file_name, "w");
+      ast_print(ast, out_file);
+      fclose(out_file);
     }
 
   /* Fill Symbol Table */
@@ -78,12 +80,18 @@ int main(int argc, char **argv)
   ast_generate_ir(ast, ir);
   if (output_ir)
     {
-      FILE *ir_file;
+      FILE *out_file;
       ext(filename, ".ir", out_file_name, sizeof(out_file_name));
-      ir_file = fopen(out_file_name, "w");
-      ir_fprint(ir_file, ir);
-      fclose(ir_file);
+      out_file = fopen(out_file_name, "w");
+      ir_fprint(out_file, ir);
+      fclose(out_file);
     }
+
+  /* Generate PKI */
+  ext(filename, ".pki", out_file_name, sizeof(out_file_name));
+  out_file = fopen(out_file_name, "w");
+  pki_generate(out_file, ir);
+  fclose(out_file);
 
   return 0;
 }
