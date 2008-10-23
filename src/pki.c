@@ -10,7 +10,7 @@
 
 static int *pki_init_reg()
 {
-  static int reg = REG_MIN; /* 0,1,2,3,4,14,15 are reserved */
+  static int reg = REG_MIN; /* 0,1,2,3,,14,15 are reserved */
   return &reg;
 }
 
@@ -26,6 +26,7 @@ static int pki_get_reg()
       fprintf(stderr, "Error: register spillover\n");
       exit(1);
     }
+  return result;
 }
 
 static void pki_reset_reg()
