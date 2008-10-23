@@ -51,6 +51,11 @@ static void pki_load(FILE *out, int reg, int label)
   fprintf(out, "\tLOAD R%i,L%i\n", reg, label);
 }
 
+static void pki_llc(FILE *out, int reg, int val)
+{
+  fprintf(out, "\tLLC R%i,%i\n", reg, val);
+}
+
 static void pki_lsc(FILE *out, int reg, int val)
 {
   fprintf(out, "\tLSC R%i,%i\n", reg, val);
@@ -68,7 +73,12 @@ static int pki_const_reg(FILE *out, int num, int load)
       {
         int result = pki_get_reg();
         if (load)
-          pki_lsc(out, result, num);
+          {
+            if (num >= -128 && num <= 127)
+              pki_lsc(out, result, num);
+            else
+              pki_llc(out, result, num);
+          }
         return result;
       }
     }
@@ -117,9 +127,9 @@ static void pki_store(FILE *out, int reg, int label)
   fprintf(out, "\tSTORE R%i,L%i\n", reg, label);
 }
 
-static void pki_sdi(FILE *out, int reg, int base, int offset)
+static void pki_sti(FILE *out, int reg, int base, int offset)
 {
-  pki_reg_op1(out, "SDI", reg, base, offset);
+  pki_reg_op1(out, "STI", reg, base, offset);
 }
 
 static void pki_store_symbol(FILE *out, int reg, SYMBOL *sym)
@@ -127,7 +137,7 @@ static void pki_store_symbol(FILE *out, int reg, SYMBOL *sym)
   if (symbol_is_global(sym))
     pki_store(out, reg, symbol_address(sym));
   else
-    pki_sdi(out, reg, BP, symbol_address(sym));
+    pki_sti(out, reg, BP, symbol_address(sym));
 }
 
 static void pki_store_result(FILE *out, int reg, IR_CELL *cell)
@@ -140,7 +150,7 @@ static void pki_store_result(FILE *out, int reg, IR_CELL *cell)
     case IR_TEMP:
       {
         int offset = pki_const_reg(out, ir_cell_num(cell), TRUE);
-        pki_sdi(out, reg, BP, offset);
+        pki_sti(out, reg, BP, offset);
       }
       break;
     default:
@@ -184,11 +194,28 @@ static void pki_assign(FILE *out, IR_QUAD *quad)
   pki_store_result(out, value, ir_quad_result(quad));
 }
 
+static void pki_jump(FILE *out, IR_QUAD *quad)
+{
+  fprintf(out, "\tJUMP L%i\n", ir_cell_num(ir_quad_arg1(quad)));
+}
+
+static void pki_push(FILE *out, IR_QUAD *quad)
+{
+  int reg = pki_reg(out, ir_quad_arg1(quad), TRUE);
+  pki_reg_op1(out, "ADD", SP, SP, reg);
+}
+
+static void pki_write(FILE *out, IR_QUAD *quad)
+{
+  int reg = pki_reg(out, ir_quad_arg1(quad), TRUE);
+  pki_syscall(out, 1, reg);
+}
+
 static void pki_generate_callback(IR_QUAD *quad, void *data)
 {
   FILE *out = (FILE *) data;
 
-  fprintf(out, "\t//");
+  fprintf(out, ";");
   ir_fprint_quad(out, quad);
 
   switch (ir_quad_inst(quad))
@@ -211,14 +238,31 @@ static void pki_generate_callback(IR_QUAD *quad, void *data)
       pki_enter(out);
       break;
     case IR_IF_EQ:
+      /* TODO */
+      break;
     case IR_IF_FALSE:
+      /* TODO */
+      break;
     case IR_IF_GE:
+      /* TODO */
+      break;
     case IR_IF_GT:
+      /* TODO */
+      break;
     case IR_IF_LE:
+      /* TODO */
+      break;
     case IR_IF_LT:
+      /* TODO */
+      break;
     case IR_IF_NE:
+      /* TODO */
+      break;
     case IR_IF_TRUE:
+      /* TODO */
+      break;
     case IR_JUMP:
+      pki_jump(out, quad);
       break;
     case IR_LABEL:
       pki_label(out, quad);
@@ -235,15 +279,25 @@ static void pki_generate_callback(IR_QUAD *quad, void *data)
       pki_reg_op(out, "OR", quad);
       break;
     case IR_PARAM:
+      /* TODO */
+      break;
     case IR_POP:
+      /* TODO */
+      break;
     case IR_PUSH:
+      pki_push(out, quad);
+      break;
     case IR_READ:
+      /* TODO */
+      break;
     case IR_RETURN:
+      /* TODO */
       break;
     case IR_SUBTRACT:
       pki_reg_op(out, "SUB", quad);
       break;
     case IR_WRITE:
+      pki_write(out, quad);
       break;
     case IR_XOR:
       pki_reg_op(out, "XOR", quad);
