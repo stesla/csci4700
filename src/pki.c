@@ -3,7 +3,7 @@
 #include "symbol.h"
 #include "util.h"
 
-#define REG_MIN 5
+#define REG_MIN 4
 #define REG_MAX 13
 #define BP 14
 #define SP 15
@@ -178,6 +178,12 @@ static void pki_label(FILE *out, IR_QUAD *quad)
   fprintf(out, "L%i: ", num);
 }
 
+static void pki_assign(FILE *out, IR_QUAD *quad)
+{
+  int value = pki_reg(out, ir_quad_arg1(quad), TRUE);
+  pki_store_result(out, value, ir_quad_result(quad));
+}
+
 static void pki_generate_callback(IR_QUAD *quad, void *data)
 {
   FILE *out = (FILE *) data;
@@ -194,6 +200,8 @@ static void pki_generate_callback(IR_QUAD *quad, void *data)
       pki_reg_op(out, "AND", quad);
       break;
     case IR_ASSIGN:
+      pki_assign(out, quad);
+      break;
     case IR_CALL:
       break;
     case IR_DIVIDE:
