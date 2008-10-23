@@ -52,11 +52,6 @@ static SYMBOL *ast_default_get_symbol(NODE *node)
   return NULL;
 }
 
-static int ast_default_get_temp(NODE *node)
-{
-  return -1;
-}
-
 struct constructor {
   size_t (*size)();
   void (*init)(NODE *node, va_list args);
@@ -95,7 +90,6 @@ NODE *ast_create(NODE_TYPE type, ...)
   result->slots = my_malloc(size);
 
   SET_METHOD(result, get_symbol, ast_default_get_symbol);
-  SET_METHOD(result, get_temp, ast_default_get_temp);
   SET_METHOD(result, add_symbols, ast_default_add_symbols);
   SET_METHOD(result, ir_type, ast_default_ir_type);
   SET_METHOD(result, ir_value, ast_default_ir_value);
@@ -120,11 +114,6 @@ void ast_generate_ir(NODE *node, IR *ir)
 SYMBOL *ast_get_symbol(NODE *node)
 {
   return node->methods.get_symbol(node);
-}
-
-int ast_get_temp(NODE *node)
-{
-  return node->methods.get_temp(node);
 }
 
 void ast_find_symbols(NODE *node, void *symbols)

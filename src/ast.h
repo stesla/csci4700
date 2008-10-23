@@ -97,7 +97,6 @@ struct _node {
   struct _methods {
     void (*add_symbols)(NODE *, void *);
     SYMBOL *(*get_symbol)(NODE *);
-    int (*get_temp)(NODE *);
     void (*find_symbols)(NODE *, void *);
     void (*generate_ir)(NODE *, IR *);
     IR_TYPE (*ir_type)(NODE *);
@@ -146,7 +145,6 @@ NODE *ast_create(NODE_TYPE type, ...);
 void ast_add_symbols(NODE *node, void *symbols);
 void ast_find_symbols(NODE *node, void *symbols);
 SYMBOL *ast_get_symbol(NODE *node);
-int ast_get_temp(NODE *node);
 void ast_generate_ir(NODE *node, IR *ir);
 IR_TYPE ast_ir_type(NODE *node);
 void *ast_ir_value(NODE *node);
