@@ -4,7 +4,7 @@ parser.c
 y.tab.h
 c--
 run-test
-ast.dot
+*.dot
 tools/bin
 tools/bison-*
 tools/flex-*
@@ -13,3 +13,6 @@ tools/info
 tools/lib
 tools/man
 tools/share
+*.ir
+*.pki
+pki_run
