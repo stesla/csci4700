@@ -283,6 +283,7 @@ static void pki_generate_callback(IR_QUAD *quad, void *data)
       pki_assign(out, quad);
       break;
     case IR_CALL:
+      /* TODO */
       break;
     case IR_DIVIDE:
       pki_reg_op(out, "DIV", quad);
