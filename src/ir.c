@@ -59,8 +59,6 @@ static void ir_arg(va_list *args, IR_CELL *cell)
 
 static void ir_fprint_cell(FILE *out, IR_CELL *cell)
 {
-  const char *id;
-
   switch (cell->type)
     {
     case IR_CONST:
@@ -72,8 +70,14 @@ static void ir_fprint_cell(FILE *out, IR_CELL *cell)
       break;
 
     case IR_SYM:
-      id = symbol_id(cell->val.ptr);
-      fprintf(out, "id:%s:%p", id, cell->val.ptr);
+      {
+        const char *id = symbol_id(cell->val.ptr);
+        int address = symbol_address(cell->val.ptr);
+        if (symbol_is_global(cell->val.ptr))
+          fprintf(out, "global:%s:L%i", id, address);
+        else
+          fprintf(out, "local:%s:%i", id, address);
+      }
       break;
 
     case IR_TEMP:
