@@ -42,9 +42,11 @@ typedef enum _ir_type {
 typedef struct _ir IR;
 typedef struct _ir_quad IR_QUAD;
 typedef struct _ir_cell IR_CELL;
+typedef void (*IR_CALLBACK)(IR_QUAD *, void *);
 
 IR *ir_create();
 void ir_add(IR *ir, IR_INST inst, ...);
+void ir_each(IR *ir, IR_CALLBACK callback, void *data);
 void ir_fprint(FILE *out, IR *ir);
 int ir_make_label();
 int ir_make_temp(IR *ir);

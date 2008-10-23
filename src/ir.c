@@ -217,12 +217,21 @@ void ir_add(IR *ir, IR_INST inst, ...)
   ir_add_inst(ir, quad);
 }
 
-void ir_fprint(FILE *out, IR *ir)
+void ir_each(IR *ir, IR_CALLBACK callback, void *data)
 {
   IR_QUAD *current = ir->start;
-
   while (current < ir->point)
-    ir_fprint_quad(out, current++);
+    callback(current++, data);
+}
+
+static void ir_fprint_callback(IR_QUAD *quad, void *data)
+{
+  ir_fprint_quad((FILE *) data, quad);
+}
+
+void ir_fprint(FILE *out, IR *ir)
+{
+  ir_each(ir, ir_fprint_callback, (void *) out);
 }
 
 int ir_make_label()
