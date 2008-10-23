@@ -214,6 +214,44 @@ static void pki_write(FILE *out, IR_QUAD *quad)
   pki_syscall(out, 1, reg);
 }
 
+static void pki_rel_op(FILE *out, const char *rel, int lhs, int rhs, int label)
+{
+  pki_reg_op1(out, "SUB", 0, lhs, rhs);
+  fprintf(out, "\tJUMP %s,L%i\n", rel, label);
+}
+
+static void pki_if_rel1(FILE *out, const char *rel, IR_QUAD *quad)
+{
+  int arg1 = pki_reg(out, ir_quad_arg1(quad), TRUE);
+  int arg2 = pki_reg(out, ir_quad_arg2(quad), TRUE);
+  int label = ir_cell_num(ir_quad_result(quad));
+  pki_rel_op(out, rel, arg1, arg2, label);
+}
+
+static void pki_if_rel2(FILE *out, const char *rel, IR_QUAD *quad)
+{
+  int arg1 = pki_reg(out, ir_quad_arg1(quad), TRUE);
+  int arg2 = pki_reg(out, ir_quad_arg2(quad), TRUE);
+  int label = ir_cell_num(ir_quad_result(quad));
+  pki_rel_op(out, rel, arg2, arg1, label);
+}
+
+static void pki_if_false(FILE *out, IR_QUAD *quad)
+{
+  int arg1 = pki_reg(out, ir_quad_arg1(quad), TRUE);
+  int label = ir_cell_num(ir_quad_result(quad));
+  pki_reg_op1(out, "SUB", 0, arg1, 0);
+  fprintf(out, "\tJUMP EQ,L%i\n", label);
+}
+
+static void pki_if_true(FILE *out, IR_QUAD *quad)
+{
+  int arg1 = pki_reg(out, ir_quad_arg1(quad), TRUE);
+  int label = ir_cell_num(ir_quad_result(quad));
+  pki_reg_op1(out, "SUB", 0, arg1, 0);
+  fprintf(out, "\tJUMP NE,L%i\n", label);
+}
+
 static void pki_generate_callback(IR_QUAD *quad, void *data)
 {
   FILE *out = (FILE *) data;
@@ -241,28 +279,28 @@ static void pki_generate_callback(IR_QUAD *quad, void *data)
       pki_enter(out);
       break;
     case IR_IF_EQ:
-      /* TODO */
+      pki_if_rel1(out, "EQ", quad);
       break;
     case IR_IF_FALSE:
-      /* TODO */
+      pki_if_false(out, quad);
       break;
     case IR_IF_GE:
-      /* TODO */
+      pki_if_rel2(out, "SLE", quad);
       break;
     case IR_IF_GT:
-      /* TODO */
+      pki_if_rel2(out, "SLT", quad);
       break;
     case IR_IF_LE:
-      /* TODO */
+      pki_if_rel1(out, "SLE", quad);
       break;
     case IR_IF_LT:
-      /* TODO */
+      pki_if_rel1(out, "SLT", quad);
       break;
     case IR_IF_NE:
-      /* TODO */
+      pki_if_rel1(out, "NE", quad);
       break;
     case IR_IF_TRUE:
-      /* TODO */
+      pki_if_true(out, quad);
       break;
     case IR_JUMP:
       pki_jump(out, quad);
@@ -274,6 +312,7 @@ static void pki_generate_callback(IR_QUAD *quad, void *data)
       pki_leave(out);
       break;
     case IR_MODULO:
+      /* TODO */
       break;
     case IR_MULTIPLY:
       pki_reg_op(out, "MUL", quad);
