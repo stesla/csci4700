@@ -18,13 +18,21 @@ struct _entry {
   ENTRY *rest;
 };
 
-struct _table {
+typedef struct _scope SCOPE;
+struct _scope {
   ENTRY *head;
-  TABLE *parent;
+  SCOPE *parent;
+  TABLE *table;
+};
+
+struct _table {
+  SCOPE *scope;
+  SYMBOL *start;
+  SYMBOL *point;
+  size_t size;
 };
 
 #define E(x) (*((ENTRY *) (x)))
-#define T(x) (*((TABLE *) (x)))
 
 /*
 ** Private Functions
@@ -35,6 +43,14 @@ static ENTRY *entry_create(SYMBOL *first, ENTRY *rest)
   ENTRY *result = my_malloc(sizeof(ENTRY));
   result->first = first;
   result->rest = rest;
+  return result;
+}
+
+static SCOPE *scope_create(TABLE *table, SCOPE *parent)
+{
+  SCOPE *result = my_malloc(sizeof(SCOPE));
+  result->table = table;
+  result->parent = parent;
   return result;
 }
 
@@ -50,16 +66,16 @@ static SYMBOL *symbol_create(const char *id)
 static SYMBOL *symbol_table_add_symbol(TABLE *table, const char *id)
 {
   SYMBOL *symbol = symbol_create(id);
-  T(table).head = entry_create(symbol, T(table).head);
+  table->scope->head = entry_create(symbol, table->scope->head);
   return symbol;
 }
 
 static TABLE *symbol_table_find_global_table(TABLE *table)
 {
-  TABLE *result = (TABLE *) table;
-  while (result->parent)
-    result = result->parent;
-  return result;
+  SCOPE *scope = table->scope;
+  while (scope->parent)
+    scope = scope->parent;
+  return scope->table;
 }
 
 /*
@@ -84,7 +100,7 @@ int symbol_is_global(SYMBOL *symbol)
 TABLE *symbol_table_create(TABLE *table)
 {
   TABLE *result = my_malloc(sizeof(TABLE));
-  result->parent = table;
+  result->scope = scope_create(result, table ? table->scope : NULL);
   return result;
 }
 
@@ -137,15 +153,17 @@ SYMBOL *symbol_table_add_param(TABLE *table, const char *id, int is_array)
 
 void symbol_table_begin_scope(TABLE *table)
 {
+  table->scope = scope_create(table, table->scope);
 }
 
 void symbol_table_end_scope(TABLE *table)
 {
+  table->scope = table->scope->parent;
 }
 
-SYMBOL *symbol_table_find(TABLE *table, const char *id)
+SYMBOL *scope_find(SCOPE *scope, const char *id)
 {
-  ENTRY *head = T(table).head;
+  ENTRY *head = scope->head;
 
   /* First check the symbols defined in this scope */
   while (head)
@@ -157,17 +175,20 @@ SYMBOL *symbol_table_find(TABLE *table, const char *id)
     }
 
   /* If we get to here, move on to the parent scope */
-  if (T(table).parent)
-    return symbol_table_find(T(table).parent, id);
+  if (scope->parent)
+    return scope_find(scope->parent, id);
   else
     return NULL;
 }
 
+SYMBOL *symbol_table_find(TABLE *table, const char *id)
+{
+  scope_find(table->scope, id);
+}
+
 size_t symbol_table_size(TABLE *table)
 {
-  /* The size of the table should be the address of the most recent symbol in
-   * the table plus its total size. */
-  TABLE *tab = (TABLE *) table;
-  SYMBOL *sym = tab->head ? tab->head->first : NULL;
+  SCOPE *scope = table->scope;
+  SYMBOL *sym = scope->head ? scope->head->first : NULL;
   return sym ? sym->address + sym->count * sym->size : 0;
 }
