@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include "symbol.h"
 #include "util.h"
 #include "sizes.h"
@@ -63,9 +64,37 @@ static SYMBOL *symbol_create(const char *id)
   return result;
 }
 
+#define GROW_BY 64
+#define GROW_BYTES (64 * sizeof(SYMBOL))
+
+static void symbol_table_grow(TABLE *table)
+{
+  size_t new_size = (table->size + GROW_BY) * sizeof(SYMBOL);
+  table->start = my_realloc(table->start, new_size);
+  table->point = table->start + table->size;
+  memset(table->point, 0, GROW_BYTES);
+  table->size = table->size + GROW_BY;
+}
+
+static int symbol_table_should_grow(TABLE *table)
+{
+  return (table->start + table->size) == table->point;
+}
+
 static SYMBOL *symbol_table_add_symbol(TABLE *table, const char *id)
 {
-  SYMBOL *symbol = symbol_create(id);
+  SYMBOL *symbol;
+  size_t address = symbol_table_size(table);
+
+  if (symbol_table_should_grow(table))
+    symbol_table_grow(table);
+
+  symbol = table->point++;
+  symbol->id = id;
+  symbol->count = 1;
+  symbol->size = INTEGER_SIZE;
+  symbol->address = address;
+
   table->scope->head = entry_create(symbol, table->scope->head);
   return symbol;
 }
@@ -135,11 +164,7 @@ SYMBOL *symbol_table_add_local(TABLE *table, const char *id)
 {
   SYMBOL *result = symbol_table_find(table, id);
   if (result == NULL)
-    {
-      size_t size = symbol_table_size(table);
-      result = symbol_table_add_symbol((TABLE *) table, id);
-      result->address = size;
-    }
+    result = symbol_table_add_symbol((TABLE *) table, id);
   return result;
 }
 
@@ -188,7 +213,11 @@ SYMBOL *symbol_table_find(TABLE *table, const char *id)
 
 size_t symbol_table_size(TABLE *table)
 {
-  SCOPE *scope = table->scope;
-  SYMBOL *sym = scope->head ? scope->head->first : NULL;
-  return sym ? sym->address + sym->count * sym->size : 0;
+  if (table->start == table->point)
+    return 0;
+  else
+    {
+      SYMBOL *last = table->point - 1;
+      return last->address + last->size * last->count;
+    }
 }
