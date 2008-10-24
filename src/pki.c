@@ -279,6 +279,14 @@ static void pki_ref(FILE *out, IR_QUAD *quad)
   pki_store_result(out, result, ir_quad_result(quad));
 }
 
+static void pki_deref(FILE *out, IR_QUAD *quad)
+{
+  int arg1 = pki_reg(out, ir_quad_arg1(quad), TRUE);
+  int result = pki_reg(out, ir_quad_result(quad), FALSE);
+  pki_ldi(out, result, 0, arg1);
+  pki_store_result(out, result, ir_quad_result(quad));
+}
+
 static void pki_generate_callback(IR_QUAD *quad, void *data)
 {
   FILE *out = (FILE *) data;
@@ -301,7 +309,7 @@ static void pki_generate_callback(IR_QUAD *quad, void *data)
       /* TODO */
       break;
     case IR_DEREF:
-      /* TODO */
+      pki_deref(out, quad);
       break;
     case IR_DIVIDE:
       pki_reg_op(out, "DIV", quad);

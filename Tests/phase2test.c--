@@ -61,8 +61,10 @@ main()
   a = 1;
   {
     x = a--; write( x );
+    b = &x;
   }
   write( a );
-  b = &a != &x; write( b );
+  flag = &a != &x; write( flag );
+  a = *b - 1; write( a );
 }
 
