@@ -48,10 +48,11 @@ void ast_constant_init(NODE *node, va_list args)
 {
   char *text = va_arg(args, char *);
   int base;
+  size_t length = strlen(text);
 
-  if (strnstr(text, "0x", 2) == text) /* hex */
+  if (length > 2 && text[0] == '0' && text[1] == 'x')
     base = 16;
-  else if (text[0] == '0') /* octal */
+  else if (length > 1 && text[0] == '0')
     base = 8;
   else
     base = 10;
