@@ -168,7 +168,9 @@ void ir_add(IR *ir, IR_INST inst, ...)
       break;
 
     case IR_ASSIGN:
+    case IR_DEREF:
     case IR_IF_FALSE:
+    case IR_REF:
     case IR_IF_TRUE:
       ir_arg(&args, &quad.arg1);
       ir_arg(&args, &quad.result);
@@ -221,6 +223,7 @@ const char *ir_inst_str(IR_INST inst)
     "AND",
     "ASSIGN",
     "CALL",
+    "DEREF",
     "DIVIDE",
     "ENTER",
     "IF_EQ",
@@ -241,6 +244,7 @@ const char *ir_inst_str(IR_INST inst)
     "POP",
     "PUSH",
     "READ",
+    "REF",
     "RETURN",
     "SUBTRACT",
     "WRITE",

@@ -265,6 +265,20 @@ static void pki_modulo(FILE *out, IR_QUAD *quad)
   pki_store_result(out, result, ir_quad_result(quad));
 }
 
+static void pki_ref(FILE *out, IR_QUAD *quad)
+{
+  SYMBOL *symbol = ir_cell_ptr(ir_quad_arg1(quad));
+  int result = pki_reg(out, ir_quad_result(quad), FALSE);
+  if (symbol_is_global(symbol))
+    pki_llc(out, result, symbol_address(symbol));
+  else
+    {
+      int offset = pki_const_reg(out, symbol_address(symbol), TRUE);
+      pki_reg_op1(out, "SUB", result, BP, offset);
+    }
+  pki_store_result(out, result, ir_quad_result(quad));
+}
+
 static void pki_generate_callback(IR_QUAD *quad, void *data)
 {
   FILE *out = (FILE *) data;
@@ -284,6 +298,9 @@ static void pki_generate_callback(IR_QUAD *quad, void *data)
       pki_assign(out, quad);
       break;
     case IR_CALL:
+      /* TODO */
+      break;
+    case IR_DEREF:
       /* TODO */
       break;
     case IR_DIVIDE:
@@ -345,6 +362,9 @@ static void pki_generate_callback(IR_QUAD *quad, void *data)
       break;
     case IR_READ:
       /* TODO */
+      break;
+    case IR_REF:
+      pki_ref(out, quad);
       break;
     case IR_RETURN:
       /* TODO */

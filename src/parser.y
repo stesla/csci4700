@@ -158,9 +158,9 @@ postfix_expression
 
 unary_expression
     : postfix_expression
-    | INC_OP unary_expression { $$ = N(AST_PREFIX, $2, AST_OP_INC); }
-    | DEC_OP unary_expression { $$ = N(AST_PREFIX, $2, AST_OP_DEC); }
-    | unary_operator unary_expression { $$ = N(AST_PREFIX, $2, $1); }
+    | INC_OP unary_expression { $$ = N(AST_PREFIX, $2, AST_OP_INC, @$.last_line); }
+    | DEC_OP unary_expression { $$ = N(AST_PREFIX, $2, AST_OP_DEC, @$.last_line); }
+    | unary_operator unary_expression { $$ = N(AST_PREFIX, $2, $1, @$.last_line); }
     ;
 
 unary_operator
