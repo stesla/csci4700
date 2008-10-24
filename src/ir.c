@@ -74,14 +74,14 @@ static void ir_fprint_cell(FILE *out, IR_CELL *cell)
         const char *id = symbol_id(cell->val.ptr);
         int address = symbol_address(cell->val.ptr);
         if (symbol_is_global(cell->val.ptr))
-          fprintf(out, "global:%s:L%i", id, address);
+          fprintf(out, "(:global \"%s\" L%i)", id, address);
         else
-          fprintf(out, "local:%s:%i", id, address);
+          fprintf(out, "(:local \"%s\" %i)", id, address);
       }
       break;
 
     case IR_TEMP:
-      fprintf(out, "temp:%i", cell->val.num);
+      fprintf(out, "'(:temp %i)", cell->val.num);
       break;
     }
 }
@@ -90,11 +90,11 @@ void ir_fprint_quad(FILE *out, IR_QUAD *quad)
 {
   int i;
 
-  fprintf(out, "(%s, ", ir_inst_str(quad->inst));
+  fprintf(out, "(:%s ", ir_inst_str(quad->inst));
   ir_fprint_cell(out, &quad->arg1);
-  fprintf(out, ", ");
+  fprintf(out, " ");
   ir_fprint_cell(out, &quad->arg2);
-  fprintf(out, ", ");
+  fprintf(out, " ");
   ir_fprint_cell(out, &quad->result);
   fprintf(out, ")\n");
 }
@@ -209,7 +209,9 @@ static void ir_fprint_callback(IR_QUAD *quad, void *data)
 
 void ir_fprint(FILE *out, IR *ir)
 {
+  fprintf(out, "'(\n");
   ir_each(ir, ir_fprint_callback, (void *) out);
+  fprintf(out, ")");
 }
 
 const char *ir_inst_str(IR_INST inst)

@@ -13,6 +13,6 @@ tools/info
 tools/lib
 tools/man
 tools/share
-*.ir
-*.pki
+*.l
+*.s
 pki_run

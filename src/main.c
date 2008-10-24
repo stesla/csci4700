@@ -81,14 +81,14 @@ int main(int argc, char **argv)
   if (output_ir)
     {
       FILE *out_file;
-      ext(filename, ".ir", out_file_name, sizeof(out_file_name));
+      ext(filename, ".l", out_file_name, sizeof(out_file_name));
       out_file = fopen(out_file_name, "w");
       ir_fprint(out_file, ir);
       fclose(out_file);
     }
 
   /* Generate PKI */
-  ext(filename, ".pki", out_file_name, sizeof(out_file_name));
+  ext(filename, ".s", out_file_name, sizeof(out_file_name));
   out_file = fopen(out_file_name, "w");
   pki_generate(out_file, ir);
   fclose(out_file);
