@@ -18,7 +18,6 @@ struct _entry {
   ENTRY *rest;
 };
 
-typedef struct _table TABLE;
 struct _table {
   ENTRY *head;
   TABLE *parent;
@@ -55,7 +54,7 @@ static SYMBOL *symbol_table_add_symbol(TABLE *table, const char *id)
   return symbol;
 }
 
-static TABLE *symbol_table_find_global_table(void *table)
+static TABLE *symbol_table_find_global_table(TABLE *table)
 {
   TABLE *result = (TABLE *) table;
   while (result->parent)
@@ -82,14 +81,14 @@ int symbol_is_global(SYMBOL *symbol)
   return symbol->is_global;
 }
 
-void *symbol_table_create(void *table)
+TABLE *symbol_table_create(TABLE *table)
 {
   TABLE *result = my_malloc(sizeof(TABLE));
   result->parent = table;
   return result;
 }
 
-SYMBOL *symbol_table_add_global(void *table, const char *id)
+SYMBOL *symbol_table_add_global(TABLE *table, const char *id)
 {
   TABLE *globals = symbol_table_find_global_table(table);
   SYMBOL *result = symbol_table_find(table, id);
@@ -102,7 +101,7 @@ SYMBOL *symbol_table_add_global(void *table, const char *id)
   return result;
 }
 
-SYMBOL *symbol_table_add_global_array(void *table, const char *id, size_t count)
+SYMBOL *symbol_table_add_global_array(TABLE *table, const char *id, size_t count)
 {
   TABLE *globals = symbol_table_find_global_table(table);
   SYMBOL *result = symbol_table_find(table, id);
@@ -116,7 +115,7 @@ SYMBOL *symbol_table_add_global_array(void *table, const char *id, size_t count)
   return result;
 }
 
-SYMBOL *symbol_table_add_local(void *table, const char *id)
+SYMBOL *symbol_table_add_local(TABLE *table, const char *id)
 {
   SYMBOL *result = symbol_table_find(table, id);
   if (result == NULL)
@@ -128,7 +127,7 @@ SYMBOL *symbol_table_add_local(void *table, const char *id)
   return result;
 }
 
-SYMBOL *symbol_table_add_param(void *table, const char *id, int is_array)
+SYMBOL *symbol_table_add_param(TABLE *table, const char *id, int is_array)
 {
   SYMBOL *result = symbol_table_add_symbol((TABLE *) table, id);
   /* TODO: Should I be recording a count here? */
@@ -136,7 +135,15 @@ SYMBOL *symbol_table_add_param(void *table, const char *id, int is_array)
   return result;
 }
 
-SYMBOL *symbol_table_find(void *table, const char *id)
+void symbol_table_begin_scope(TABLE *table)
+{
+}
+
+void symbol_table_end_scope(TABLE *table)
+{
+}
+
+SYMBOL *symbol_table_find(TABLE *table, const char *id)
 {
   ENTRY *head = T(table).head;
 
@@ -156,7 +163,7 @@ SYMBOL *symbol_table_find(void *table, const char *id)
     return NULL;
 }
 
-size_t symbol_table_size(void *table)
+size_t symbol_table_size(TABLE *table)
 {
   /* The size of the table should be the address of the most recent symbol in
    * the table plus its total size. */

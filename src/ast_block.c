@@ -8,7 +8,6 @@
 struct slots {
   NODE *declarations;
   NODE *statements;
-  void *symbols;
   int start_line;
   int end_line;
 };
@@ -19,21 +18,17 @@ static void find_symbols(NODE *node, void *symbols)
 {
   void *cur;
 
-  S(node).symbols = symbol_table_create(symbols);
+  symbol_table_begin_scope(symbols);
   if (S(node).declarations)
-    ast_find_symbols(S(node).declarations, S(node).symbols);
+    ast_find_symbols(S(node).declarations, symbols);
   if (S(node).statements)
-    ast_find_symbols(S(node).statements, S(node).symbols);
+    ast_find_symbols(S(node).statements, symbols);
+  symbol_table_end_scope(symbols);
 }
 
 static void generate_ir(NODE *node, IR *ir)
 {
-  size_t ar_size = symbol_table_size(S(node).symbols);
-  ir_reset_temp(ar_size);
-  ir_add(ir, IR_ENTER);
-  ir_add(ir, IR_PUSH, IR_CONST, &ar_size);
   ast_generate_ir(S(node).statements, ir);
-  ir_add(ir, IR_LEAVE);
 }
 
 static void print(NODE *node, FILE *out)
