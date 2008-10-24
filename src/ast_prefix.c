@@ -39,7 +39,10 @@ static void generate_ir(NODE *node, IR *ir)
 
   S(node).temp = ir_make_temp(ir);
 
-  /* TODO: Need to implement REF and DEREF */
+  /* TODO: The grammar allows the operand to be anything, but it should only be
+   * a valid identifier for REF and DEREF, and possibly INC and DEC. Consider
+   * adding a static analysis phase to catch that stuff. */
+
   ast_generate_ir(S(node).operand, ir);
   switch(S(node).op)
     {
@@ -49,17 +52,12 @@ static void generate_ir(NODE *node, IR *ir)
     case AST_OP_DEREF:
       {
         SYMBOL *symbol = ast_get_symbol(S(node).operand);
-        if (symbol == NULL)
+        if (symbol)
           {
-            /* TODO: Print file:line number */
-            fprintf(stderr,
-                    "line %i: Attempt to dereference a non-variable.\n",
-                    S(node).line);
-            exit(1);
+            ir_add(ir, IR_DEREF,
+                   IR_SYM, symbol,
+                   ast_ir_type(node), ast_ir_value(node));
           }
-        ir_add(ir, IR_DEREF,
-               IR_SYM, symbol,
-               ast_ir_type(node), ast_ir_value(node));
       }
       break;
     case AST_OP_INC:
@@ -91,17 +89,12 @@ static void generate_ir(NODE *node, IR *ir)
     case AST_OP_REF:
       {
         SYMBOL *symbol = ast_get_symbol(S(node).operand);
-        if (symbol == NULL)
+        if(symbol)
           {
-            /* TODO: print file:line number */
-            fprintf(stderr,
-                    "line %i: Attempt to reference a non-variable.\n",
-                    S(node).line);
-            exit(1);
+            ir_add(ir, IR_REF,
+                   IR_SYM, symbol,
+                   ast_ir_type(node), ast_ir_value(node));
           }
-        ir_add(ir, IR_REF,
-               IR_SYM, symbol,
-               ast_ir_type(node), ast_ir_value(node));
       }
       break;
     default:
