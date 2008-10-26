@@ -52,6 +52,11 @@ static SYMBOL *ast_default_get_symbol(NODE *node)
   return NULL;
 }
 
+static int ast_default_is_lvalue(NODE *node)
+{
+  return FALSE;
+}
+
 struct constructor {
   size_t (*size)();
   void (*init)(NODE *node, va_list args);
@@ -93,6 +98,7 @@ NODE *ast_create(NODE_TYPE type, ...)
   SET_METHOD(result, add_symbols, ast_default_add_symbols);
   SET_METHOD(result, ir_type, ast_default_ir_type);
   SET_METHOD(result, ir_value, ast_default_ir_value);
+  SET_METHOD(result, is_lvalue, ast_default_is_lvalue);
 
   va_start(args, type);
   constructor[type].init(result, args);
@@ -129,6 +135,11 @@ IR_TYPE ast_ir_type(NODE *node)
 void *ast_ir_value(NODE *node)
 {
   return node->methods.ir_value(node);
+}
+
+int ast_is_lvalue(NODE *node)
+{
+  return node->methods.is_lvalue(node);
 }
 
 const char *ast_node_type_str(NODE_TYPE type)

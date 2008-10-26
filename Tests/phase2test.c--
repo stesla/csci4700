@@ -66,5 +66,5 @@ main()
   write( a );
   flag = &a != &x; write( flag );
   a = *b - 1; write( a );
+  a = &b; *a = 1; write( b );
 }
-

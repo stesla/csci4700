@@ -70,21 +70,34 @@ static void ir_short_op(NODE *node, IR *ir, IR_INST inst, int v1, int v2)
   ir_add(ir, IR_LABEL, IR_CONST, &label_b);
 }
 
+static int is_indirect(NODE *node)
+{
+  return ast_is_lvalue(node) && ast_get_symbol(node) == NULL;
+}
+
+static void ir_assign(NODE *node, IR *ir)
+{
+  /* rvalue */
+  ast_generate_ir(S(node).right, ir);
+
+  /* temporary var for this expression */
+  ir_add(ir, IR_ASSIGN,
+         ast_ir_type(S(node).right), ast_ir_value(S(node).right),
+         ast_ir_type(node), ast_ir_value(node));
+
+  /* lvalue */
+  ir_add(ir, is_indirect(S(node).left) ? IR_ASSIGN_INDIRECT : IR_ASSIGN,
+         ast_ir_type(node), ast_ir_value(node),
+         ast_ir_type(S(node).left), ast_ir_value(S(node).left));
+}
+
 static void generate_ir(NODE *node, IR *ir)
 {
   S(node).temp = ir_make_temp(ir);
   switch (S(node).op)
     {
     case AST_OP_ASSIGN:
-      ast_generate_ir(S(node).right, ir);
-      /* In order to make a = b = c work, we need to put our value into both a
-       * temp register and into the actual variable. */
-      ir_add(ir, IR_ASSIGN,
-             ast_ir_type(S(node).right), ast_ir_value(S(node).right),
-             ast_ir_type(node), ast_ir_value(node));
-      ir_add(ir, IR_ASSIGN,
-             ast_ir_type(node), ast_ir_value(node),
-             IR_SYM, ast_get_symbol(S(node).left));
+      ir_assign(node, ir);
       break;
     case AST_OP_BAND:
       ir_binary_op(node, ir, IR_AND);

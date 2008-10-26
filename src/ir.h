@@ -5,6 +5,7 @@ typedef enum _ir_inst {
   IR_ADD,
   IR_AND,
   IR_ASSIGN,
+  IR_ASSIGN_INDIRECT,
   IR_CALL,
   IR_DEREF,
   IR_DIVIDE,

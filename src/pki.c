@@ -198,6 +198,13 @@ static void pki_assign(FILE *out, IR_QUAD *quad)
   pki_store_result(out, value, ir_quad_result(quad));
 }
 
+static void pki_assign_indirect(FILE *out, IR_QUAD *quad)
+{
+  int value = pki_reg(out, ir_quad_arg1(quad), TRUE);
+  int offset = pki_reg(out, ir_quad_result(quad), TRUE);
+  pki_sti(out, value, 0, offset);
+}
+
 static void pki_jump(FILE *out, IR_QUAD *quad)
 {
   fprintf(out, "\tJUMP L%i\n", ir_cell_num(ir_quad_arg1(quad)));
@@ -304,6 +311,9 @@ static void pki_generate_callback(IR_QUAD *quad, void *data)
       break;
     case IR_ASSIGN:
       pki_assign(out, quad);
+      break;
+    case IR_ASSIGN_INDIRECT:
+      pki_assign_indirect(out, quad);
       break;
     case IR_CALL:
       /* TODO */

@@ -117,6 +117,11 @@ static void *ir_value(NODE *node)
   return &(S(node).temp);
 }
 
+static int is_lvalue(NODE *node)
+{
+  return S(node).op == AST_OP_DEREF;
+}
+
 static void print(NODE *node, FILE *out)
 {
   char label[15];
@@ -146,4 +151,5 @@ void ast_prefix_init(NODE *node, va_list args)
   SET_METHODS(node);
   OVERRIDE(node, ir_type);
   OVERRIDE(node, ir_value);
+  OVERRIDE(node, is_lvalue);
 }

@@ -101,6 +101,7 @@ struct _node {
     void (*generate_ir)(NODE *, IR *);
     IR_TYPE (*ir_type)(NODE *);
     void *(*ir_value)(NODE *);
+    int (*is_lvalue)(NODE *);
     void (*print)(NODE *, FILE *);
     const char *(*to_s)(NODE *);
   } methods;
@@ -148,6 +149,7 @@ SYMBOL *ast_get_symbol(NODE *node);
 void ast_generate_ir(NODE *node, IR *ir);
 IR_TYPE ast_ir_type(NODE *node);
 void *ast_ir_value(NODE *node);
+int ast_is_lvalue(NODE *node);
 void ast_print(NODE *node, FILE *out);
 const char *ast_to_s(NODE *node);
 

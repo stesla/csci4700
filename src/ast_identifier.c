@@ -42,6 +42,11 @@ static void *ir_value(NODE *node)
   return S(node).symbol;
 }
 
+static int is_lvalue(NODE *node)
+{
+  return TRUE;
+}
+
 static void print(NODE *node, FILE *out)
 {
   size_t length = strlen("AST_IDENTIFIER") + strlen(S(node).identifier) + 3;
@@ -68,4 +73,5 @@ void ast_identifier_init(NODE *node, va_list args)
   OVERRIDE(node, get_symbol);
   OVERRIDE(node, ir_type);
   OVERRIDE(node, ir_value);
+  OVERRIDE(node, is_lvalue);
 }

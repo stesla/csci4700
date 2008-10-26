@@ -168,6 +168,7 @@ void ir_add(IR *ir, IR_INST inst, ...)
       break;
 
     case IR_ASSIGN:
+    case IR_ASSIGN_INDIRECT:
     case IR_DEREF:
     case IR_IF_FALSE:
     case IR_REF:
@@ -222,6 +223,7 @@ const char *ir_inst_str(IR_INST inst)
     "ADD",
     "AND",
     "ASSIGN",
+    "ASSIGN_INDIRECT",
     "CALL",
     "DEREF",
     "DIVIDE",
