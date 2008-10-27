@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "ir.h"
+#include "buffer.h"
 #include "sizes.h"
 #include "symbol.h"
 #include "util.h"
@@ -23,13 +24,8 @@ struct _ir_quad {
 };
 
 struct _ir {
-  IR_QUAD *start;
-  IR_QUAD *point;
-  size_t size;
+  BUFFER *buffer;
 };
-
-#define GROW_BY 128
-#define GROW_BYTES (GROW_BY * sizeof(IR_QUAD))
 
 /*
 ** Utility Functions
@@ -99,31 +95,13 @@ void ir_fprint_quad(FILE *out, IR_QUAD *quad)
   fprintf(out, ")\n");
 }
 
-static void ir_grow(IR *ir)
-{
-  ir->start = my_realloc(ir->start, (ir->size + GROW_BY) * sizeof(IR_QUAD));
-  ir->point = ir->start + ir->size;
-  memset(ir->point, 0, GROW_BYTES);
-  ir->size = ir->size + GROW_BY;
-}
-
-static int ir_should_grow(IR *ir)
-{
-  return (ir->start + ir->size) == ir->point;
-}
-
 /*
 ** Private Functions
 */
 
 static void ir_add_inst(IR *ir, IR_QUAD quad)
 {
-  IR_QUAD *current;
-
-  if (ir_should_grow(ir))
-    ir_grow(ir);
-
-  current = ir->point++;
+  IR_QUAD *current = buffer_next(ir->buffer);
 
   current->inst = quad.inst;
   current->arg1 = quad.arg1;
@@ -137,7 +115,9 @@ static void ir_add_inst(IR *ir, IR_QUAD quad)
 
 IR *ir_create()
 {
-  return my_malloc(sizeof(IR));
+  IR *result = my_malloc(sizeof(IR));
+  result->buffer = buffer_create(sizeof(IR_QUAD), 128);
+  return result;
 }
 
 void ir_add(IR *ir, IR_INST inst, ...)
@@ -200,9 +180,7 @@ void ir_add(IR *ir, IR_INST inst, ...)
 
 void ir_each(IR *ir, IR_CALLBACK callback, void *data)
 {
-  IR_QUAD *current = ir->start;
-  while (current < ir->point)
-    callback(current++, data);
+  buffer_each(ir->buffer, (BUFFER_CALLBACK) callback, data);
 }
 
 static void ir_fprint_callback(IR_QUAD *quad, void *data)
