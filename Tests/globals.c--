@@ -1,0 +1,12 @@
+global a;
+
+main() {
+  a = 7; write( a );
+
+  {
+    global b;
+    b = 6; write( b );
+  }
+
+  c = a * b; write( c );
+}

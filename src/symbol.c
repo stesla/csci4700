@@ -99,6 +99,13 @@ static SYMBOL *symbol_table_add_symbol(TABLE *table, const char *id)
   return symbol;
 }
 
+void symbol_table_each(TABLE *table, SYMBOL_CALLBACK callback, void *data)
+{
+  SYMBOL *current = table->start;
+  while (current < table->point)
+    callback(current++, data);
+}
+
 static TABLE *symbol_table_find_global_table(TABLE *table)
 {
   SCOPE *scope = table->scope;
@@ -124,6 +131,11 @@ const char *symbol_id(SYMBOL *symbol)
 int symbol_is_global(SYMBOL *symbol)
 {
   return symbol->is_global;
+}
+
+int symbol_size(SYMBOL *symbol)
+{
+  return symbol->count * symbol->size;
 }
 
 TABLE *symbol_table_create(TABLE *table)

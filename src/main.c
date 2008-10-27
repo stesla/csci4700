@@ -23,8 +23,8 @@ int main(int argc, char **argv)
   char out_file_name[FILENAME_MAX];
   int  i, success;
   NODE *ast = NULL;
-  void *symbols;
-  void *ir;
+  TABLE *symbols;
+  IR *ir;
 
   /* CLI flags */
   int lexer_debug = FALSE;
@@ -91,6 +91,7 @@ int main(int argc, char **argv)
   ext(filename, ".s", out_file_name, sizeof(out_file_name));
   out_file = fopen(out_file_name, "w");
   pki_generate(out_file, ir);
+  pki_generate_globals(out_file, symbols);
   fclose(out_file);
 
   return 0;

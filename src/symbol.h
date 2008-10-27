@@ -3,6 +3,7 @@
 
 typedef struct _table TABLE;
 typedef struct _symbol SYMBOL;
+typedef void (*SYMBOL_CALLBACK)(SYMBOL *, void *);
 
 /*
 ** Creation
@@ -21,6 +22,11 @@ void symbol_table_end_scope(TABLE *table);
 SYMBOL *symbol_table_find(TABLE *table, const char *id);
 
 /*
+** Iteration
+*/
+void symbol_table_each(TABLE *table, SYMBOL_CALLBACK callback, void *data);
+
+/*
 ** Accessors
 */
 /* IF symbol_is_global
@@ -29,6 +35,7 @@ SYMBOL *symbol_table_find(TABLE *table, const char *id);
 int symbol_address(SYMBOL *symbol);
 const char *symbol_id(SYMBOL *symbol);
 int symbol_is_global(SYMBOL *symbol);
+int symbol_size(SYMBOL *symbol);
 size_t symbol_table_size(TABLE *table);
 
 #endif

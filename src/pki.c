@@ -400,6 +400,12 @@ static void pki_generate_callback(IR_QUAD *quad, void *data)
   pki_reset_reg();
 }
 
+static void pki_globals_callback(SYMBOL *sym, void *data)
+{
+  FILE *out = (FILE *) data;
+  fprintf(out, "L%i:\tds %i\n", symbol_address(sym), symbol_size(sym));
+}
+
 static void pki_generate_epilogue(FILE *out)
 {
   pki_syscall(out, 0, 0);
@@ -417,4 +423,9 @@ void pki_generate(FILE *out, IR *ir)
   pki_generate_prologue(out);
   ir_each(ir, pki_generate_callback, (void *) out);
   pki_generate_epilogue(out);
+}
+
+void pki_generate_globals(FILE *out, TABLE *symbols)
+{
+  symbol_table_each(symbols, pki_globals_callback, (void *) out);
 }
