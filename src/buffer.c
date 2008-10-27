@@ -54,7 +54,10 @@ void *buffer_last_entry(BUFFER *buffer)
 
 void *buffer_next(BUFFER *buffer)
 {
+  void *result;;
   if (buffer_should_grow(buffer))
     buffer_grow(buffer);
-  return buffer->point += buffer->entry_size;
+  result = buffer->point;
+  buffer->point += buffer->entry_size;
+  return result;
 }

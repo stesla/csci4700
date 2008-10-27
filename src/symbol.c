@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include "buffer.h"
 #include "symbol.h"
 #include "util.h"
 #include "sizes.h"
@@ -28,9 +29,7 @@ struct _scope {
 
 struct _table {
   SCOPE *scope;
-  SYMBOL *start;
-  SYMBOL *point;
-  size_t size;
+  BUFFER *buffer;
 };
 
 #define E(x) (*((ENTRY *) (x)))
@@ -55,41 +54,13 @@ static SCOPE *scope_create(TABLE *table, SCOPE *parent)
   return result;
 }
 
-static SYMBOL *symbol_create(const char *id)
-{
-  SYMBOL *result = my_malloc(sizeof(SYMBOL));
-  result->id = id;
-  result->count = 1;
-  result->size = INTEGER_SIZE;
-  return result;
-}
-
-#define GROW_BY 64
-#define GROW_BYTES (64 * sizeof(SYMBOL))
-
-static void symbol_table_grow(TABLE *table)
-{
-  size_t new_size = (table->size + GROW_BY) * sizeof(SYMBOL);
-  table->start = my_realloc(table->start, new_size);
-  table->point = table->start + table->size;
-  memset(table->point, 0, GROW_BYTES);
-  table->size = table->size + GROW_BY;
-}
-
-static int symbol_table_should_grow(TABLE *table)
-{
-  return (table->start + table->size) == table->point;
-}
-
 static SYMBOL *symbol_table_add_symbol(TABLE *table, const char *id)
 {
   SYMBOL *symbol;
   size_t address = symbol_table_size(table);
 
-  if (symbol_table_should_grow(table))
-    symbol_table_grow(table);
+  symbol = buffer_next(table->buffer);
 
-  symbol = table->point++;
   symbol->id = id;
   symbol->count = 1;
   symbol->size = INTEGER_SIZE;
@@ -101,9 +72,7 @@ static SYMBOL *symbol_table_add_symbol(TABLE *table, const char *id)
 
 void symbol_table_each(TABLE *table, SYMBOL_CALLBACK callback, void *data)
 {
-  SYMBOL *current = table->start;
-  while (current < table->point)
-    callback(current++, data);
+  buffer_each(table->buffer, (BUFFER_CALLBACK) callback, data);
 }
 
 static TABLE *symbol_table_find_global_table(TABLE *table)
@@ -141,6 +110,7 @@ int symbol_size(SYMBOL *symbol)
 TABLE *symbol_table_create(TABLE *table)
 {
   TABLE *result = my_malloc(sizeof(TABLE));
+  result->buffer = buffer_create(sizeof(SYMBOL), 64);
   result->scope = scope_create(result, table ? table->scope : NULL);
   return result;
 }
@@ -225,11 +195,11 @@ SYMBOL *symbol_table_find(TABLE *table, const char *id)
 
 size_t symbol_table_size(TABLE *table)
 {
-  if (table->start == table->point)
+  if (buffer_is_empty(table->buffer))
     return 0;
   else
     {
-      SYMBOL *last = table->point - 1;
+      SYMBOL *last = buffer_last_entry(table->buffer);
       return last->address + last->size * last->count;
     }
 }
