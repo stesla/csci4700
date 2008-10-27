@@ -22,3 +22,8 @@ clobber: clean
 	rm -rf tools/${FLEXVERSION} tools/${BISONVERSION}
 	rm -rf tools/include tools/bin tools/usr tools/lib
 	rm -rf tools/info tools/man tools/share
+
+test: PROGRAM=phase2test
+test: c-- ../pki_machine/pki_run
+	./c-- Tests/$(PROGRAM).c--
+	../pki_machine/pki_run Tests/$(PROGRAM).s
