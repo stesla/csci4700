@@ -1,30 +1,30 @@
 #ifndef SYMBOL_H
 #define SYMBOL_H
 
-typedef struct _table TABLE;
+typedef struct _symbols SYMBOLS;
 typedef struct _symbol SYMBOL;
 typedef void (*SYMBOL_CALLBACK)(SYMBOL *, void *);
 
 /*
 ** Creation
 */
-TABLE *symbol_table_create(TABLE *table);
-SYMBOL *symbol_table_add_global(TABLE *table, const char *id);
-SYMBOL *symbol_table_add_global_array(TABLE *table, const char *id, size_t size);
-SYMBOL *symbol_table_add_local(TABLE *table, const char *id);
-SYMBOL *symbol_table_add_param(TABLE *table, const char *id, int is_array);
-void symbol_table_begin_scope(TABLE *table);
-void symbol_table_end_scope(TABLE *table);
+SYMBOLS *symbol_table_create(SYMBOLS *table);
+SYMBOL *symbol_table_add_global(SYMBOLS *table, const char *id);
+SYMBOL *symbol_table_add_global_array(SYMBOLS *table, const char *id, size_t size);
+SYMBOL *symbol_table_add_local(SYMBOLS *table, const char *id);
+SYMBOL *symbol_table_add_param(SYMBOLS *table, const char *id, int is_array);
+void symbol_table_begin_scope(SYMBOLS *table);
+void symbol_table_end_scope(SYMBOLS *table);
 
 /*
 ** Lookup
 */
-SYMBOL *symbol_table_find(TABLE *table, const char *id);
+SYMBOL *symbol_table_find(SYMBOLS *table, const char *id);
 
 /*
 ** Iteration
 */
-void symbol_table_each(TABLE *table, SYMBOL_CALLBACK callback, void *data);
+void symbol_table_each(SYMBOLS *table, SYMBOL_CALLBACK callback, void *data);
 
 /*
 ** Accessors
@@ -36,6 +36,6 @@ int symbol_address(SYMBOL *symbol);
 const char *symbol_id(SYMBOL *symbol);
 int symbol_is_global(SYMBOL *symbol);
 int symbol_size(SYMBOL *symbol);
-size_t symbol_table_size(TABLE *table);
+size_t symbol_table_size(SYMBOLS *table);
 
 #endif

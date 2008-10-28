@@ -24,10 +24,10 @@ typedef struct _scope SCOPE;
 struct _scope {
   ENTRY *head;
   SCOPE *parent;
-  TABLE *table;
+  SYMBOLS *table;
 };
 
-struct _table {
+struct _symbols {
   SCOPE *scope;
   BUFFER *buffer;
 };
@@ -46,7 +46,7 @@ static ENTRY *entry_create(SYMBOL *first, ENTRY *rest)
   return result;
 }
 
-static SCOPE *scope_create(TABLE *table, SCOPE *parent)
+static SCOPE *scope_create(SYMBOLS *table, SCOPE *parent)
 {
   SCOPE *result = my_malloc(sizeof(SCOPE));
   result->table = table;
@@ -54,7 +54,7 @@ static SCOPE *scope_create(TABLE *table, SCOPE *parent)
   return result;
 }
 
-static SYMBOL *symbol_table_add_symbol(TABLE *table, const char *id)
+static SYMBOL *symbol_table_add_symbol(SYMBOLS *table, const char *id)
 {
   SYMBOL *symbol;
   size_t address = symbol_table_size(table);
@@ -70,12 +70,12 @@ static SYMBOL *symbol_table_add_symbol(TABLE *table, const char *id)
   return symbol;
 }
 
-void symbol_table_each(TABLE *table, SYMBOL_CALLBACK callback, void *data)
+void symbol_table_each(SYMBOLS *table, SYMBOL_CALLBACK callback, void *data)
 {
   buffer_each(table->buffer, (BUFFER_CALLBACK) callback, data);
 }
 
-static TABLE *symbol_table_find_global_table(TABLE *table)
+static SYMBOLS *symbol_table_find_global_table(SYMBOLS *table)
 {
   SCOPE *scope = table->scope;
   while (scope->parent)
@@ -107,17 +107,17 @@ int symbol_size(SYMBOL *symbol)
   return symbol->count * symbol->size;
 }
 
-TABLE *symbol_table_create(TABLE *table)
+SYMBOLS *symbol_table_create(SYMBOLS *table)
 {
-  TABLE *result = my_malloc(sizeof(TABLE));
+  SYMBOLS *result = my_malloc(sizeof(SYMBOLS));
   result->buffer = buffer_create(sizeof(SYMBOL), 64);
   result->scope = scope_create(result, table ? table->scope : NULL);
   return result;
 }
 
-SYMBOL *symbol_table_add_global(TABLE *table, const char *id)
+SYMBOL *symbol_table_add_global(SYMBOLS *table, const char *id)
 {
-  TABLE *globals = symbol_table_find_global_table(table);
+  SYMBOLS *globals = symbol_table_find_global_table(table);
   SYMBOL *result = symbol_table_find(table, id);
   if (result == NULL)
     {
@@ -128,9 +128,9 @@ SYMBOL *symbol_table_add_global(TABLE *table, const char *id)
   return result;
 }
 
-SYMBOL *symbol_table_add_global_array(TABLE *table, const char *id, size_t count)
+SYMBOL *symbol_table_add_global_array(SYMBOLS *table, const char *id, size_t count)
 {
-  TABLE *globals = symbol_table_find_global_table(table);
+  SYMBOLS *globals = symbol_table_find_global_table(table);
   SYMBOL *result = symbol_table_find(table, id);
   if (result == NULL)
     {
@@ -142,28 +142,28 @@ SYMBOL *symbol_table_add_global_array(TABLE *table, const char *id, size_t count
   return result;
 }
 
-SYMBOL *symbol_table_add_local(TABLE *table, const char *id)
+SYMBOL *symbol_table_add_local(SYMBOLS *table, const char *id)
 {
   SYMBOL *result = symbol_table_find(table, id);
   if (result == NULL)
-    result = symbol_table_add_symbol((TABLE *) table, id);
+    result = symbol_table_add_symbol((SYMBOLS *) table, id);
   return result;
 }
 
-SYMBOL *symbol_table_add_param(TABLE *table, const char *id, int is_array)
+SYMBOL *symbol_table_add_param(SYMBOLS *table, const char *id, int is_array)
 {
-  SYMBOL *result = symbol_table_add_symbol((TABLE *) table, id);
+  SYMBOL *result = symbol_table_add_symbol((SYMBOLS *) table, id);
   /* TODO: Should I be recording a count here? */
   result->is_array = is_array;
   return result;
 }
 
-void symbol_table_begin_scope(TABLE *table)
+void symbol_table_begin_scope(SYMBOLS *table)
 {
   table->scope = scope_create(table, table->scope);
 }
 
-void symbol_table_end_scope(TABLE *table)
+void symbol_table_end_scope(SYMBOLS *table)
 {
   table->scope = table->scope->parent;
 }
@@ -188,12 +188,12 @@ SYMBOL *scope_find(SCOPE *scope, const char *id)
     return NULL;
 }
 
-SYMBOL *symbol_table_find(TABLE *table, const char *id)
+SYMBOL *symbol_table_find(SYMBOLS *table, const char *id)
 {
   scope_find(table->scope, id);
 }
 
-size_t symbol_table_size(TABLE *table)
+size_t symbol_table_size(SYMBOLS *table)
 {
   if (buffer_is_empty(table->buffer))
     return 0;

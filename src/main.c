@@ -23,7 +23,7 @@ int main(int argc, char **argv)
   char out_file_name[FILENAME_MAX];
   int  i, success;
   NODE *ast = NULL;
-  TABLE *symbols;
+  SYMBOLS *symbols;
   IR *ir;
 
   /* CLI flags */

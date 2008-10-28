@@ -6,6 +6,6 @@
 #include "symbol.h"
 
 void pki_generate(FILE *out, IR *ir);
-void pki_generate_globals(FILE *out, TABLE *symbols);
+void pki_generate_globals(FILE *out, SYMBOLS *symbols);
 
 #endif

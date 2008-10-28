@@ -425,7 +425,7 @@ void pki_generate(FILE *out, IR *ir)
   pki_generate_epilogue(out);
 }
 
-void pki_generate_globals(FILE *out, TABLE *symbols)
+void pki_generate_globals(FILE *out, SYMBOLS *symbols)
 {
   symbol_table_each(symbols, pki_globals_callback, (void *) out);
 }
