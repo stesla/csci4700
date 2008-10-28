@@ -154,6 +154,7 @@ IR_TYPE ast_ir_type(NODE *node);
 void *ast_ir_value(NODE *node);
 int ast_is_lvalue(NODE *node);
 void ast_print(NODE *node, FILE *out);
+OP_TYPE ast_node_type(NODE *node);
 const char *ast_to_s(NODE *node);
 
 #endif

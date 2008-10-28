@@ -23,6 +23,16 @@ static void generate_ir(NODE *node, IR *ir)
   /* TODO:IR */
 }
 
+static IR_TYPE ir_type(NODE *node)
+{
+  return IR_LITERAL;
+}
+
+static void *ir_value(NODE *node)
+{
+  return S(node).literal;
+}
+
 static void print(NODE *node, FILE *out)
 {
   size_t length = strlen("AST_STRING_LITERAL") + strlen(S(node).value) + 7;
@@ -44,4 +54,6 @@ void ast_string_literal_init(NODE *node, va_list args)
 
   SET_METHODS(node);
   OVERRIDE(node, find_literals);
+  OVERRIDE(node, ir_type);
+  OVERRIDE(node, ir_value);
 }

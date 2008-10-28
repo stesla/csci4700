@@ -221,6 +221,11 @@ void ast_print(NODE *node, FILE *out)
   fprintf(out, "}\n");
 }
 
+OP_TYPE ast_node_type(NODE *node)
+{
+  return node->type;
+}
+
 const char *ast_to_s(NODE *node)
 {
   if (!node)

@@ -109,6 +109,14 @@ static int pki_symbol_reg(FILE *out, SYMBOL *sym, int load)
     return pki_stack_reg(out, symbol_address(sym), load);
 }
 
+static int pki_literal_reg(FILE *out, LITERAL *lit, int load)
+{
+  int reg = pki_get_reg();
+  if (load)
+    fprintf(out, "\tLLC R%i,L%i\n", reg, literal_address(lit));
+  return reg;
+}
+
 static int pki_reg(FILE *out, IR_CELL *cell, int load)
 {
   int result;
@@ -117,6 +125,7 @@ static int pki_reg(FILE *out, IR_CELL *cell, int load)
   switch (ir_cell_type(cell))
     {
     case IR_CONST: return pki_const_reg(out, ir_cell_num(cell), load);
+    case IR_LITERAL: return pki_literal_reg(out, ir_cell_ptr(cell), load);
     case IR_NULL: return 0;
     case IR_SYM: return pki_symbol_reg(out, (SYMBOL *) ir_cell_ptr(cell), load);
     case IR_TEMP: return pki_stack_reg(out, ir_cell_num(cell), load);
@@ -221,6 +230,13 @@ static void pki_write(FILE *out, IR_QUAD *quad)
   int reg = pki_reg(out, ir_quad_arg1(quad), TRUE);
   pki_syscall(out, 1, reg);
 }
+
+static void pki_write_literal(FILE *out, IR_QUAD *quad)
+{
+  int reg = pki_reg(out, ir_quad_arg1(quad), TRUE);
+  pki_syscall(out, 2, reg);
+}
+
 
 static void pki_rel_op(FILE *out, const char *rel, int lhs, int rhs, int label)
 {
@@ -392,6 +408,9 @@ static void pki_generate_callback(IR_QUAD *quad, void *data)
       break;
     case IR_WRITE:
       pki_write(out, quad);
+      break;
+    case IR_WRITE_LITERAL:
+      pki_write_literal(out, quad);
       break;
     case IR_XOR:
       pki_reg_op(out, "XOR", quad);

@@ -22,9 +22,13 @@ static void find_symbols(NODE *node, void *symbols)
 
 static void generate_ir(NODE *node, IR *ir)
 {
+  IR_INST inst;
+  if (ast_node_type(S(node).value) == AST_STRING_LITERAL)
+    inst = IR_WRITE_LITERAL;
+  else
+    inst = IR_WRITE;
   ast_generate_ir(S(node).value, ir);
-  ir_add(ir, IR_WRITE,
-         ast_ir_type(S(node).value), ast_ir_value(S(node).value));
+  ir_add(ir, inst, ast_ir_type(S(node).value), ast_ir_value(S(node).value));
 }
 
 static void print(NODE *node, FILE *out)

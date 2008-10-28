@@ -34,11 +34,13 @@ typedef enum _ir_inst {
   IR_RETURN,
   IR_SUBTRACT,
   IR_WRITE,
+  IR_WRITE_LITERAL,
   IR_XOR
 } IR_INST;
 
 typedef enum _ir_type {
   IR_CONST,
+  IR_LITERAL,
   IR_NULL,
   IR_SYM,
   IR_TEMP

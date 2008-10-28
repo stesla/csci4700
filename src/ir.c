@@ -4,6 +4,7 @@
 #include <string.h>
 #include "ir.h"
 #include "buffer.h"
+#include "literal.h"
 #include "sizes.h"
 #include "symbol.h"
 #include "util.h"
@@ -38,6 +39,7 @@ static void ir_arg(va_list *args, IR_CELL *cell)
   cell->type = va_arg(*args, IR_TYPE);
   switch (cell->type)
     {
+    case IR_LITERAL:
     case IR_SYM:
       cell->val.ptr = va_arg(*args, void *);
       break;
@@ -60,11 +62,16 @@ static void ir_fprint_cell(FILE *out, IR_CELL *cell)
     case IR_CONST:
       fprintf(out, "%i", cell->val.num);
       break;
-
+    case IR_LITERAL:
+      {
+        const char *id = literal_value(cell->val.ptr);
+        int address = literal_address(cell->val.ptr);
+        fprintf(out, "(:literal \"%s\" L%i)", id, address);
+      }
+      break;
     case IR_NULL:
       fprintf(out, "nil");
       break;
-
     case IR_SYM:
       {
         const char *id = symbol_id(cell->val.ptr);
@@ -75,7 +82,6 @@ static void ir_fprint_cell(FILE *out, IR_CELL *cell)
           fprintf(out, "(:local \"%s\" %i)", id, address);
       }
       break;
-
     case IR_TEMP:
       fprintf(out, "'(:temp %i)", cell->val.num);
       break;
@@ -166,6 +172,7 @@ void ir_add(IR *ir, IR_INST inst, ...)
     case IR_READ:
     case IR_RETURN:
     case IR_WRITE:
+    case IR_WRITE_LITERAL:
       ir_arg(&args, &quad.arg1);
       break;
 
@@ -228,6 +235,7 @@ const char *ir_inst_str(IR_INST inst)
     "RETURN",
     "SUBTRACT",
     "WRITE",
+    "WRITE_LITERAL",
     "XOR"
   };
   return strs[inst];
