@@ -2,9 +2,13 @@ BISONVERSION=bison-2.3
 FLEXVERSION=flex-2.5.35
 TOOLS=${PWD}/tools
 
-all: tools/bin/flex tools/bin/bison
+all: tools/bin/flex tools/bin/bison c--
+
+c--: src/c--
+	cp $< $@
+
+src/c--:
 	cd src && make
-	cp src/c-- .
 
 tools/bin/bison:
 	cd tools && tar zxvf ${BISONVERSION}.tar.gz
