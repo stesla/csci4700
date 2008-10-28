@@ -19,11 +19,20 @@ main() {
   else
     write("not ok");
 
+  write("i from 0 to 2");
   i = 0;
-  while(i < 2)
+  while(i <= 2)
     {
-      write("Counter:");
       write(i);
       i++;
     }
+
+  write("j from 2 to 0");
+  for (j = 2; j >= 0; --j)
+    {
+      write(j);
+    }
+
+  for (;;)
+    ;
 }
