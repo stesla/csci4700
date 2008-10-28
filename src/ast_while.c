@@ -24,7 +24,16 @@ static void find_symbols(NODE *node, void *symbols)
 
 static void generate_ir(NODE *node, IR *ir)
 {
-  /* TODO:IR */
+  int label_a = ir_make_label();
+  int label_b = ir_make_label();
+  ir_add(ir, IR_LABEL, IR_CONST, &label_a);
+  ast_generate_ir(S(node).condition, ir);
+  ir_add(ir, IR_IF_FALSE,
+         ast_ir_type(S(node).condition), ast_ir_value(S(node).condition),
+         IR_CONST, &label_b);
+  ast_generate_ir(S(node).body, ir);
+  ir_add(ir, IR_JUMP, IR_CONST, &label_a);
+  ir_add(ir, IR_LABEL, IR_CONST, &label_b);
 }
 
 static void print(NODE *node, FILE *out)

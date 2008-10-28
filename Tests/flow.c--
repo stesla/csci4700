@@ -18,4 +18,12 @@ main() {
     write("ok");
   else
     write("not ok");
+
+  i = 0;
+  while(i < 2)
+    {
+      write("Counter:");
+      write(i);
+      i++;
+    }
 }
