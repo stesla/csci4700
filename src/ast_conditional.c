@@ -12,6 +12,14 @@ struct slots {
 
 size_t ast_conditional_size() { return SLOT_SIZE; }
 
+static void find_literals(NODE *node, LITERALS *literals)
+{
+  if (S(node).if_branch)
+    ast_find_literals(S(node).if_branch, literals);
+  if (S(node).else_branch)
+    ast_find_literals(S(node).else_branch, literals);
+}
+
 static void find_symbols(NODE *node, void *symbols)
 {
   ast_find_symbols(S(node).condition, symbols);
@@ -64,4 +72,5 @@ void ast_conditional_init(NODE *node, va_list args)
   S(node).else_branch = va_arg(args, NODE *);
 
   SET_METHODS(node);
+  OVERRIDE(node, find_literals);
 }

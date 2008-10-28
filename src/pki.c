@@ -406,6 +406,12 @@ static void pki_globals_callback(SYMBOL *sym, void *data)
   fprintf(out, "L%i:\tds %i\n", symbol_address(sym), symbol_size(sym));
 }
 
+static void pki_literals_callback(LITERAL *lit, void *data)
+{
+  FILE *out = (FILE *) data;
+  fprintf(out, "L%i:\tda \"%s\"\n", literal_address(lit), literal_value(lit));
+}
+
 static void pki_generate_epilogue(FILE *out)
 {
   pki_syscall(out, 0, 0);
@@ -428,4 +434,9 @@ void pki_generate(FILE *out, IR *ir)
 void pki_generate_globals(FILE *out, SYMBOLS *symbols)
 {
   symbol_table_each(symbols, pki_globals_callback, (void *) out);
+}
+
+void pki_generate_literals(FILE *out, LITERALS *literals)
+{
+  literal_table_each(literals, pki_literals_callback, (void *) out);
 }

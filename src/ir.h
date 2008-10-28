@@ -1,6 +1,8 @@
 #ifndef IR_H
 #define IR_H
 
+#include <stdio.h>
+
 typedef enum _ir_inst {
   IR_ADD,
   IR_AND,

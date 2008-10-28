@@ -15,6 +15,11 @@ struct slots {
 
 size_t ast_function_size() { return SLOT_SIZE; }
 
+static void find_literals(NODE *node, LITERALS *literals)
+{
+  ast_find_literals(S(node).body, literals);
+}
+
 static void find_symbols(NODE *node, void *symbols)
 {
   void *cur;
@@ -64,4 +69,5 @@ void ast_function_init(NODE *node, va_list args)
   S(node).end_line = va_arg(args, int);
 
   SET_METHODS(node);
+  OVERRIDE(node, find_literals);
 }

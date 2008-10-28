@@ -14,6 +14,12 @@ struct slots {
 
 size_t ast_block_size() { return SLOT_SIZE; }
 
+static void find_literals(NODE *node, LITERALS *literals)
+{
+  if (S(node).statements)
+    ast_find_literals(S(node).statements, literals);
+}
+
 static void find_symbols(NODE *node, void *symbols)
 {
   void *cur;
@@ -28,7 +34,8 @@ static void find_symbols(NODE *node, void *symbols)
 
 static void generate_ir(NODE *node, IR *ir)
 {
-  ast_generate_ir(S(node).statements, ir);
+  if (S(node).statements)
+    ast_generate_ir(S(node).statements, ir);
 }
 
 static void print(NODE *node, FILE *out)
@@ -58,4 +65,5 @@ void ast_block_init(NODE *node, va_list args)
   S(node).end_line = va_arg(args, int);
 
   SET_METHODS(node);
+  OVERRIDE(node, find_literals);
 }

@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "ir.h"
+#include "literal.h"
 #include "symbol.h"
 #include "util.h"
 
@@ -97,6 +98,7 @@ struct _node {
   struct _methods {
     void (*add_symbols)(NODE *, void *);
     SYMBOL *(*get_symbol)(NODE *);
+    void (*find_literals)(NODE *, LITERALS *);
     void (*find_symbols)(NODE *, void *);
     void (*generate_ir)(NODE *, IR *);
     IR_TYPE (*ir_type)(NODE *);
@@ -144,6 +146,7 @@ const char *ast_op_str(OP_TYPE type);
 
 NODE *ast_create(NODE_TYPE type, ...);
 void ast_add_symbols(NODE *node, void *symbols);
+void ast_find_literals(NODE *node, LITERALS *literals);
 void ast_find_symbols(NODE *node, void *symbols);
 SYMBOL *ast_get_symbol(NODE *node);
 void ast_generate_ir(NODE *node, IR *ir);

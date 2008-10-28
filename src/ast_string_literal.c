@@ -4,9 +4,15 @@
 
 struct slots {
   const char *value;
+  LITERAL *literal;
 };
 
 size_t ast_string_literal_size() { return SLOT_SIZE; }
+
+static void find_literals(NODE *node, LITERALS *literals)
+{
+  S(node).literal = literal_table_add(literals, S(node).value);
+}
 
 static void find_symbols(NODE *node, void *symbols)
 {
@@ -37,4 +43,5 @@ void ast_string_literal_init(NODE *node, va_list args)
   S(node).value = va_arg(args, char *);
 
   SET_METHODS(node);
+  OVERRIDE(node, find_literals);
 }
