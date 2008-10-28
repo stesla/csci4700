@@ -1,0 +1,21 @@
+main() {
+  x = 1;
+  y = 0;
+
+  if (x)
+    write("ok");
+  else
+    write("not ok");
+
+  if (y)
+    write("not ok");
+  else
+    write("ok");
+
+  if (y)
+    write("not ok");
+  else if (x)
+    write("ok");
+  else
+    write("not ok");
+}
