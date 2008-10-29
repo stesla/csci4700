@@ -86,6 +86,7 @@ static void ir_assign(NODE *node, IR *ir)
          ast_ir_type(node), ast_ir_value(node));
 
   /* lvalue */
+  ast_generate_lval_ir(S(node).left, ir);
   ir_add(ir, is_indirect(S(node).left) ? IR_ASSIGN_INDIRECT : IR_ASSIGN,
          ast_ir_type(node), ast_ir_value(node),
          ast_ir_type(S(node).left), ast_ir_value(S(node).left));

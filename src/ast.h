@@ -101,6 +101,7 @@ struct _node {
     void (*find_literals)(NODE *, LITERALS *);
     void (*find_symbols)(NODE *, void *);
     void (*generate_ir)(NODE *, IR *);
+    void (*generate_lval_ir)(NODE *, IR *);
     IR_TYPE (*ir_type)(NODE *);
     void *(*ir_value)(NODE *);
     int (*is_lvalue)(NODE *);
@@ -150,6 +151,7 @@ void ast_find_literals(NODE *node, LITERALS *literals);
 void ast_find_symbols(NODE *node, void *symbols);
 SYMBOL *ast_get_symbol(NODE *node);
 void ast_generate_ir(NODE *node, IR *ir);
+void ast_generate_lval_ir(NODE *node, IR *ir);
 IR_TYPE ast_ir_type(NODE *node);
 void *ast_ir_value(NODE *node);
 int ast_is_lvalue(NODE *node);
