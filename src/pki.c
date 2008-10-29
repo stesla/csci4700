@@ -302,7 +302,7 @@ static void pki_ref(FILE *out, IR_QUAD *quad)
   SYMBOL *symbol = ir_cell_ptr(ir_quad_arg1(quad));
   int result = pki_reg(out, ir_quad_result(quad), FALSE);
   if (symbol_is_global(symbol))
-    pki_llc(out, result, symbol_address(symbol));
+    fprintf(out, "\tLLC R%i,L%i\n", result, symbol_address(symbol));
   else
     {
       int offset = pki_const_reg(out, symbol_address(symbol), TRUE);
@@ -431,7 +431,7 @@ static void pki_generate_callback(IR_QUAD *quad, void *data)
 static void pki_globals_callback(SYMBOL *sym, void *data)
 {
   FILE *out = (FILE *) data;
-  fprintf(out, "L%i:\tds %i\n", symbol_address(sym), symbol_size(sym));
+  fprintf(out, "L%i:\tds %i\n", symbol_address(sym), symbol_sizeof(sym));
 }
 
 static void pki_literals_callback(LITERAL *lit, void *data)
