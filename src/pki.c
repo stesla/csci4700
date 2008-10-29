@@ -227,6 +227,13 @@ static void pki_push(FILE *out, IR_QUAD *quad)
   pki_reg_op1(out, "SUB", SP, SP, reg);
 }
 
+static void pki_read(FILE *out, IR_QUAD *quad)
+{
+  int result = pki_reg(out, ir_quad_result(quad), FALSE);
+  pki_syscall(out, PKI_SYSCALL_READ, result);
+  pki_store_result(out, result, ir_quad_result(quad));
+}
+
 static void pki_write(FILE *out, IR_QUAD *quad)
 {
   int reg = pki_reg(out, ir_quad_arg1(quad), TRUE);
@@ -397,7 +404,7 @@ static void pki_generate_callback(IR_QUAD *quad, void *data)
       pki_push(out, quad);
       break;
     case IR_READ:
-      /* TODO */
+      pki_read(out, quad);
       break;
     case IR_REF:
       pki_ref(out, quad);

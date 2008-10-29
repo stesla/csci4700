@@ -169,11 +169,14 @@ void ir_add(IR *ir, IR_INST inst, ...)
     case IR_PARAM:
     case IR_POP:
     case IR_PUSH:
-    case IR_READ:
     case IR_RETURN:
     case IR_WRITE:
     case IR_WRITE_LITERAL:
       ir_arg(&args, &quad.arg1);
+      break;
+
+    case IR_READ:
+      ir_arg(&args, &quad.result);
       break;
 
     case IR_ENTER:

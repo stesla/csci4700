@@ -12,12 +12,13 @@ size_t ast_read_size() { return SLOT_SIZE; }
 
 static void find_symbols(NODE *node, void *symbols)
 {
-  /* TODO */
+  ast_find_symbols(S(node).identifier, symbols);
 }
 
 static void generate_ir(NODE *node, IR *ir)
 {
-  /* TODO:IR */
+  ir_add(ir, IR_READ,
+         ast_ir_type(S(node).identifier), ast_ir_value(S(node).identifier));
 }
 
 static void print(NODE *node, FILE *out)
