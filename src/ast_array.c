@@ -32,13 +32,13 @@ static void generate_index_ir(NODE *node, IR *ir, int result)
   size_t size = sym ? symbol_size(sym) : INTEGER_SIZE;
   ast_generate_ir(S(node).identifier, ir);
   ast_generate_ir(S(node).count, ir);
+  ir_add(ir, IR_REF,
+         ast_ir_type(S(node).identifier), ast_ir_value(S(node).identifier),
+         IR_TEMP, &base);
   ir_add(ir, IR_MULTIPLY,
          ast_ir_type(S(node).count), ast_ir_value(S(node).count),
          IR_CONST, &size,
          IR_TEMP, &offset);
-  ir_add(ir, IR_REF,
-         ast_ir_type(S(node).identifier), ast_ir_value(S(node).count),
-         IR_TEMP, &base);
   ir_add(ir, IR_ADD, IR_TEMP, &base, IR_TEMP, &offset, IR_TEMP, &result);
 }
 
