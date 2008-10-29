@@ -1,0 +1,14 @@
+array a[3];
+main() {
+  for (i = 0; i < 3; i++)
+    {
+      p = &a + i * 4;
+      *p = i * 2;
+    }
+  for (i = 0; i < 3; i++)
+    {
+      p = &a + i * 4;
+      b = *p;
+      write(b);
+    }
+}

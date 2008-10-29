@@ -51,13 +51,9 @@ static void generate_ir(NODE *node, IR *ir)
       break;
     case AST_OP_DEREF:
       {
-        SYMBOL *symbol = ast_get_symbol(S(node).operand);
-        if (symbol)
-          {
-            ir_add(ir, IR_DEREF,
-                   IR_SYM, symbol,
-                   ast_ir_type(node), ast_ir_value(node));
-          }
+        ir_add(ir, IR_DEREF,
+               ast_ir_type(S(node).operand), ast_ir_value(S(node).operand),
+               ast_ir_type(node), ast_ir_value(node));
       }
       break;
     case AST_OP_INC:
@@ -100,6 +96,19 @@ static void generate_ir(NODE *node, IR *ir)
     default:
       ;
     }
+}
+
+static void generate_lval_ir(NODE *node, IR *ir)
+{
+  if (S(node).op == AST_OP_DEREF)
+    {
+      S(node).temp = ir_make_temp(ir);
+      ir_add(ir, IR_ASSIGN,
+             ast_ir_type(S(node).operand), ast_ir_value(S(node).operand),
+             ast_ir_type(node), ast_ir_value(node));
+    }
+  else
+    ;
 }
 
 static void find_symbols(NODE *node, void *symbols)
@@ -149,6 +158,7 @@ void ast_prefix_init(NODE *node, va_list args)
   S(node).line = va_arg(args, int);
 
   SET_METHODS(node);
+  OVERRIDE(node, generate_lval_ir);
   OVERRIDE(node, ir_type);
   OVERRIDE(node, ir_value);
   OVERRIDE(node, is_lvalue);
