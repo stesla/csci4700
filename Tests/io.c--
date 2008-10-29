@@ -1,0 +1,10 @@
+main()
+{
+  read(a);
+  for (; a % 2 == 0; a = a / 2)
+    {
+      write(a);
+      write("EVEN");
+    }
+  write("ODD");
+}

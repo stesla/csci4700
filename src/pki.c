@@ -3,10 +3,17 @@
 #include "symbol.h"
 #include "util.h"
 
-#define REG_MIN 4
+#define REG_MIN 5
 #define REG_MAX 13
 #define BP 14
 #define SP 15
+
+enum _syscall {
+  PKI_SYSCALL_HALT,
+  PKI_SYSCALL_WRITE_REG,
+  PKI_SYSCALL_WRITE_STR,
+  PKI_SYSCALL_READ
+};
 
 static int *pki_init_reg()
 {
@@ -64,24 +71,19 @@ static void pki_lsc(FILE *out, int reg, int val)
 
 static int pki_const_reg(FILE *out, int num, int load)
 {
-  switch(num)
+  if (num >= 0 && num < REG_MIN)
+    return num;
+  else
     {
-    case 0: return 0;
-    case 1: return 1;
-    case 2: return 2;
-    case 4: return 3;
-    default:
-      {
-        int result = pki_get_reg();
-        if (load)
-          {
-            if (num >= -128 && num <= 127)
-              pki_lsc(out, result, num);
-            else
-              pki_llc(out, result, num);
-          }
-        return result;
-      }
+      int result = pki_get_reg();
+      if (load)
+        {
+          if (num >= -128 && num <= 127)
+            pki_lsc(out, result, num);
+          else
+            pki_llc(out, result, num);
+        }
+      return result;
     }
 }
 
@@ -228,13 +230,13 @@ static void pki_push(FILE *out, IR_QUAD *quad)
 static void pki_write(FILE *out, IR_QUAD *quad)
 {
   int reg = pki_reg(out, ir_quad_arg1(quad), TRUE);
-  pki_syscall(out, 1, reg);
+  pki_syscall(out, PKI_SYSCALL_WRITE_REG, reg);
 }
 
 static void pki_write_literal(FILE *out, IR_QUAD *quad)
 {
   int reg = pki_reg(out, ir_quad_arg1(quad), TRUE);
-  pki_syscall(out, 2, reg);
+  pki_syscall(out, PKI_SYSCALL_WRITE_STR, reg);
 }
 
 
@@ -433,14 +435,14 @@ static void pki_literals_callback(LITERAL *lit, void *data)
 
 static void pki_generate_epilogue(FILE *out)
 {
-  pki_syscall(out, 0, 0);
+  pki_syscall(out, PKI_SYSCALL_HALT, PKI_SYSCALL_HALT);
 }
 
 static void pki_generate_prologue(FILE *out)
 {
-  pki_lsc(out, 1, 1);
-  pki_lsc(out, 2, 2);
-  pki_lsc(out, 3, 4);
+  int i;
+  for (i = 0; i < REG_MIN; i++)
+    pki_lsc(out, i, i);
 }
 
 void pki_generate(FILE *out, IR *ir)
