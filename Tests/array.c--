@@ -1,8 +1,9 @@
-array a[5];
 main() {
-  for (i = 0; i < 5; i++)
+  array a[3];
+  size = 3;
+  for (i = 0; i < size; i++)
     a[i] = i * 2;
-  for (i = 0; i < 5; i++)
+  for (i = 0; i < size; i++)
     {
       b = a[i];
       write(b);

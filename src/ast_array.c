@@ -97,6 +97,7 @@ void ast_array_init(NODE *node, va_list args)
 
   SET_METHODS(node);
   OVERRIDE(node, add_symbols);
+  OVERRIDE(node, generate_lval_ir);
   OVERRIDE(node, ir_type);
   OVERRIDE(node, ir_value);
 }
