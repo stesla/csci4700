@@ -72,7 +72,7 @@ static void ir_short_op(NODE *node, IR *ir, IR_INST inst, int v1, int v2)
 
 static int is_indirect(NODE *node)
 {
-  return ast_is_lvalue(node) && ast_get_symbol(node) == NULL;
+  return ast_get_symbol(node) == NULL;
 }
 
 static void ir_assign(NODE *node, IR *ir)
