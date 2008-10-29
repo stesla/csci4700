@@ -36,6 +36,7 @@ int symbol_address(SYMBOL *symbol);
 const char *symbol_id(SYMBOL *symbol);
 int symbol_is_global(SYMBOL *symbol);
 int symbol_size(SYMBOL *symbol);
+int symbol_sizeof(SYMBOL *symbol);
 size_t symbol_table_size(SYMBOLS *table);
 
 #endif

@@ -104,6 +104,11 @@ int symbol_is_global(SYMBOL *symbol)
 
 int symbol_size(SYMBOL *symbol)
 {
+  return symbol->size;
+}
+
+int symbol_sizeof(SYMBOL *symbol)
+{
   return symbol->count * symbol->size;
 }
 
