@@ -16,3 +16,4 @@ tools/share
 *.l
 *.s
 pki_run
+phase?test
