@@ -9,6 +9,7 @@ struct _symbol {
   const char *id;
   int is_array;
   int is_global;
+  int is_function;
   int count;
   int size;
   int address; /* IF is_global THEN label number ELSE offset */
@@ -97,6 +98,11 @@ const char *symbol_id(SYMBOL *symbol)
   return symbol->id;
 }
 
+int symbol_is_function(SYMBOL *symbol)
+{
+  return symbol->is_function;
+}
+
 int symbol_is_global(SYMBOL *symbol)
 {
   return symbol->is_global;
@@ -117,6 +123,22 @@ SYMBOLS *symbol_table_create(SYMBOLS *table)
   SYMBOLS *result = my_malloc(sizeof(SYMBOLS));
   result->buffer = buffer_create(sizeof(SYMBOL), 64);
   result->scope = scope_create(result, table ? table->scope : NULL);
+  return result;
+}
+
+SYMBOL *symbol_table_add_function(SYMBOLS *table, const char *id)
+{
+  /* This function probably will never get called with a table OTHER than the
+   * global table. However, it can't hurt to make sure we have it. */
+  SYMBOLS *globals = symbol_table_find_global_table(table);
+  SYMBOL *result = symbol_table_find(table, id);
+  if (result == NULL)
+    {
+      result = symbol_table_add_symbol(globals, id);
+      result->is_function = result->is_global = TRUE;
+      result->address = ir_make_label();
+      /* TODO: we also need to put the params on this guy */
+    }
   return result;
 }
 

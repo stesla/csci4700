@@ -9,6 +9,7 @@ typedef void (*SYMBOL_CALLBACK)(SYMBOL *, void *);
 ** Creation
 */
 SYMBOLS *symbol_table_create(SYMBOLS *table);
+SYMBOL *symbol_table_add_function(SYMBOLS *table, const char *id);
 SYMBOL *symbol_table_add_global(SYMBOLS *table, const char *id);
 SYMBOL *symbol_table_add_global_array(SYMBOLS *table, const char *id, size_t size);
 SYMBOL *symbol_table_add_local(SYMBOLS *table, const char *id);
@@ -34,6 +35,7 @@ void symbol_table_each(SYMBOLS *table, SYMBOL_CALLBACK callback, void *data);
  * ELSE symbol_address returns an offset */
 int symbol_address(SYMBOL *symbol);
 const char *symbol_id(SYMBOL *symbol);
+int symbol_is_function(SYMBOL *symbol);
 int symbol_is_global(SYMBOL *symbol);
 int symbol_size(SYMBOL *symbol);
 int symbol_sizeof(SYMBOL *symbol);
