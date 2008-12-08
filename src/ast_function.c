@@ -36,11 +36,14 @@ static void find_symbols(NODE *node, void *symbols)
 static void generate_ir(NODE *node, IR *ir)
 {
   size_t ar_size = symbol_table_size(S(node).symbols);
+  int address = symbol_address(S(node).symbol);
   ir_reset_temp(ar_size);
+  ir_add(ir, IR_LABEL, IR_CONST, &address);
   ir_add(ir, IR_ENTER);
   ir_add(ir, IR_PUSH, IR_CONST, &ar_size);
   ast_generate_ir(S(node).body, ir);
   ir_add(ir, IR_LEAVE);
+  ir_add(ir, IR_RETURN, IR_NULL);
 }
 
 static void hook_functions(NODE *node, SYMBOLS *symbols)

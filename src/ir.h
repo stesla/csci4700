@@ -12,6 +12,7 @@ typedef enum _ir_inst {
   IR_DEREF,
   IR_DIVIDE,
   IR_ENTER,
+  IR_HALT,
   IR_IF_EQ,
   IR_IF_FALSE,
   IR_IF_GE,

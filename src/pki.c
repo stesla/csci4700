@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include "pki.h"
+#include "sizes.h"
 #include "symbol.h"
 #include "util.h"
 
@@ -187,16 +188,6 @@ static void pki_syscall(FILE *out, int r1, int r2)
   fprintf(out, "\tSYSCALL R%i,R%i\n", r1, r2);
 }
 
-static void pki_enter(FILE *out)
-{
-  pki_reg_op1(out, "ADD", BP, SP, 0);
-}
-
-static void pki_leave(FILE *out)
-{
-  pki_reg_op1(out, "ADD", SP, BP, 0);
-}
-
 static void pki_label(FILE *out, IR_QUAD *quad)
 {
   int num = ir_cell_num(ir_quad_arg1(quad));
@@ -319,6 +310,34 @@ static void pki_deref(FILE *out, IR_QUAD *quad)
   pki_store_result(out, result, ir_quad_result(quad));
 }
 
+static void pki_enter(FILE *out)
+{
+  int size = pki_const_reg(out, INTEGER_SIZE, TRUE);
+  pki_reg_op1(out, "ADD", BP, SP, 0);
+}
+
+static void pki_leave(FILE *out)
+{
+  int size = pki_const_reg(out, INTEGER_SIZE, TRUE);
+  pki_reg_op1(out, "ADD", SP, BP, 0);
+}
+
+static void pki_call(FILE *out, IR_QUAD *quad)
+{
+  SYMBOL *fun = (SYMBOL *) ir_cell_ptr(ir_quad_arg1(quad));
+  int size = pki_const_reg(out, INTEGER_SIZE, TRUE);
+  pki_reg_op1(out, "SUB", SP, SP, size);
+  pki_sti(out, BP, SP, 0);
+  fprintf(out, "\tCALL L%i\n", symbol_address(fun));
+  pki_ldi(out, BP, SP, 0);
+}
+
+static void pki_return(FILE *out, IR_QUAD *quad)
+{
+  /* TODO: get return value out of quad */
+  fprintf(out, "\tRETURN\n");
+}
+
 static void pki_generate_callback(IR_QUAD *quad, void *data)
 {
   FILE *out = (FILE *) data;
@@ -341,7 +360,7 @@ static void pki_generate_callback(IR_QUAD *quad, void *data)
       pki_assign_indirect(out, quad);
       break;
     case IR_CALL:
-      /* TODO */
+      pki_call(out, quad);
       break;
     case IR_DEREF:
       pki_deref(out, quad);
@@ -351,6 +370,9 @@ static void pki_generate_callback(IR_QUAD *quad, void *data)
       break;
     case IR_ENTER:
       pki_enter(out);
+      break;
+    case IR_HALT:
+      pki_syscall(out, PKI_SYSCALL_HALT, PKI_SYSCALL_HALT);
       break;
     case IR_IF_EQ:
       pki_if_rel1(out, "EQ", quad);
@@ -410,7 +432,7 @@ static void pki_generate_callback(IR_QUAD *quad, void *data)
       pki_ref(out, quad);
       break;
     case IR_RETURN:
-      /* TODO */
+      pki_return(out, quad);
       break;
     case IR_SUBTRACT:
       pki_reg_op(out, "SUB", quad);
@@ -431,6 +453,8 @@ static void pki_generate_callback(IR_QUAD *quad, void *data)
 static void pki_globals_callback(SYMBOL *sym, void *data)
 {
   FILE *out = (FILE *) data;
+  if (symbol_is_function(sym))
+    return;
   fprintf(out, "L%i:\tds %i\n", symbol_address(sym), symbol_sizeof(sym));
 }
 
@@ -438,11 +462,6 @@ static void pki_literals_callback(LITERAL *lit, void *data)
 {
   FILE *out = (FILE *) data;
   fprintf(out, "L%i:\tda \"%s\"\n", literal_address(lit), literal_value(lit));
-}
-
-static void pki_generate_epilogue(FILE *out)
-{
-  pki_syscall(out, PKI_SYSCALL_HALT, PKI_SYSCALL_HALT);
 }
 
 static void pki_generate_prologue(FILE *out)
@@ -456,7 +475,6 @@ void pki_generate(FILE *out, IR *ir)
 {
   pki_generate_prologue(out);
   ir_each(ir, pki_generate_callback, (void *) out);
-  pki_generate_epilogue(out);
 }
 
 void pki_generate_globals(FILE *out, SYMBOLS *symbols)

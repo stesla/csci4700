@@ -16,6 +16,8 @@ int usage( void )
   return( 1 );
 }
 
+static void add_main_invocation(IR *ir, SYMBOLS *symbols);
+
 int main(int argc, char **argv)
 {
   const char *filename;
@@ -81,6 +83,7 @@ int main(int argc, char **argv)
 
   /* Generate IR */
   ir = ir_create();
+  add_main_invocation(ir, symbols);
   ast_generate_ir(ast, ir);
   if (output_ir)
     {
@@ -100,4 +103,16 @@ int main(int argc, char **argv)
   fclose(out_file);
 
   return 0;
+}
+
+static void add_main_invocation(IR *ir, SYMBOLS *symbols)
+{
+  SYMBOL *main = symbol_table_find(symbols, "main");
+  if (main == NULL || ! symbol_is_function(main))
+    {
+      fprintf(stderr, "Could not find main function.\n");
+      exit(1);
+    }
+  ir_add(ir, IR_CALL, IR_SYM, main);
+  ir_add(ir, IR_HALT);
 }

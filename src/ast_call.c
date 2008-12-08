@@ -19,7 +19,8 @@ static void find_symbols(NODE *node, void *symbols)
 
 static void generate_ir(NODE *node, IR *ir)
 {
-  /* TODO:IR */
+  /* TODO: Handle a return value */
+  ir_add(ir, IR_CALL, IR_SYM, S(node).symbol);
 }
 
 static void hook_functions(NODE *node, SYMBOLS *symbols)

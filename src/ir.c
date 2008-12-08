@@ -180,6 +180,7 @@ void ir_add(IR *ir, IR_INST inst, ...)
       break;
 
     case IR_ENTER:
+    case IR_HALT:
     case IR_LEAVE:
       break;
     }
@@ -216,6 +217,7 @@ const char *ir_inst_str(IR_INST inst)
     "DEREF",
     "DIVIDE",
     "ENTER",
+    "HALT",
     "IF_EQ",
     "IF_FALSE",
     "IF_GE",
