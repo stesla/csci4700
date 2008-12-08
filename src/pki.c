@@ -326,10 +326,11 @@ static void pki_call(FILE *out, IR_QUAD *quad)
 {
   SYMBOL *fun = (SYMBOL *) ir_cell_ptr(ir_quad_arg1(quad));
   int size = pki_const_reg(out, INTEGER_SIZE, TRUE);
-  pki_reg_op1(out, "SUB", SP, SP, size);
+  pki_reg_op1(out, "SUB", SP, SP, size); /* PUSH */
   pki_sti(out, BP, SP, 0);
   fprintf(out, "\tCALL L%i\n", symbol_address(fun));
   pki_ldi(out, BP, SP, 0);
+  pki_reg_op1(out, "ADD", SP, SP, size); /* POP */
 }
 
 static void pki_return(FILE *out, IR_QUAD *quad)
