@@ -182,6 +182,7 @@ void ir_add(IR *ir, IR_INST inst, ...)
     case IR_ENTER:
     case IR_HALT:
     case IR_LEAVE:
+    case IR_PARAM_START:
       break;
     }
   va_end(args);
@@ -233,6 +234,7 @@ const char *ir_inst_str(IR_INST inst)
     "MULTIPLY",
     "OR",
     "PARAM",
+    "PARAM_START",
     "POP",
     "PUSH",
     "READ",

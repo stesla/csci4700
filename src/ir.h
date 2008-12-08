@@ -28,6 +28,7 @@ typedef enum _ir_inst {
   IR_MULTIPLY,
   IR_OR,
   IR_PARAM,
+  IR_PARAM_START,
   IR_POP,
   IR_PUSH,
   IR_READ,

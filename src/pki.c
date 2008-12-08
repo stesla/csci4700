@@ -420,6 +420,9 @@ static void pki_generate_callback(IR_QUAD *quad, void *data)
     case IR_PARAM:
       /* TODO */
       break;
+    case IR_PARAM_START:
+      /* TODO */
+      break;
     case IR_POP:
       /* TODO */
       break;
