@@ -34,6 +34,11 @@ static void *ir_value(NODE *node)
   return ast_ir_value(S(node).inner);
 }
 
+static void hook_functions(NODE *node, SYMBOLS *symbols)
+{
+  ast_hook_functions(S(node).inner, symbols);
+}
+
 static void print(NODE *node, FILE *out)
 {
   PRINT_NODE(out, node, "AST_GROUP");
@@ -54,6 +59,7 @@ void ast_group_init(NODE *node, va_list args)
   S(node).inner = va_arg(args, NODE *);
 
   SET_METHODS(node);
+  OVERRIDE(node, hook_functions);
   OVERRIDE(node, ir_type);
   OVERRIDE(node, ir_value);
 }

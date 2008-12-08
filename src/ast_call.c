@@ -7,6 +7,7 @@
 struct slots {
   NODE *func;
   NODE *args;
+  SYMBOL *symbol;
 };
 
 size_t ast_call_size() { return SLOT_SIZE; }
@@ -19,6 +20,12 @@ static void find_symbols(NODE *node, void *symbols)
 static void generate_ir(NODE *node, IR *ir)
 {
   /* TODO:IR */
+}
+
+static void hook_functions(NODE *node, SYMBOLS *symbols)
+{
+  const char *id = ast_to_s(S(node).func);
+  S(node).symbol = symbol_table_find(symbols, id);
 }
 
 static void print(NODE *node, FILE *out)
@@ -44,4 +51,5 @@ void ast_call_init(NODE *node, va_list args)
   S(node).args = va_arg(args, NODE *);
 
   SET_METHODS(node);
+  OVERRIDE(node, hook_functions);
 }

@@ -35,6 +35,14 @@ static void find_symbols(NODE *node, void *symbols)
     ast_find_symbols(S(node).rest, symbols);
 }
 
+static void hook_functions(NODE *node, SYMBOLS *symbols)
+{
+  if (S(node).first)
+    ast_hook_functions(S(node).first, symbols);
+  if (S(node).rest)
+    ast_hook_functions(S(node).rest, symbols);
+}
+
 static void generate_ir(NODE *node, IR *ir)
 {
   if (S(node).first)
@@ -83,4 +91,5 @@ void ast_list_init(NODE *node, va_list args)
   SET_METHODS(node);
   OVERRIDE(node, add_symbols);
   OVERRIDE(node, find_literals);
+  OVERRIDE(node, hook_functions);
 }

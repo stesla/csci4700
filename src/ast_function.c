@@ -43,6 +43,11 @@ static void generate_ir(NODE *node, IR *ir)
   ir_add(ir, IR_LEAVE);
 }
 
+static void hook_functions(NODE *node, SYMBOLS *symbols)
+{
+  ast_hook_functions(S(node).body, symbols);
+}
+
 static void print(NODE *node, FILE *out)
 {
   PRINT_NODE(out, node, "AST_FUNCTION");
@@ -72,4 +77,5 @@ void ast_function_init(NODE *node, va_list args)
 
   SET_METHODS(node);
   OVERRIDE(node, find_literals);
+  OVERRIDE(node, hook_functions);
 }

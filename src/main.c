@@ -77,6 +77,7 @@ int main(int argc, char **argv)
   ast_find_symbols(ast, symbols);
   literals = literal_table_create();
   ast_find_literals(ast, literals);
+  ast_hook_functions(ast, symbols);
 
   /* Generate IR */
   ir = ir_create();

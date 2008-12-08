@@ -48,6 +48,14 @@ static void generate_ir(NODE *node, IR *ir)
     ir_add(ir, IR_LABEL, IR_CONST, &label_a);
 }
 
+static void hook_functions(NODE *node, SYMBOLS *symbols)
+{
+  if (S(node).if_branch)
+    ast_hook_functions(S(node).if_branch, symbols);
+  if (S(node).else_branch)
+    ast_hook_functions(S(node).else_branch, symbols);
+}
+
 static void print(NODE *node, FILE *out)
 {
   PRINT_NODE(out, node, "AST_CONDITIONAL");
@@ -88,4 +96,5 @@ void ast_conditional_init(NODE *node, va_list args)
 
   SET_METHODS(node);
   OVERRIDE(node, find_literals);
+  OVERRIDE(node, hook_functions);
 }
