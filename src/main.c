@@ -75,7 +75,7 @@ int main(int argc, char **argv)
     }
 
   /* Fill Tables */
-  symbols = symbol_table_create(NULL);
+  symbols = symbol_table_create(NULL, SYMBOL_DIRECTION_DOWN);
   ast_find_symbols(ast, symbols);
   literals = literal_table_create();
   ast_find_literals(ast, literals);

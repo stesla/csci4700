@@ -29,6 +29,7 @@ struct _scope {
 };
 
 struct _symbols {
+  int direction;
   SCOPE *scope;
   BUFFER *buffer;
 };
@@ -65,7 +66,7 @@ static SYMBOL *symbol_table_add_symbol(SYMBOLS *table, const char *id)
   symbol->id = id;
   symbol->count = 1;
   symbol->size = INTEGER_SIZE;
-  symbol->address = -address;
+  symbol->address = table->direction * address;
 
   table->scope->head = entry_create(symbol, table->scope->head);
   return symbol;
@@ -118,11 +119,12 @@ int symbol_sizeof(SYMBOL *symbol)
   return symbol->count * symbol->size;
 }
 
-SYMBOLS *symbol_table_create(SYMBOLS *table)
+SYMBOLS *symbol_table_create(SYMBOLS *table, int direction)
 {
   SYMBOLS *result = my_malloc(sizeof(SYMBOLS));
   result->buffer = buffer_create(sizeof(SYMBOL), 64);
   result->scope = scope_create(result, table ? table->scope : NULL);
+  result->direction = direction;
   return result;
 }
 

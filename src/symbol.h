@@ -5,10 +5,13 @@ typedef struct _symbols SYMBOLS;
 typedef struct _symbol SYMBOL;
 typedef void (*SYMBOL_CALLBACK)(SYMBOL *, void *);
 
+#define SYMBOL_DIRECTION_DOWN -1
+#define SYMBOL_DIRECTION_UP 1
+
 /*
 ** Creation
 */
-SYMBOLS *symbol_table_create(SYMBOLS *table);
+SYMBOLS *symbol_table_create(SYMBOLS *table, int direction);
 SYMBOL *symbol_table_add_function(SYMBOLS *table, const char *id);
 SYMBOL *symbol_table_add_global(SYMBOLS *table, const char *id);
 SYMBOL *symbol_table_add_global_array(SYMBOLS *table, const char *id, size_t size);
