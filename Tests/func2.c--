@@ -1,0 +1,10 @@
+subtract_and_print(a, b) {
+  x = a - b;
+  write(x);
+}
+
+main() {
+  read(x);
+  read(y);
+  subtract_and_print(x, y);
+}
