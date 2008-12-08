@@ -1,0 +1,77 @@
+array leftStack[ 10 ];
+global lStackTop;
+array rightStack[ 10 ];
+global rStackTop;
+global val;
+
+quickSort(items[])
+{
+    left = leftStack[ lStackTop ];
+    right = rightStack[ rStackTop ];
+
+    i = left;
+    j = right;
+    x = items[(left+right)/2];
+
+    flag = 1;
+    while ( flag )
+    {
+        while((items[i] < x) && (i < right))
+            i++;
+        while((x < items[j]) && (j > left))
+            j--;
+
+        if(i <= j) {
+            y = items[i];
+            items[i] = items[j];
+            items[j] = y;
+            i++; j--;
+        }
+        if ( i > j )
+            flag = 0;
+    }
+
+    if(i < right)
+    {
+        lStackTop++;
+        leftStack[ lStackTop ] = i;
+        rStackTop++;
+        rightStack[ rStackTop ] = right;
+        quickSort(items);
+        lStackTop--;
+        rStackTop--;
+    }
+
+    if(left < j)
+    {
+        lStackTop++;
+        leftStack[ lStackTop ] = left;
+        rStackTop++;
+        rightStack[ rStackTop ] = j;
+        quickSort(items);
+        lStackTop--;
+        rStackTop--;
+    }
+}
+
+array vec[ 100 ];
+
+main()
+{
+    for( i = 0; i < 100; i++ )
+    {
+        read( val );
+        vec[ i ] = val;
+    }
+
+    leftStack[ 0 ] = 0;
+    rightStack[ 0 ] = 99;
+    quickSort( vec );
+    
+    for( i = 0; i < 100; i++ )
+    {
+        val = vec[ i ];
+        write( val );
+    }
+    
+}

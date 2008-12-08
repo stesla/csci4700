@@ -1,0 +1,93 @@
+
+isqrt( input )
+{
+    nv = 0;
+    v = input / 2;
+    for( c = 0; c < 25; c++ )
+    {
+        nv = ( v + input/v ) / 2;
+        if ( v > nv )
+            diff = v - nv;
+        else
+            diff = nv - v;
+        if ( diff < 1 )
+            c = 25;
+        else
+            v = nv;
+    }
+
+    return nv;
+}
+
+prime( input )
+{
+    isprime = 1;
+    for( i = 2; i < input && isprime; ++i )
+    {
+        if ( ( input % i ) == 0 )
+            isprime = 0;
+    }
+    return isprime;
+}
+
+fib( input )
+{
+    fib1 = 1; fib2 = 1; fibsum = 2;
+    while ( fibsum < input )
+    {
+        fibsum = fib1 + fib2;
+        if ( fibsum == input )
+            fibsum = input;
+        else
+        {
+            fib1 = fib1 ^ fib2;
+            fib2 = fib1 ^ fib2;
+            fib1 = fib1 ^ fib2;
+            fib2 = fib2 ^ fibsum;
+            fibsum = fib2 ^ fibsum;
+            fib2 = fib2 ^ fibsum;
+        }
+    }
+    return fibsum;
+}
+
+process( input, lowLimit, highLimit )
+{
+    if ( input > lowLimit && input < highLimit )
+    {
+        nv = isqrt( input );
+        write( "The square root of that is about" );
+        write( nv );
+        
+        isprime = prime( input );
+        if ( isprime )
+            write( "The input was also prime" );
+        else
+            write( "The input was not prime." );
+        
+        fibsum = fib( input );
+        if ( fibsum == input )
+            write( "That's also a Fibonacci number!" );
+        else
+            write( "That's not a Fibonacci number." );
+    }
+    else if ( input < highLimit )
+        write( 1 );
+    else
+        write( "That is too big, dork." );
+}
+
+main()
+{
+
+    three = 3;
+    toobig = 1000;
+
+    read( input );
+    while ( input > 0 )
+    {
+        process( input, three, toobig );
+        read( input );
+    }
+}
+
