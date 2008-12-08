@@ -13,6 +13,7 @@ struct _symbol {
   int count;
   int size;
   int address; /* IF is_global THEN label number ELSE offset */
+  void *data;
 };
 
 typedef struct _entry ENTRY;
@@ -94,6 +95,11 @@ int symbol_address(SYMBOL *symbol)
   return symbol->address;
 }
 
+void *symbol_data(SYMBOL *symbol)
+{
+  return symbol->data;
+}
+
 const char *symbol_id(SYMBOL *symbol)
 {
   return symbol->id;
@@ -128,7 +134,7 @@ SYMBOLS *symbol_table_create(SYMBOLS *table, int direction)
   return result;
 }
 
-SYMBOL *symbol_table_add_function(SYMBOLS *table, const char *id)
+SYMBOL *symbol_table_add_function(SYMBOLS *table, const char *id, void *data)
 {
   /* This function probably will never get called with a table OTHER than the
    * global table. However, it can't hurt to make sure we have it. */
@@ -139,6 +145,7 @@ SYMBOL *symbol_table_add_function(SYMBOLS *table, const char *id)
       result = symbol_table_add_symbol(globals, id);
       result->is_function = result->is_global = TRUE;
       result->address = ir_make_label();
+      result->data = data;
       /* TODO: we also need to put the params on this guy */
     }
   return result;

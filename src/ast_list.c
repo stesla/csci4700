@@ -93,3 +93,15 @@ void ast_list_init(NODE *node, va_list args)
   OVERRIDE(node, find_literals);
   OVERRIDE(node, check_functions);
 }
+
+size_t ast_list_length(NODE *node)
+{
+  if (node == NULL)
+    return 0;
+  else if (node->type != AST_LIST)
+    return 0;
+  else if (S(node).first == NULL)
+    return 0;
+  else
+    return 1 + ast_list_length(S(node).rest);
+}

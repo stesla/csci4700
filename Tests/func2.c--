@@ -4,7 +4,7 @@ subtract_and_print(a, b) {
 }
 
 main() {
-  read(x);
-  read(y);
-  subtract_and_print(x, y);
+  a = 50;
+  b = 8;
+  subtract_and_print(a,b);
 }

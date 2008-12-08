@@ -1,7 +1,9 @@
 #include <stdarg.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <strings.h>
 #include "ast.h"
+#include "symbol.h"
 #include "util.h"
 
 struct slots {
@@ -26,7 +28,24 @@ static void generate_ir(NODE *node, IR *ir)
 static void check_functions(NODE *node, SYMBOLS *symbols)
 {
   const char *id = ast_to_s(S(node).func);
+  NODE *arg = S(node).args;
+  NODE *formal;
+  int size_diff;
   S(node).symbol = symbol_table_find(symbols, id);
+  formal = (NODE *) symbol_data(S(node).symbol);
+  size_diff = ast_list_length(arg) - ast_list_length(formal);
+  if (size_diff < 0)
+    {
+      fprintf(stderr, "Too few parameters in call to %s\n",
+              symbol_id(S(node).symbol));
+      exit(1);
+    }
+  else if (size_diff > 0)
+    {
+      fprintf(stderr, "Too many parameters in call to %s\n",
+              symbol_id(S(node).symbol));
+      exit(1);
+    }
 }
 
 static void print(NODE *node, FILE *out)

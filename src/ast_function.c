@@ -26,10 +26,9 @@ static void find_symbols(NODE *node, void *symbols)
   void *cur;
   const char *id = ast_to_s(S(node).identifier);
 
-  /* TODO: Add params */
-  S(node).symbol = symbol_table_add_function(symbols, id);
+  /* TODO: make a parameter symbol table */
+  S(node).symbol = symbol_table_add_function(symbols, id, S(node).params);
   S(node).symbols = symbol_table_create(symbols, SYMBOL_DIRECTION_DOWN);
-  ast_find_symbols(S(node).params, S(node).symbols);
   ast_find_symbols(S(node).body, S(node).symbols);
 }
 
