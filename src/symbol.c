@@ -58,7 +58,7 @@ static SCOPE *scope_create(SYMBOLS *table, SCOPE *parent)
 static SYMBOL *symbol_table_add_symbol(SYMBOLS *table, const char *id)
 {
   SYMBOL *symbol;
-  size_t address = symbol_table_size(table);
+  size_t address = symbol_table_size(table) + INTEGER_SIZE;
 
   symbol = buffer_next(table->buffer);
 
