@@ -23,7 +23,7 @@ static void generate_ir(NODE *node, IR *ir)
   ir_add(ir, IR_CALL, IR_SYM, S(node).symbol);
 }
 
-static void hook_functions(NODE *node, SYMBOLS *symbols)
+static void check_functions(NODE *node, SYMBOLS *symbols)
 {
   const char *id = ast_to_s(S(node).func);
   S(node).symbol = symbol_table_find(symbols, id);
@@ -52,5 +52,5 @@ void ast_call_init(NODE *node, va_list args)
   S(node).args = va_arg(args, NODE *);
 
   SET_METHODS(node);
-  OVERRIDE(node, hook_functions);
+  OVERRIDE(node, check_functions);
 }

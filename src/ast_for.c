@@ -53,16 +53,16 @@ static void generate_ir(NODE *node, IR *ir)
   ir_add(ir, IR_LABEL, IR_CONST, &label_b);
 }
 
-static void hook_functions(NODE *node, SYMBOLS *symbols)
+static void check_functions(NODE *node, SYMBOLS *symbols)
 {
   if (S(node).initializer)
-    ast_hook_functions(S(node).initializer, symbols);
+    ast_check_functions(S(node).initializer, symbols);
   if (S(node).condition)
-    ast_hook_functions(S(node).condition, symbols);
+    ast_check_functions(S(node).condition, symbols);
   if (S(node).increment)
-    ast_hook_functions(S(node).increment, symbols);
+    ast_check_functions(S(node).increment, symbols);
   if (S(node).body)
-    ast_hook_functions(S(node).body, symbols);
+    ast_check_functions(S(node).body, symbols);
 }
 
 void print(NODE *node, FILE *out)
@@ -90,5 +90,5 @@ void ast_for_init(NODE *node, va_list args)
 
   SET_METHODS(node);
   OVERRIDE(node, find_literals);
-  OVERRIDE(node, hook_functions);
+  OVERRIDE(node, check_functions);
 }

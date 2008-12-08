@@ -38,10 +38,10 @@ static void generate_ir(NODE *node, IR *ir)
     ast_generate_ir(S(node).statements, ir);
 }
 
-static void hook_functions(NODE *node, SYMBOLS *symbols)
+static void check_functions(NODE *node, SYMBOLS *symbols)
 {
   if (S(node).statements)
-    ast_hook_functions(S(node).statements, symbols);
+    ast_check_functions(S(node).statements, symbols);
 }
 
 static void print(NODE *node, FILE *out)
@@ -72,5 +72,5 @@ void ast_block_init(NODE *node, va_list args)
 
   SET_METHODS(node);
   OVERRIDE(node, find_literals);
-  OVERRIDE(node, hook_functions);
+  OVERRIDE(node, check_functions);
 }

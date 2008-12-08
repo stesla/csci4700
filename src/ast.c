@@ -45,7 +45,7 @@ static void ast_default_generate_lval_ir(NODE *node, IR *ir)
 {
 }
 
-static void ast_default_hook_functions(NODE *node, SYMBOLS *symbols)
+static void ast_default_check_functions(NODE *node, SYMBOLS *symbols)
 {
 }
 
@@ -110,7 +110,7 @@ NODE *ast_create(NODE_TYPE type, ...)
   SET_METHOD(result, find_literals, ast_default_find_literals);
   SET_METHOD(result, get_symbol, ast_default_get_symbol);
   SET_METHOD(result, add_symbols, ast_default_add_symbols);
-  SET_METHOD(result, hook_functions, ast_default_hook_functions);
+  SET_METHOD(result, check_functions, ast_default_check_functions);
   SET_METHOD(result, ir_type, ast_default_ir_type);
   SET_METHOD(result, ir_value, ast_default_ir_value);
   SET_METHOD(result, is_lvalue, ast_default_is_lvalue);
@@ -152,9 +152,9 @@ void ast_find_symbols(NODE *node, void *symbols)
   node->methods.find_symbols(node, symbols);
 }
 
-void ast_hook_functions(NODE *node, SYMBOLS *symbols)
+void ast_check_functions(NODE *node, SYMBOLS *symbols)
 {
-  node->methods.hook_functions(node, symbols);
+  node->methods.check_functions(node, symbols);
 }
 
 IR_TYPE ast_ir_type(NODE *node)
