@@ -265,7 +265,7 @@ int ir_make_temp(IR *ir)
   if (ctr == NULL)
     ctr = ir_init_temp();
   ir_add(ir, IR_PUSH, IR_CONST, &size);
-  return (*ctr) += INTEGER_SIZE;
+  return (*ctr) -= INTEGER_SIZE;
 }
 
 void ir_reset_temp(size_t ar_size)
@@ -273,7 +273,7 @@ void ir_reset_temp(size_t ar_size)
   static int *ctr = NULL;
   if (ctr == NULL)
     ctr = ir_init_temp();
-  *ctr = ar_size;
+  *ctr = -ar_size;
 }
 
 IR_INST ir_quad_inst(IR_QUAD *quad)

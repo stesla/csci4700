@@ -93,7 +93,7 @@ static int pki_stack_reg(FILE *out, int offset, int load)
   int reg = pki_get_reg();
   if (load)
     {
-      int offset_reg = pki_const_reg(out, -offset, TRUE);
+      int offset_reg = pki_const_reg(out, offset, TRUE);
       pki_ldi(out, reg, BP, offset_reg);
     }
   return reg;
@@ -151,7 +151,7 @@ static void pki_store_symbol(FILE *out, int reg, SYMBOL *sym)
     pki_store(out, reg, symbol_address(sym));
   else
     {
-      int offset = pki_const_reg(out, -symbol_address(sym), TRUE);
+      int offset = pki_const_reg(out, symbol_address(sym), TRUE);
       pki_sti(out, reg, BP, offset);
     }
 }
@@ -165,7 +165,7 @@ static void pki_store_result(FILE *out, int reg, IR_CELL *cell)
       break;
     case IR_TEMP:
       {
-        int offset = pki_const_reg(out, -ir_cell_num(cell), TRUE);
+        int offset = pki_const_reg(out, ir_cell_num(cell), TRUE);
         pki_sti(out, reg, BP, offset);
       }
       break;
@@ -297,7 +297,7 @@ static void pki_ref(FILE *out, IR_QUAD *quad)
   else
     {
       int offset = pki_const_reg(out, symbol_address(symbol), TRUE);
-      pki_reg_op1(out, "SUB", result, BP, offset);
+      pki_reg_op1(out, "ADD", result, BP, offset);
     }
   pki_store_result(out, result, ir_quad_result(quad));
 }

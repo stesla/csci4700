@@ -65,7 +65,7 @@ static SYMBOL *symbol_table_add_symbol(SYMBOLS *table, const char *id)
   symbol->id = id;
   symbol->count = 1;
   symbol->size = INTEGER_SIZE;
-  symbol->address = address;
+  symbol->address = -address;
 
   table->scope->head = entry_create(symbol, table->scope->head);
   return symbol;
@@ -227,6 +227,6 @@ size_t symbol_table_size(SYMBOLS *table)
   else
     {
       SYMBOL *last = buffer_last_entry(table->buffer);
-      return last->address + last->size * last->count;
+      return abs(last->address) + last->size * last->count;
     }
 }
