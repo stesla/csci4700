@@ -113,6 +113,7 @@ static void add_main_invocation(IR *ir, SYMBOLS *symbols)
       fprintf(stderr, "Could not find main function.\n");
       exit(1);
     }
+  ir_add(ir, IR_PARAM_START);
   ir_add(ir, IR_CALL, IR_SYM, main);
   ir_add(ir, IR_HALT);
 }

@@ -51,6 +51,14 @@ static void generate_ir(NODE *node, IR *ir)
     ast_generate_ir(S(node).rest, ir);
 }
 
+static void generate_param_ir(NODE *node, IR *ir)
+{
+  if(S(node).rest)
+    ast_generate_param_ir(S(node).rest, ir);
+  if (S(node).first)
+    ast_generate_param_ir(S(node).first, ir);
+}
+
 static void print(NODE *node, FILE *out)
 {
   PRINT_NODE(out, node, "AST_LIST");
@@ -92,6 +100,7 @@ void ast_list_init(NODE *node, va_list args)
   OVERRIDE(node, add_symbols);
   OVERRIDE(node, find_literals);
   OVERRIDE(node, check_functions);
+  OVERRIDE(node, generate_param_ir);
 }
 
 size_t ast_list_length(NODE *node)

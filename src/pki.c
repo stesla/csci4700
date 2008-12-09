@@ -5,7 +5,8 @@
 #include "util.h"
 
 #define REG_MIN 5
-#define REG_MAX 13
+#define REG_MAX 12
+#define PARAM_REG 13
 #define BP 14
 #define SP 15
 
@@ -326,17 +327,45 @@ static void pki_call(FILE *out, IR_QUAD *quad)
 {
   SYMBOL *fun = (SYMBOL *) ir_cell_ptr(ir_quad_arg1(quad));
   int size = pki_const_reg(out, INTEGER_SIZE, TRUE);
-  pki_reg_op1(out, "SUB", SP, SP, size); /* PUSH */
+  /* Currently, the BP back to the beginning of the arguments, where the BP
+   * that points to the beginning of the activation record is stored. Push that
+   * location on to the stack so we can get it when we come back from calling
+   * and clean up the parameters.*/
+  pki_reg_op1(out, "SUB", SP, SP, size);
   pki_sti(out, BP, SP, 0);
   fprintf(out, "\tCALL L%i\n", symbol_address(fun));
+  /* Move the SP back to the location of the saved BP, cleaning up the
+   * parameters. */
+  pki_ldi(out, SP, SP, 0);
+  /* Reset the BP to it's value before the call. This was pushed onto the stack
+   * in pki_param_start. */
   pki_ldi(out, BP, SP, 0);
-  pki_reg_op1(out, "ADD", SP, SP, size); /* POP */
+  pki_reg_op1(out, "ADD", SP, SP, size);
 }
 
 static void pki_return(FILE *out, IR_QUAD *quad)
 {
   /* TODO: get return value out of quad */
   fprintf(out, "\tRETURN\n");
+}
+
+static void pki_param_start(FILE *out)
+{
+  int size = pki_const_reg(out, INTEGER_SIZE, TRUE);
+  /* Save the BP so we can reuse the BP register to remember the position
+   * before the parameters start. This will get popped back off the stack in
+   * pki_call.*/
+  pki_reg_op1(out, "SUB", SP, SP, size);
+  pki_sti(out, BP, SP, 0);
+  pki_reg_op1(out, "ADD", BP, SP, 0);
+}
+
+static void pki_param(FILE *out, IR_QUAD *quad)
+{
+  int val = pki_reg(out, ir_quad_arg1(quad), TRUE);
+  int size = pki_const_reg(out, INTEGER_SIZE, TRUE);
+  pki_reg_op1(out, "SUB", SP, SP, size);
+  pki_sti(out, val, SP, 0);
 }
 
 static void pki_generate_callback(IR_QUAD *quad, void *data)
@@ -418,10 +447,10 @@ static void pki_generate_callback(IR_QUAD *quad, void *data)
       pki_reg_op(out, "OR", quad);
       break;
     case IR_PARAM:
-      /* TODO */
+      pki_param(out, quad);
       break;
     case IR_PARAM_START:
-      /* TODO */
+      pki_param_start(out);
       break;
     case IR_POP:
       /* TODO */
@@ -473,6 +502,8 @@ static void pki_generate_prologue(FILE *out)
   int i;
   for (i = 0; i < REG_MIN; i++)
     pki_lsc(out, i, i);
+  pki_lsc(out, SP, -1);
+  pki_lsc(out, BP, -1);
 }
 
 void pki_generate(FILE *out, IR *ir)

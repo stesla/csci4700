@@ -27,6 +27,11 @@ static void generate_ir(NODE *node, IR *ir)
 {
 }
 
+static void generate_param_ir(NODE *node, IR *ir)
+{
+  ir_add(ir, IR_PARAM, IR_SYM, S(node).symbol);
+}
+
 static SYMBOL *get_symbol(NODE *node)
 {
   return S(node).symbol;
@@ -70,6 +75,7 @@ void ast_identifier_init(NODE *node, va_list args)
 
   SET_METHODS(node);
   OVERRIDE(node, add_symbols);
+  OVERRIDE(node, generate_param_ir);
   OVERRIDE(node, get_symbol);
   OVERRIDE(node, ir_type);
   OVERRIDE(node, ir_value);

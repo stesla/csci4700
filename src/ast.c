@@ -45,6 +45,10 @@ static void ast_default_generate_lval_ir(NODE *node, IR *ir)
 {
 }
 
+static void ast_default_generate_param_ir(NODE *node, IR *ir)
+{
+}
+
 static void ast_default_check_functions(NODE *node, SYMBOLS *symbols)
 {
 }
@@ -107,6 +111,7 @@ NODE *ast_create(NODE_TYPE type, ...)
   result->slots = my_malloc(size);
 
   SET_METHOD(result, generate_lval_ir, ast_default_generate_lval_ir);
+  SET_METHOD(result, generate_param_ir, ast_default_generate_param_ir);
   SET_METHOD(result, find_literals, ast_default_find_literals);
   SET_METHOD(result, get_symbol, ast_default_get_symbol);
   SET_METHOD(result, add_symbols, ast_default_add_symbols);
@@ -135,6 +140,11 @@ void ast_generate_ir(NODE *node, IR *ir)
 void ast_generate_lval_ir(NODE *node, IR *ir)
 {
   node->methods.generate_lval_ir(node, ir);
+}
+
+void ast_generate_param_ir(NODE *node, IR *ir)
+{
+  node->methods.generate_param_ir(node, ir);
 }
 
 SYMBOL *ast_get_symbol(NODE *node)

@@ -22,6 +22,8 @@ static void find_symbols(NODE *node, void *symbols)
 static void generate_ir(NODE *node, IR *ir)
 {
   /* TODO: Handle a return value */
+  ir_add(ir, IR_PARAM_START);
+  ast_generate_param_ir(S(node).args, ir);
   ir_add(ir, IR_CALL, IR_SYM, S(node).symbol);
 }
 
