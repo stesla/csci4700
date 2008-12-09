@@ -16,7 +16,7 @@ SYMBOL *symbol_table_add_function(SYMBOLS *table, const char *id, void *data);
 SYMBOL *symbol_table_add_global(SYMBOLS *table, const char *id);
 SYMBOL *symbol_table_add_global_array(SYMBOLS *table, const char *id, size_t size);
 SYMBOL *symbol_table_add_local(SYMBOLS *table, const char *id);
-SYMBOL *symbol_table_add_param(SYMBOLS *table, const char *id, int is_array);
+SYMBOL *symbol_table_add_symbol(SYMBOLS *table, const char *id);
 void symbol_table_begin_scope(SYMBOLS *table);
 void symbol_table_end_scope(SYMBOLS *table);
 

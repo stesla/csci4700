@@ -1,4 +1,6 @@
 subtract_and_print(a, b) {
+  write(a);
+  write(b);
   x = a - b;
   write(x);
 }
@@ -6,5 +8,6 @@ subtract_and_print(a, b) {
 main() {
   a = 50;
   b = 8;
+  c = 37;
   subtract_and_print(a,b);
 }

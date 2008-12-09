@@ -9,18 +9,18 @@ struct slots {
   NODE *identifier;
   int is_array;
   int line;
-  SYMBOL *symbol;
 };
 
 size_t ast_formal_size() { return SLOT_SIZE; }
 
 static void find_symbols(NODE *node, void *symbols)
 {
+  const char *id = ast_to_s(S(node).identifier);
+  symbol_table_add_symbol(symbols, id);
 }
 
 static void generate_ir(NODE *node, IR *ir)
 {
-  /* TODO:IR */
 }
 
 static void print(NODE *node, FILE *out)

@@ -10,7 +10,8 @@ struct slots {
   NODE *params;
   NODE *body;
   SYMBOL *symbol;
-  void *symbols;
+  SYMBOLS *psymbols;
+  SYMBOLS *symbols;
   int end_line;
 };
 
@@ -26,9 +27,10 @@ static void find_symbols(NODE *node, void *symbols)
   void *cur;
   const char *id = ast_to_s(S(node).identifier);
 
-  /* TODO: make a parameter symbol table */
   S(node).symbol = symbol_table_add_function(symbols, id, S(node).params);
-  S(node).symbols = symbol_table_create(symbols, SYMBOL_DIRECTION_DOWN);
+  S(node).psymbols = symbol_table_create(symbols, SYMBOL_DIRECTION_UP);
+  ast_find_symbols(S(node).params, S(node).psymbols);
+  S(node).symbols = symbol_table_create(S(node).psymbols, SYMBOL_DIRECTION_DOWN);
   ast_find_symbols(S(node).body, S(node).symbols);
 }
 

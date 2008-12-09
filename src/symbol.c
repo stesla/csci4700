@@ -57,10 +57,10 @@ static SCOPE *scope_create(SYMBOLS *table, SCOPE *parent)
   return result;
 }
 
-static SYMBOL *symbol_table_add_symbol(SYMBOLS *table, const char *id)
+SYMBOL *symbol_table_add_symbol(SYMBOLS *table, const char *id)
 {
   SYMBOL *symbol;
-  size_t address = symbol_table_size(table) + INTEGER_SIZE;
+  size_t address = symbol_table_size(table);
 
   symbol = buffer_next(table->buffer);
 
@@ -186,14 +186,6 @@ SYMBOL *symbol_table_add_local(SYMBOLS *table, const char *id)
   return result;
 }
 
-SYMBOL *symbol_table_add_param(SYMBOLS *table, const char *id, int is_array)
-{
-  SYMBOL *result = symbol_table_add_symbol((SYMBOLS *) table, id);
-  /* TODO: Should I be recording a count here? */
-  result->is_array = is_array;
-  return result;
-}
-
 void symbol_table_begin_scope(SYMBOLS *table)
 {
   table->scope = scope_create(table, table->scope);
@@ -232,7 +224,12 @@ SYMBOL *symbol_table_find(SYMBOLS *table, const char *id)
 size_t symbol_table_size(SYMBOLS *table)
 {
   if (buffer_is_empty(table->buffer))
-    return 0;
+    {
+      if (table->direction == SYMBOL_DIRECTION_DOWN)
+        return INTEGER_SIZE;
+      else
+        return 0;
+    }
   else
     {
       SYMBOL *last = buffer_last_entry(table->buffer);

@@ -10,6 +10,9 @@
 #define BP 14
 #define SP 15
 
+/* TODO: Adjust for return value */
+#define PARAM_OFFSET (3 * INTEGER_SIZE)
+
 enum _syscall {
   PKI_SYSCALL_HALT,
   PKI_SYSCALL_WRITE_REG,
@@ -94,7 +97,8 @@ static int pki_stack_reg(FILE *out, int offset, int load)
   int reg = pki_get_reg();
   if (load)
     {
-      int offset_reg = pki_const_reg(out, offset, TRUE);
+      int actual_offset = offset >= 0 ? PARAM_OFFSET + offset : offset;
+      int offset_reg = pki_const_reg(out, actual_offset, TRUE);
       pki_ldi(out, reg, BP, offset_reg);
     }
   return reg;
