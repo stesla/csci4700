@@ -155,6 +155,7 @@ void ir_add(IR *ir, IR_INST inst, ...)
 
     case IR_ASSIGN:
     case IR_ASSIGN_INDIRECT:
+    case IR_CALL:
     case IR_DEREF:
     case IR_IF_FALSE:
     case IR_REF:
@@ -163,7 +164,6 @@ void ir_add(IR *ir, IR_INST inst, ...)
       ir_arg(&args, &quad.result);
       break;
 
-    case IR_CALL:
     case IR_JUMP:
     case IR_LABEL:
     case IR_PARAM:

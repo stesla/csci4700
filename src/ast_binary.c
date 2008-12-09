@@ -11,6 +11,11 @@ struct slots {
 
 size_t ast_binary_size() { return SLOT_SIZE; }
 
+static void check_functions(NODE *node, SYMBOLS *symbols)
+{
+  ast_check_functions(S(node).right, symbols);
+}
+
 static void find_symbols(NODE *node, void *symbols)
 {
   ast_find_symbols(S(node).left, symbols);
@@ -191,6 +196,7 @@ void ast_binary_init(NODE *node, va_list args)
   S(node).right = va_arg(args, NODE *);
 
   SET_METHODS(node);
+  OVERRIDE(node, check_functions);
   OVERRIDE(node, ir_type);
   OVERRIDE(node, ir_value);
 }

@@ -108,12 +108,13 @@ int main(int argc, char **argv)
 static void add_main_invocation(IR *ir, SYMBOLS *symbols)
 {
   SYMBOL *main = symbol_table_find(symbols, "main");
+  int result = ir_make_temp(ir);
   if (main == NULL || ! symbol_is_function(main))
     {
       fprintf(stderr, "Could not find main function.\n");
       exit(1);
     }
   ir_add(ir, IR_PARAM_START);
-  ir_add(ir, IR_CALL, IR_SYM, main);
+  ir_add(ir, IR_CALL, IR_SYM, main, IR_TEMP, &result);
   ir_add(ir, IR_HALT);
 }

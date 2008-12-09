@@ -10,6 +10,7 @@ struct slots {
   NODE *func;
   NODE *args;
   SYMBOL *symbol;
+  int temp;
 };
 
 size_t ast_call_size() { return SLOT_SIZE; }
@@ -21,10 +22,12 @@ static void find_symbols(NODE *node, void *symbols)
 
 static void generate_ir(NODE *node, IR *ir)
 {
-  /* TODO: Handle a return value */
+  S(node).temp = ir_make_temp(ir);
   ir_add(ir, IR_PARAM_START);
   ast_generate_param_ir(S(node).args, ir);
-  ir_add(ir, IR_CALL, IR_SYM, S(node).symbol);
+  ir_add(ir, IR_CALL,
+         IR_SYM, S(node).symbol,
+         ast_ir_type(node), ast_ir_value(node));
 }
 
 static void check_functions(NODE *node, SYMBOLS *symbols)
@@ -48,6 +51,16 @@ static void check_functions(NODE *node, SYMBOLS *symbols)
               symbol_id(S(node).symbol));
       exit(1);
     }
+}
+
+static IR_TYPE ir_type(NODE *node)
+{
+  return IR_TEMP;
+}
+
+static void *ir_value(NODE *node)
+{
+  return &(S(node).temp);
 }
 
 static void print(NODE *node, FILE *out)
@@ -74,4 +87,6 @@ void ast_call_init(NODE *node, va_list args)
 
   SET_METHODS(node);
   OVERRIDE(node, check_functions);
+  OVERRIDE(node, ir_type);
+  OVERRIDE(node, ir_value);
 }

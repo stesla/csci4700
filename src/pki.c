@@ -10,8 +10,8 @@
 #define BP 14
 #define SP 15
 
-/* TODO: Adjust for return value */
-#define PARAM_OFFSET (3 * INTEGER_SIZE)
+#define PARAM_OFFSET (4 * INTEGER_SIZE)
+#define RETURN_OFFSET INTEGER_SIZE
 
 enum _syscall {
   PKI_SYSCALL_HALT,
@@ -331,27 +331,47 @@ static void pki_call(FILE *out, IR_QUAD *quad)
 {
   /* TODO: Make space for the return value. */
   SYMBOL *fun = (SYMBOL *) ir_cell_ptr(ir_quad_arg1(quad));
-  int grow = pki_const_reg(out, 2 * INTEGER_SIZE, TRUE);
-  int offset = pki_const_reg(out, INTEGER_SIZE, TRUE);
+  int result = pki_reg(out, ir_quad_result(quad), FALSE);
+  /* NOTE: If size is ever something greater than 4, it needs to be
+   * reloaded after the call as registers 5-MAX_REG could have been (and
+   * probably were) changed. */
+  int size = pki_const_reg(out, INTEGER_SIZE, TRUE);
   /* Store the location of the beginning of the parameters, and the base
    * pointer, so that we can fix the stack when the call returns. */
-  pki_reg_op1(out, "SUB", SP, SP, grow);
-  pki_sti(out, PP, SP, offset);
+  pki_reg_op1(out, "SUB", SP, SP, size);
+  pki_sti(out, PP, SP, 0);
+  pki_reg_op1(out, "SUB", SP, SP, size);
   pki_sti(out, BP, SP, 0);
+  /* Allocate space for the return value */
+  pki_reg_op1(out, "SUB", SP, SP, size);
   /* Call the function. */
   fprintf(out, "\tCALL L%i\n", symbol_address(fun));
+  /* Snag return value into register */
+  pki_ldi(out, result, SP, 0);
+  pki_reg_op1(out, "ADD", SP, SP, size);
   /* Restore the base pointer and move the stack pointer to before the
    * parameters. */
   pki_ldi(out, BP, SP, 0);
-  /* NOTE: If offset is ever something greater than 4, it needs to be
-   * reloaded after the call as registers 5-MAX_REG could have been (and
-   * probably were) changed. */
-  pki_ldi(out, SP, SP, offset);
+  pki_reg_op1(out, "ADD", SP, SP, size);
+  pki_ldi(out, SP, SP, 0);
+  /* Store result into destination. */
+  pki_store_result(out, result, ir_quad_result(quad));
 }
 
 static void pki_return(FILE *out, IR_QUAD *quad)
 {
-  /* TODO: get return value out of quad */
+  IR_CELL *arg1 = ir_quad_arg1(quad);
+  switch(ir_cell_type(arg1))
+    {
+    case IR_CONST:
+    case IR_SYM:
+    case IR_TEMP:
+      {
+        int reg = pki_reg(out, arg1, TRUE);
+        int offset = pki_const_reg(out, RETURN_OFFSET, TRUE);
+        pki_sti(out, reg, BP, offset);
+      }
+    }
   fprintf(out, "\tRETURN\n");
 }
 
