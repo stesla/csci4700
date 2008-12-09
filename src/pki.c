@@ -6,7 +6,7 @@
 
 #define REG_MIN 5
 #define REG_MAX 12
-#define PARAM_REG 13
+#define PP 13
 #define BP 14
 #define SP 15
 
@@ -325,22 +325,24 @@ static void pki_leave(FILE *out)
 
 static void pki_call(FILE *out, IR_QUAD *quad)
 {
+  /* TODO: Make space for the return value. */
   SYMBOL *fun = (SYMBOL *) ir_cell_ptr(ir_quad_arg1(quad));
-  int size = pki_const_reg(out, INTEGER_SIZE, TRUE);
-  /* Currently, the BP back to the beginning of the arguments, where the BP
-   * that points to the beginning of the activation record is stored. Push that
-   * location on to the stack so we can get it when we come back from calling
-   * and clean up the parameters.*/
-  pki_reg_op1(out, "SUB", SP, SP, size);
+  int grow = pki_const_reg(out, 2 * INTEGER_SIZE, TRUE);
+  int offset = pki_const_reg(out, INTEGER_SIZE, TRUE);
+  /* Store the location of the beginning of the parameters, and the base
+   * pointer, so that we can fix the stack when the call returns. */
+  pki_reg_op1(out, "SUB", SP, SP, grow);
+  pki_sti(out, PP, SP, offset);
   pki_sti(out, BP, SP, 0);
+  /* Call the function. */
   fprintf(out, "\tCALL L%i\n", symbol_address(fun));
-  /* Move the SP back to the location of the saved BP, cleaning up the
+  /* Restore the base pointer and move the stack pointer to before the
    * parameters. */
-  pki_ldi(out, SP, SP, 0);
-  /* Reset the BP to it's value before the call. This was pushed onto the stack
-   * in pki_param_start. */
   pki_ldi(out, BP, SP, 0);
-  pki_reg_op1(out, "ADD", SP, SP, size);
+  /* NOTE: If offset is ever something greater than 4, it needs to be
+   * reloaded after the call as registers 5-MAX_REG could have been (and
+   * probably were) changed. */
+  pki_ldi(out, SP, SP, offset);
 }
 
 static void pki_return(FILE *out, IR_QUAD *quad)
@@ -352,12 +354,10 @@ static void pki_return(FILE *out, IR_QUAD *quad)
 static void pki_param_start(FILE *out)
 {
   int size = pki_const_reg(out, INTEGER_SIZE, TRUE);
-  /* Save the BP so we can reuse the BP register to remember the position
-   * before the parameters start. This will get popped back off the stack in
-   * pki_call.*/
-  pki_reg_op1(out, "SUB", SP, SP, size);
-  pki_sti(out, BP, SP, 0);
-  pki_reg_op1(out, "ADD", BP, SP, 0);
+  /* Remember the position of the stack pointer before we start adding
+   * parameters to the stack. This value will be recorded on the stack by
+   * pki_call before the call is made. */
+  pki_reg_op1(out, "ADD", PP, SP, 0);
 }
 
 static void pki_param(FILE *out, IR_QUAD *quad)
