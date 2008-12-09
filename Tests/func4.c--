@@ -1,0 +1,12 @@
+array a[2];
+
+subtract(x[]) {
+  return x[0] - x[1];
+}
+
+main() {
+  a[0] = 50;
+  a[1] = 8;
+  c = subtract(a);
+  write(c);
+}
